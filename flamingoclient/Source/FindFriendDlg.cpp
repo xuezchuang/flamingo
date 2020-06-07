@@ -3,7 +3,7 @@
 #include "FlamingoClient.h"
 #include "UserSnapInfoDlg.h"
 #include "Utils.h"
-#include "EncodingUtil.h"
+#include "EncodeUtil.h"
 
 // CFindFriendDlg实现代码
 CFindFriendDlg::CFindFriendDlg()
@@ -98,6 +98,7 @@ void CFindFriendDlg::OnAddFriend(UINT uNotifyCode, int nID, CWindow wndCtl)
 	long nRelationType = 0;
 	if(m_pFMGClient->m_UserMgr.IsSelf(strAccountToAdd))
 		nRelationType = 1;
+    //注意调试版在账号后面加上了userid，所以导致可以加已经是好友的用户为好友，这不是bug；Release版不存在这个问题
 	else if(m_pFMGClient->m_UserMgr.IsFriend(strAccountToAdd))
 		nRelationType = 2;
 	
@@ -107,7 +108,7 @@ void CFindFriendDlg::OnAddFriend(UINT uNotifyCode, int nID, CWindow wndCtl)
 		CUserSnapInfoDlg userSnapInfoDlg;
 		userSnapInfoDlg.SetUserFaceID(m_pFMGClient->m_UserMgr.GetFaceID(strAccountToAdd));
 		memset(szData, 0, sizeof(szData));
-		_stprintf_s(szData, ARRAYSIZE(szData), _T("账户：%s"), strAccountToAdd);
+		_stprintf_s(szData, ARRAYSIZE(szData), _T("账户：%s"), strAccountToAdd.GetString());
 		userSnapInfoDlg.SetAccountName(szData);
 		memset(szData, 0, sizeof(szData));
 		_stprintf_s(szData, ARRAYSIZE(szData), _T("昵称：%s"), m_pFMGClient->m_UserMgr.GetNickName(strAccountToAdd).c_str());

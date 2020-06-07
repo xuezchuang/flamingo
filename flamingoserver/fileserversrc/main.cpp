@@ -3,85 +3,50 @@
  *  zhangyl 2017.03.09
  **/
 #include <iostream>
-#include <signal.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include "../base/logging.h"
-#include "../base/singleton.h"
-#include "../base/configfilereader.h"
-#include "../base/asynclogging.h"
-#include "../net/eventloop.h"
-#include "../net/eventloopthreadpool.h"
+
+#include "../base/Platform.h"
+#include "../base/Singleton.h"
+#include "../base/ConfigFileReader.h"
+#include "../base/AsyncLog.h"
+#include "../net/EventLoop.h"
 #include "FileManager.h"
+
+#ifndef WIN32
+#include <string.h>
+#include "../utils/DaemonRun.h"
+#endif 
+
 #include "FileServer.h"
 
 using namespace net;
 
+#ifdef WIN32
+//初始化Windows socket库
+NetworkInitializer windowsNetworkInitializer;
+#endif
+
 EventLoop g_mainLoop;
 
-AsyncLogging* g_asyncLog = NULL;
-void asyncOutput(const char* msg, int len)
-{
-    if (g_asyncLog != NULL)
-    {
-        g_asyncLog->append(msg, len);
-        std::cout << msg << std::endl;
-    }
-}
-
+#ifndef WIN32
 void prog_exit(int signo)
 {
     std::cout << "program recv signal [" << signo << "] to exit." << std::endl;
 
+    Singleton<FileServer>::Instance().uninit();
     g_mainLoop.quit();
 }
-
-void daemon_run()
-{
-    int pid;
-    signal(SIGCHLD, SIG_IGN);
-    //1）在父进程中，fork返回新创建子进程的进程ID；
-    //2）在子进程中，fork返回0；
-    //3）如果出现错误，fork返回一个负值；
-    pid = fork();
-    if (pid < 0)
-    {
-        std::cout << "fork error" << std::endl;
-        exit(-1);
-    }
-    //父进程退出，子进程独立运行
-    else if (pid > 0) {
-        exit(0);
-    }
-    //之前parent和child运行在同一个session里,parent是会话（session）的领头进程,
-    //parent进程作为会话的领头进程，如果exit结束执行的话，那么子进程会成为孤儿进程，并被init收养。
-    //执行setsid()之后,child将重新获得一个新的会话(session)id。
-    //这时parent退出之后,将不会影响到child了。
-    setsid();
-    int fd;
-    fd = open("/dev/null", O_RDWR, 0);
-    if (fd != -1)
-    {
-        dup2(fd, STDIN_FILENO);
-        dup2(fd, STDOUT_FILENO);
-        dup2(fd, STDERR_FILENO);
-    }
-    if (fd > 2)
-        close(fd);
-}
-
+#endif
 
 int main(int argc, char* argv[])
 {
+#ifndef WIN32
     //设置信号处理
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_IGN);
     signal(SIGINT, prog_exit);
     signal(SIGTERM, prog_exit);
+
 
     int ch;
     bool bdaemon = false;
@@ -97,54 +62,56 @@ int main(int argc, char* argv[])
 
     if (bdaemon)
         daemon_run();
+#endif
 
-    CConfigFileReader config("myfileserver.conf");
-    const char* logfilepath = config.GetConfigName("logfiledir");
+#ifdef WIN32
+    CConfigFileReader config("../etc/fileserver.conf");
+#else
+    CConfigFileReader config("etc/fileserver.conf");
+#endif
+
+    std::string logFileFullPath;
+
+#ifndef WIN32
+    const char* logfilepath = config.getConfigName("logfiledir");
     if (logfilepath == NULL)
     {
-        LOG_SYSFATAL << "logdir is not set in config file";
+        LOGF("logdir is not set in config file");
         return 1;
     }
+
     //如果log目录不存在则创建之
     DIR* dp = opendir(logfilepath);
     if (dp == NULL)
     {
         if (mkdir(logfilepath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
         {
-            LOG_SYSFATAL << "create base dir error, " << logfilepath << ", errno: " << errno << ", " << strerror(errno);
+            LOGF("create base dir error, %s , errno: %d, %s", logfilepath, errno, strerror(errno));
             return 1;
         }
-    }
+}
     closedir(dp);
 
-    const char* logfilename = config.GetConfigName("logfilename");
-    if (logfilename == NULL)
-    {
-        LOG_SYSFATAL << "logfilename is not set in config file";
-        return 1;
-    }
-    std::string strLogFileFullPath(logfilepath);
-    strLogFileFullPath += logfilename;
-    Logger::setLogLevel(Logger::INFO);
-    int kRollSize = 500 * 1000 * 1000;
-    AsyncLogging log(strLogFileFullPath.c_str(), kRollSize);
-    log.start();
-    g_asyncLog = &log;
-    Logger::setOutput(asyncOutput);
+    logFileFullPath = logfilepath;
+#endif
 
-    const char* filecachedir = config.GetConfigName("filecachedir");
-    Singleton<FileManager>::Instance().Init(filecachedir);
+    const char* logfilename = config.getConfigName("logfilename");
+    logFileFullPath += logfilename;
 
-    Singleton<EventLoopThreadPool>::Instance().Init(&g_mainLoop, 6);
-    Singleton<EventLoopThreadPool>::Instance().start();
+    CAsyncLog::init(logFileFullPath.c_str());
 
-    const char* listenip = config.GetConfigName("listenip");
-    short listenport = (short)atol(config.GetConfigName("listenport"));
-    Singleton<FileServer>::Instance().Init(listenip, listenport, &g_mainLoop, filecachedir);
+    const char* filecachedir = config.getConfigName("filecachedir");
+    Singleton<FileManager>::Instance().init(filecachedir);   
 
-    LOG_INFO << "fileserver initialization complete.";
+    const char* listenip = config.getConfigName("listenip");
+    short listenport = (short)atol(config.getConfigName("listenport"));
+    Singleton<FileServer>::Instance().init(listenip, listenport, &g_mainLoop, filecachedir);
+
+    LOGI("fileserver initialization completed, now you can use client to connect it.");
     
     g_mainLoop.loop();
+
+    LOGI("exit fileserver.");
 
     return 0;
 }

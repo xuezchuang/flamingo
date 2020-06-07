@@ -4,15 +4,13 @@
 #include "IULog.h"
 #include "MiniBuffer.h"
 #include "Path.h"
-#include "EncodingUtil.h"
+#include "EncodeUtil.h"
 #include "FlamingoClient.h"
 #include "UserMgr.h"
 #include "File2.h"
 #include "net/Msg.h"
 #include "net/IUSocket.h"
 #include "net/protocolstream.h"
-
-using namespace balloon;
 
 CMsgItem::CMsgItem(void)
 {
@@ -159,8 +157,16 @@ void CSendMsgThread::HandleItem(CNetData* pNetData)
 		HandleCreateNewGroup((const CCreateNewGroupRequest*)pNetData);
 		break;
 
-    case NET_DATA_ADD_NEW_TEAM:
-        HandleAddNewTeam((const CAddTeamInfoRequest*)pNetData);
+    case NET_DATA_OPERATE_TEAM:
+        HandleOperateTeam((const CAddTeamInfoRequest*)pNetData);
+        break;
+
+    case NET_DATA_MODIFY_FRIEND_MARKNAME:
+        HandleModifyFriendMarkName((const CModifyFriendMakeNameRequest*)pNetData);
+        break;
+
+    case NET_DATA_MOVE_FRIEND:
+        HandleMoveFriendMessage((const CMoveFriendRequest*)pNetData);
         break;
 
 	default:
@@ -190,7 +196,7 @@ void CSendMsgThread::HandleRegister(const CRegisterRequest* pRegisterRequest)
                 pRegisterRequest->m_szPassword);
 
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_register);
     writeStream.WriteInt32(m_seq);
     std::string data = szRegisterInfo;
@@ -280,7 +286,7 @@ void CSendMsgThread::HandleUserBasicInfo(const CUserBasicInfoRequest* pUserBasic
 		return;
 	
 	std::string outbuf;
-	BinaryWriteStream writeStream(&outbuf);
+	net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_getofriendlist);
     writeStream.WriteInt32(m_seq);
 	std::string dummy;
@@ -298,7 +304,7 @@ void CSendMsgThread::HandleChangeUserStatus(const CChangeUserStatusRequest* pCha
         return;
 
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_userstatuschange);
     writeStream.WriteInt32(m_seq);
     char szData[32] = { 0 };
@@ -317,7 +323,7 @@ void CSendMsgThread::HandleGroupBasicInfo(const CGroupBasicInfoRequest* pGroupBa
         return;
 
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_getgroupmembers);
     writeStream.WriteInt32(m_seq);
     char szData[32] = {0};
@@ -339,7 +345,7 @@ void CSendMsgThread::HandleFindFriendMessage(const CFindFriendRequest* pFindFrie
     sprintf_s(szData, 64, "{\"type\": %d, \"username\": \"%s\"}", pFindFriendRequest->m_nType, pFindFriendRequest->m_szAccountName);
 
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_finduser);
     writeStream.WriteInt32(m_seq);
     //std::string data = szData;
@@ -371,7 +377,7 @@ void CSendMsgThread::HandleOperateFriendMessage(const COperateFriendRequest* pOp
     }
 
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_operatefriend);
     writeStream.WriteInt32(m_seq);
     std::string data = szData;
@@ -409,7 +415,7 @@ void CSendMsgThread::HandleUpdateLogonUserInfoMessage(const CUpdateLogonUserInfo
 
 
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_updateuserinfo);
     writeStream.WriteInt32(m_seq);
     writeStream.WriteString(os.str());
@@ -428,7 +434,7 @@ void CSendMsgThread::HandleModifyPassword(const CModifyPasswordRequest* pModifyP
     char szData[256] = { 0 };
     sprintf_s(szData, ARRAYSIZE(szData), "{\"oldpassword\": \"%s\", \"newpassword\": \"%s\"}", pModifyPassword->m_szOldPassword, pModifyPassword->m_szNewPassword);
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_modifypassword);
     writeStream.WriteInt32(m_seq);
     writeStream.WriteCString(szData, strlen(szData));
@@ -447,7 +453,7 @@ void CSendMsgThread::HandleCreateNewGroup(const CCreateNewGroupRequest* pCreateN
     char szData[256] = { 0 };
     sprintf_s(szData, ARRAYSIZE(szData), "{\"groupname\": \"%s\", \"type\": 0}", pCreateNewGroup->m_szGroupName);
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_creategroup);
     writeStream.WriteInt32(m_seq);
     writeStream.WriteCString(szData, strlen(szData));
@@ -458,20 +464,71 @@ void CSendMsgThread::HandleCreateNewGroup(const CCreateNewGroupRequest* pCreateN
     CIUSocket::GetInstance().Send(outbuf);
 }
 
-void CSendMsgThread::HandleAddNewTeam(const CAddTeamInfoRequest* pAddNewTeam)
+void CSendMsgThread::HandleOperateTeam(const CAddTeamInfoRequest* pAddNewTeam)
 {
     if (pAddNewTeam == NULL)
         return;
    
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_updateteaminfo);
     writeStream.WriteInt32(m_seq);
-    std::string strUtf8NewTeamInfo = EncodeUtil::UnicodeToUtf8(pAddNewTeam->m_strNewTeamInfo);
-    writeStream.WriteString(strUtf8NewTeamInfo);
+    std::string dummy;
+    writeStream.WriteString(dummy);
+    writeStream.WriteInt32(pAddNewTeam->m_opType);
+    std::string strUtf8NewTeamName = EncodeUtil::UnicodeToUtf8(pAddNewTeam->m_strNewTeamName);
+    writeStream.WriteString(strUtf8NewTeamName);
+    std::string strUtf8OldTeamName = EncodeUtil::UnicodeToUtf8(pAddNewTeam->m_strOldTeamName);
+    writeStream.WriteString(strUtf8OldTeamName);
     writeStream.Flush();
 
-    LOG_INFO(_T("Request to update teaminfo, data=%s"), pAddNewTeam->m_strNewTeamInfo);
+    //LOG_INFO(_T("Request to update teamname, NewTeamName=%s, OldTeamName=%s."), pAddNewTeam->m_strNewTeamName, pAddNewTeam->m_strOldTeamName);
+
+    CIUSocket::GetInstance().Send(outbuf);
+}
+
+void CSendMsgThread::HandleModifyFriendMarkName(const CModifyFriendMakeNameRequest* pModifyFriendMakeNameRequest)
+{
+    if (pModifyFriendMakeNameRequest == NULL)
+        return;
+
+    std::string outbuf;
+    net::BinaryStreamWriter writeStream(&outbuf);
+    writeStream.WriteInt32(msg_type_modifyfriendmarkname);
+    writeStream.WriteInt32(m_seq);
+    std::string dummyData;
+    writeStream.WriteString(dummyData);
+    writeStream.WriteInt32((int32_t)(pModifyFriendMakeNameRequest->m_uFriendID));
+    char szData[64] = { 0 };
+    EncodeUtil::UnicodeToUtf8(pModifyFriendMakeNameRequest->m_szNewMarkName, szData, ARRAYSIZE(szData));
+    std::string newMarkName = szData;
+    writeStream.WriteString(newMarkName);
+    writeStream.Flush();
+
+    LOG_INFO(_T("Request to update friend markname, friendid=%d, NewMarkName=%s."), pModifyFriendMakeNameRequest->m_uFriendID, pModifyFriendMakeNameRequest->m_szNewMarkName);
+
+    CIUSocket::GetInstance().Send(outbuf);
+}
+
+void CSendMsgThread::HandleMoveFriendMessage(const CMoveFriendRequest* pMoveFriendRequest)
+{
+    if (pMoveFriendRequest == NULL)
+        return;
+
+    std::string outbuf;
+    net::BinaryStreamWriter writeStream(&outbuf);
+    writeStream.WriteInt32(msg_type_movefriendtootherteam);
+    writeStream.WriteInt32(m_seq);
+    std::string dummy;
+    writeStream.WriteString(dummy);
+    writeStream.WriteInt32(pMoveFriendRequest->m_nFriendID);
+    std::string strUtf8NewTeamName = EncodeUtil::UnicodeToUtf8(pMoveFriendRequest->m_strNewTeamName);
+    writeStream.WriteString(strUtf8NewTeamName);
+    std::string strUtf8OldTeamName = EncodeUtil::UnicodeToUtf8(pMoveFriendRequest->m_strOldTeamName);
+    writeStream.WriteString(strUtf8OldTeamName);
+    writeStream.Flush();
+
+    //LOG_INFO(_T("Request to move friend, NewTeamName=%s, OldTeamName=%s."), pAddNewTeam->m_strNewTeamName, pAddNewTeam->m_strOldTeamName);
 
     CIUSocket::GetInstance().Send(outbuf);
 }
@@ -541,7 +598,7 @@ BOOL CSendMsgThread::HandleSentConfirmImageMessage(const CSentChatConfirmImageMe
 		//bRet = m_pProtocol->SendChatMessage(pConfirmImageMessage->m_pszConfirmBody, pConfirmImageMessage->m_uConfirmBodySize, FALSE, uTargetID, 0);
         long nChatMsgLength = pConfirmImageMessage->m_uConfirmBodySize;
         std::string outbuf;
-        BinaryWriteStream writeStream(&outbuf);
+        net::BinaryStreamWriter writeStream(&outbuf);
         writeStream.WriteInt32(msg_type_chat);
         writeStream.WriteInt32(m_seq);
         //senderId
@@ -1161,7 +1218,7 @@ BOOL CSendMsgThread::SendMultiMsg(CMsgItem* lpMsgItem)
 BOOL CSendMsgThread::SendMultiChatMessage(const char* pszChatMsg, int nChatMsgLength, UINT* pAccountList, int nAccountNum)
 {
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_multichat);
     writeStream.WriteInt32(m_seq);
     //senderId
@@ -1432,7 +1489,7 @@ BOOL CSendMsgThread::ProcessBuddyMsg(CBuddyMessage* lpBuddyMsg)
 
     long nChatMsgLength = strUtf8Msg.GetLength();
     std::string outbuf;
-    BinaryWriteStream writeStream(&outbuf);
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_chat);
     writeStream.WriteInt32(m_seq);
     //senderId
