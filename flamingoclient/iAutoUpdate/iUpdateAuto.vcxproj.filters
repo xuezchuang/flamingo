@@ -29,7 +29,10 @@
     <ClInclude Include="unzip.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\public\wlconfig.h">
+    <ClInclude Include="wlconfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="wldef.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

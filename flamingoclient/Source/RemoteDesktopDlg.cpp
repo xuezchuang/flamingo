@@ -1,28 +1,28 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "RemoteDesktopDlg.h"
 #include "FlamingoClient.h"
 #include "UserSnapInfoDlg.h"
 #include "Utils.h"
 #include "EncodeUtil.h"
 
-// Á½ÖÖËã·¨
-#define ALGORITHM_SCAN	1	// ËÙ¶ÈºÜ¿ì£¬µ«ËéÆ¬Ì«¶à
-#define ALGORITHM_DIFF	2	// ËÙ¶ÈºÜÂı£¬Ò²Õ¼CPU£¬µ«ÊÇÊı¾İÁ¿¶¼ÊÇ×îĞ¡µÄ
+// ä¸¤ç§ç®—æ³•
+#define ALGORITHM_SCAN	1	// é€Ÿåº¦å¾ˆå¿«ï¼Œä½†ç¢ç‰‡å¤ªå¤š
+#define ALGORITHM_DIFF	2	// é€Ÿåº¦å¾ˆæ…¢ï¼Œä¹Ÿå CPUï¼Œä½†æ˜¯æ•°æ®é‡éƒ½æ˜¯æœ€å°çš„
 
 enum
 {
     IDM_CONTROL = 0x0010,
     IDM_SEND_CTRL_ALT_DEL,
-    IDM_TRACE_CURSOR,	// ¸ú×ÙÏÔÊ¾Ô¶³ÌÊó±ê
-    IDM_BLOCK_INPUT,	// Ëø¶¨Ô¶³Ì¼ÆËã»úÊäÈë
-    IDM_BLANK_SCREEN,	// ºÚÆÁ
-    IDM_CAPTURE_LAYER,	// ²¶×½²ã
-    IDM_SAVEDIB,		// ±£´æÍ¼Æ¬
-    IDM_GET_CLIPBOARD,	// »ñÈ¡¼ôÌù°å
-    IDM_SET_CLIPBOARD,	// ÉèÖÃ¼ôÌù°å
-    IDM_ALGORITHM_SCAN,	// ¸ôĞĞÉ¨ÃèËã·¨
-    IDM_ALGORITHM_DIFF,	// ²îÒì±È½ÏËã·¨
-    IDM_DEEP_1,			// ÆÁÄ»É«²ÊÉî¶È.....
+    IDM_TRACE_CURSOR,	// è·Ÿè¸ªæ˜¾ç¤ºè¿œç¨‹é¼ æ ‡
+    IDM_BLOCK_INPUT,	// é”å®šè¿œç¨‹è®¡ç®—æœºè¾“å…¥
+    IDM_BLANK_SCREEN,	// é»‘å±
+    IDM_CAPTURE_LAYER,	// æ•æ‰å±‚
+    IDM_SAVEDIB,		// ä¿å­˜å›¾ç‰‡
+    IDM_GET_CLIPBOARD,	// è·å–å‰ªè´´æ¿
+    IDM_SET_CLIPBOARD,	// è®¾ç½®å‰ªè´´æ¿
+    IDM_ALGORITHM_SCAN,	// éš”è¡Œæ‰«æç®—æ³•
+    IDM_ALGORITHM_DIFF,	// å·®å¼‚æ¯”è¾ƒç®—æ³•
+    IDM_DEEP_1,			// å±å¹•è‰²å½©æ·±åº¦.....
     IDM_DEEP_4_GRAY,
     IDM_DEEP_4_COLOR,
     IDM_DEEP_8_GRAY,
@@ -31,30 +31,30 @@ enum
     IDM_DEEP_32
 };
 
-// CRemoteDesktopDlgÊµÏÖ´úÂë
+// CRemoteDesktopDlgå®ç°ä»£ç 
 CRemoteDesktopDlg::CRemoteDesktopDlg()
 {
     m_pFMGClient = NULL;
 
     //m_iocpServer = pIOCPServer;
     //m_pContext = pContext;
-    m_bIsFirst = true; // Èç¹ûÊÇµÚÒ»´Î´ò¿ª¶Ô»°¿ò£¬ÏÔÊ¾ÌáÊ¾µÈ´ıĞÅÏ¢
+    m_bIsFirst = true; // å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡æ‰“å¼€å¯¹è¯æ¡†ï¼Œæ˜¾ç¤ºæç¤ºç­‰å¾…ä¿¡æ¯
     m_lpScreenDIB = NULL;
     TCHAR szPath[MAX_PATH];
     ::GetSystemDirectory(szPath, MAX_PATH);
     lstrcat(szPath, _T("\\shell32.dll"));
-    m_hIcon = ::ExtractIcon(::GetModuleHandle(NULL), szPath, 17/*ÍøÉÏÁÚ¾ÓÍ¼±êË÷Òı*/);
+    m_hIcon = ::ExtractIcon(::GetModuleHandle(NULL), szPath, 17/*ç½‘ä¸Šé‚»å±…å›¾æ ‡ç´¢å¼•*/);
 
     UINT	nBISize = 1064;/*m_pContext->m_DeCompressionBuffer.GetBufferLen() - 1;*/
-    m_lpbmi = (BITMAPINFO *) new BYTE[nBISize];
-    m_lpbmi_rect = (BITMAPINFO *) new BYTE[nBISize];
+    m_lpbmi = (BITMAPINFO*) new BYTE[nBISize];
+    m_lpbmi_rect = (BITMAPINFO*) new BYTE[nBISize];
 
     //memcpy(m_lpbmi, m_pContext->m_DeCompressionBuffer.GetBuffer(1), nBISize);
     //memcpy(m_lpbmi_rect, m_pContext->m_DeCompressionBuffer.GetBuffer(1), nBISize);
 
     memset(&m_MMI, 0, sizeof(MINMAXINFO));
 
-    m_bIsCtrl = false; // Ä¬ÈÏ²»¿ØÖÆ
+    m_bIsCtrl = false; // é»˜è®¤ä¸æ§åˆ¶
     m_nCount = 0;
     m_bCursorIndex = 1;
 }
@@ -65,7 +65,7 @@ CRemoteDesktopDlg::~CRemoteDesktopDlg()
 
 BOOL CRemoteDesktopDlg::PreTranslateMessage(MSG* pMsg)
 {
-    //Ö§³Ö»Ø³µ¼ü²éÕÒ
+    //æ”¯æŒå›è½¦é”®æŸ¥æ‰¾
     if (pMsg->hwnd == m_hWnd && pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
     {
         PostMessage(WM_COMMAND, (WPARAM)IDC_BTN_ADD, 0);
@@ -144,27 +144,27 @@ BOOL CRemoteDesktopDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     if (hSysMenu != NULL)
     {
         ::AppendMenu(hSysMenu, MF_SEPARATOR, 0, NULL);
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_CONTROL, _T("¿ØÖÆÆÁÄ»(&Y)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_SEND_CTRL_ALT_DEL, _T("·¢ËÍCtrl-Alt-Del(&K)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_TRACE_CURSOR, _T("¸ú×Ù·şÎñ¶ËÊó±ê(&T)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_BLOCK_INPUT, _T("Ëø¶¨·şÎñ¶ËÊó±êºÍ¼üÅÌ(&L)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_BLANK_SCREEN, _T("·şÎñ¶ËºÚÆÁ(&B)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_CAPTURE_LAYER, _T("²¶×½²ã(µ¼ÖÂÊó±êÉÁË¸)(&L)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_SAVEDIB, _T("±£´æ¿ìÕÕ(&S)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_CONTROL, _T("æ§åˆ¶å±å¹•(&Y)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_SEND_CTRL_ALT_DEL, _T("å‘é€Ctrl-Alt-Del(&K)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_TRACE_CURSOR, _T("è·Ÿè¸ªæœåŠ¡ç«¯é¼ æ ‡(&T)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_BLOCK_INPUT, _T("é”å®šæœåŠ¡ç«¯é¼ æ ‡å’Œé”®ç›˜(&L)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_BLANK_SCREEN, _T("æœåŠ¡ç«¯é»‘å±(&B)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_CAPTURE_LAYER, _T("æ•æ‰å±‚(å¯¼è‡´é¼ æ ‡é—ªçƒ)(&L)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_SAVEDIB, _T("ä¿å­˜å¿«ç…§(&S)"));
         ::AppendMenu(hSysMenu, MF_SEPARATOR, 0, NULL);
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_GET_CLIPBOARD, _T("»ñÈ¡¼ôÌù°å(&R)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_SET_CLIPBOARD, _T("ÉèÖÃ¼ôÌù°å(&L)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_GET_CLIPBOARD, _T("è·å–å‰ªè´´æ¿(&R)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_SET_CLIPBOARD, _T("è®¾ç½®å‰ªè´´æ¿(&L)"));
         ::AppendMenu(hSysMenu, MF_SEPARATOR, 0, NULL);
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_ALGORITHM_SCAN, _T("¸ôĞĞÉ¨ÃèËã·¨(&S)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_ALGORITHM_DIFF, _T("²îÒì±È½ÏËã·¨(&X)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_ALGORITHM_SCAN, _T("éš”è¡Œæ‰«æç®—æ³•(&S)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_ALGORITHM_DIFF, _T("å·®å¼‚æ¯”è¾ƒç®—æ³•(&X)"));
         ::AppendMenu(hSysMenu, MF_SEPARATOR, 0, NULL);
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_1, _T("1 Î»ºÚ°×(&A)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_4_GRAY, _T("4 Î»»Ò¶È(&B)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_4_COLOR, _T("4 Î»²ÊÉ«(&C)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_8_GRAY, _T("8 Î»»Ò¶È(&D)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_8_COLOR, _T("8 Î»²ÊÉ«(&E)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_16, _T("16Î»¸ß²Ê(&F)"));
-        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_32, _T("32Î»Õæ²Ê(&G)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_1, _T("1 ä½é»‘ç™½(&A)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_4_GRAY, _T("4 ä½ç°åº¦(&B)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_4_COLOR, _T("4 ä½å½©è‰²(&C)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_8_GRAY, _T("8 ä½ç°åº¦(&D)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_8_COLOR, _T("8 ä½å½©è‰²(&E)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_16, _T("16ä½é«˜å½©(&F)"));
+        ::AppendMenu(hSysMenu, MF_STRING, IDM_DEEP_32, _T("32ä½çœŸå½©(&G)"));
 
         ::CheckMenuRadioItem(hSysMenu, IDM_ALGORITHM_SCAN, IDM_ALGORITHM_DIFF, IDM_ALGORITHM_SCAN, MF_BYCOMMAND);
         ::CheckMenuRadioItem(hSysMenu, IDM_DEEP_4_GRAY, IDM_DEEP_32, IDM_DEEP_8_COLOR, MF_BYCOMMAND);
@@ -192,7 +192,7 @@ BOOL CRemoteDesktopDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     m_RemoteCursorPos.x = 0;
     m_bIsTraceCursor = false;
 
-    // ³õÊ¼»¯´°¿Ú´óĞ¡½á¹¹
+    // åˆå§‹åŒ–çª—å£å¤§å°ç»“æ„
     m_hDC = ::GetDC(m_hWnd);
     m_hMemDC = CreateCompatibleDC(m_hDC);
     m_hFullBitmap = CreateDIBSection(m_hDC, m_lpbmi, DIB_RGB_COLORS, &m_lpScreenDIB, NULL, NULL);
@@ -214,7 +214,7 @@ BOOL CRemoteDesktopDlg::InitUI()
     m_SkinDlg.SetBgPic(_T("DlgBg\\FindFriendDlgBg.png"));
     m_SkinDlg.SetCloseSysBtnPic(_T("SysBtn\\btn_close_normal.png"), _T("SysBtn\\btn_close_highlight.png"), _T("SysBtn\\btn_close_down.png"));
     m_SkinDlg.SubclassWindow(m_hWnd);
-    m_SkinDlg.SetTitleText(_T("Ô¶³Ì×ÀÃæ"));
+    m_SkinDlg.SetTitleText(_T("è¿œç¨‹æ¡Œé¢â€”â€”â€”â€”åŠŸèƒ½å¼€å‘ä¸­......"));
     m_SkinDlg.MoveWindow(0, 0, 350, 200, TRUE);
 
 
@@ -230,8 +230,8 @@ BOOL CRemoteDesktopDlg::InitUI()
     //m_btnAdd.SetBgPic(_T("Button\\btn_normal.png"), _T("Button\\btn_focus.png"), _T("Button\\btn_focus.png"), _T("Button\\btn_focus.png"));
     //m_btnAdd.SetRound(4, 4);
     //m_btnAdd.SubclassWindow(GetDlgItem(IDC_BTN_ADD));
-    //m_btnAdd.SetWindowText(_T("²éÕÒ"));
-    //m_btnAdd.SetToolTipText(_T("µã»÷°´Å¥½øĞĞ²éÕÒ"));
+    //m_btnAdd.SetWindowText(_T("æŸ¥æ‰¾"));
+    //m_btnAdd.SetToolTipText(_T("ç‚¹å‡»æŒ‰é’®è¿›è¡ŒæŸ¥æ‰¾"));
 
     //m_btnFindTypeSingle.Attach(GetDlgItem(IDC_RADIO_FINDTYPE1));
     //m_btnFindTypeSingle.SetCheck(TRUE);
@@ -250,12 +250,12 @@ BOOL CRemoteDesktopDlg::InitUI()
 
 void CRemoteDesktopDlg::OnAddFriend(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-    
+
 }
 
 LRESULT CRemoteDesktopDlg::OnFindFriendResult(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    
+
 
     return (LRESULT)1;
 
@@ -275,7 +275,7 @@ void CRemoteDesktopDlg::OnDestroy()
 
 void CRemoteDesktopDlg::UninitUI()
 {
-    
+
 }
 
 void CRemoteDesktopDlg::AddMessageFilter()
@@ -356,7 +356,7 @@ void CRemoteDesktopDlg::OnReceiveComplete()
         UpdateLocalClipboard((char *)m_pContext->m_DeCompressionBuffer.GetBuffer(1), m_pContext->m_DeCompressionBuffer.GetBufferLen() - 1);
         break;
     default:
-        // ´«Êä·¢ÉúÒì³£Êı¾İ
+        // ä¼ è¾“å‘ç”Ÿå¼‚å¸¸æ•°æ®
         return;
     }
     */
@@ -366,7 +366,7 @@ void CRemoteDesktopDlg::OnReceiveComplete()
 bool CRemoteDesktopDlg::SaveSnapshot()
 {
     //CString	strFileName = m_IPAddress + CTime::GetCurrentTime().Format(_T("_%Y-%m-%d_%H-%M-%S.bmp"));
-    //CFileDialog dlg(FALSE, _T("bmp"), strFileName, OFN_OVERWRITEPROMPT, _T("Î»Í¼ÎÄ¼ş(*.bmp)|*.bmp|"), this);
+    //CFileDialog dlg(FALSE, _T("bmp"), strFileName, OFN_OVERWRITEPROMPT, _T("ä½å›¾æ–‡ä»¶(*.bmp)|*.bmp|"), this);
     //if (dlg.DoModal() != IDOK)
     //    return false;
 
@@ -375,11 +375,11 @@ bool CRemoteDesktopDlg::SaveSnapshot()
     //CFile	file;
     //if (!file.Open(dlg.GetPathName(), CFile::modeWrite | CFile::modeCreate))
     //{
-    //    MessageBox(_T("ÎÄ¼ş±£´æÊ§°Ü"));
+    //    MessageBox(_T("æ–‡ä»¶ä¿å­˜å¤±è´¥"));
     //    return false;
     //}
 
-    //// BITMAPINFO´óĞ¡
+    //// BITMAPINFOå¤§å°
     //int	nbmiSize = sizeof(BITMAPINFOHEADER) + (lpbi->bmiHeader.biBitCount > 16 ? 1 : (1 << lpbi->bmiHeader.biBitCount)) * sizeof(RGBQUAD);
 
     //// Fill in the fields of the file header
@@ -404,7 +404,7 @@ void CRemoteDesktopDlg::OnReceive()
      //   return;
 
     CString str;
-    str.Format(_T("\\\\%s %d * %d µÚ%dÖ¡ %d%%"), m_IPAddress, m_lpbmi->bmiHeader.biWidth, m_lpbmi->bmiHeader.biHeight,
+    str.Format(_T("\\\\%s %d * %d ç¬¬%då¸§ %d%%"), m_IPAddress, m_lpbmi->bmiHeader.biWidth, m_lpbmi->bmiHeader.biHeight,
         m_nCount, 9999/*m_pContext->m_nTransferProgress*/);
     SetWindowText(str);
 }
@@ -429,10 +429,10 @@ void CRemoteDesktopDlg::SendResetAlgorithm(UINT nAlgorithm)
 
 // void CRemoteDesktopDlg::FullScreen()
 // {
-// 	m_bIsFullScreen = !m_bIsFullScreen; // ÉèÖÃÈ«ÆÁÏÔÊ¾±êÖ¾ 
-// 	//Ò»ÖÖ¸üºÃµÄÈ«ÆÁÏÔÊ¾
+// 	m_bIsFullScreen = !m_bIsFullScreen; // è®¾ç½®å…¨å±æ˜¾ç¤ºæ ‡å¿— 
+// 	//ä¸€ç§æ›´å¥½çš„å…¨å±æ˜¾ç¤º
 // 	LONG style = ::GetWindowLong(this->m_hWnd,GWL_STYLE);
-// 	if(m_bIsFullScreen)//È«ÆÁÏÔÊ¾
+// 	if(m_bIsFullScreen)//å…¨å±æ˜¾ç¤º
 // 	{
 // 		style &= ~(WS_DLGFRAME | WS_THICKFRAME);
 // 		SetWindowLong(this->m_hWnd, GWL_STYLE, style);
@@ -460,8 +460,8 @@ void CRemoteDesktopDlg::ResetScreen()
         delete[] m_lpbmi;
         delete[] m_lpbmi_rect;
 
-        m_lpbmi = (BITMAPINFO *) new BYTE[nBISize];
-        m_lpbmi_rect = (BITMAPINFO *) new BYTE[nBISize];
+        m_lpbmi = (BITMAPINFO*) new BYTE[nBISize];
+        m_lpbmi_rect = (BITMAPINFO*) new BYTE[nBISize];
 
         //memcpy(m_lpbmi, m_pContext->m_DeCompressionBuffer.GetBuffer(1), nBISize);
         //memcpy(m_lpbmi_rect, m_pContext->m_DeCompressionBuffer.GetBuffer(1), nBISize);
@@ -473,7 +473,7 @@ void CRemoteDesktopDlg::ResetScreen()
         memset(&m_MMI, 0, sizeof(MINMAXINFO));
         InitMMI();
 
-        // ·Ö±æÂÊ·¢Éú¸Ä±ä
+        // åˆ†è¾¨ç‡å‘ç”Ÿæ”¹å˜
         if (nOldWidth != m_lpbmi->bmiHeader.biWidth || nOldHeight != m_lpbmi->bmiHeader.biHeight)
         {
             RECT	rectClient, rectWindow;
@@ -481,7 +481,7 @@ void CRemoteDesktopDlg::ResetScreen()
             GetClientRect(&rectClient);
             ClientToScreen(&rectClient);
 
-            // ¼ÆËãClientRectÓëWindowRectµÄ²î¾à£¨±êÌâÀ¸£¬¹ö¶¯Ìõ£©
+            // è®¡ç®—ClientRectä¸WindowRectçš„å·®è·ï¼ˆæ ‡é¢˜æ ï¼Œæ»šåŠ¨æ¡ï¼‰
             rectWindow.right = m_lpbmi->bmiHeader.biWidth + rectClient.left + (rectWindow.right - rectClient.right);
             rectWindow.bottom = m_lpbmi->bmiHeader.biHeight + rectClient.top + (rectWindow.bottom - rectClient.bottom);
             MoveWindow(&rectWindow);
@@ -500,9 +500,9 @@ void CRemoteDesktopDlg::DrawFirstScreen()
 
 void CRemoteDesktopDlg::DrawNextScreenDiff()
 {
-    //// ¸ù¾İÊó±êÊÇ·ñÒÆ¶¯ºÍÆÁÄ»ÊÇ·ñ±ä»¯ÅĞ¶ÏÊÇ·ñÖØ»æÊó±ê£¬·ÀÖ¹Êó±êÉÁË¸
+    //// æ ¹æ®é¼ æ ‡æ˜¯å¦ç§»åŠ¨å’Œå±å¹•æ˜¯å¦å˜åŒ–åˆ¤æ–­æ˜¯å¦é‡ç»˜é¼ æ ‡ï¼Œé˜²æ­¢é¼ æ ‡é—ªçƒ
     //bool	bIsReDraw = false;
-    //int		nHeadLength = 1 + 1 + sizeof(POINT) + sizeof(BYTE); // ±êÊ¶ + Ëã·¨ + ¹â±êÎ»ÖÃ + ¹â±êÀàĞÍË÷Òı
+    //int		nHeadLength = 1 + 1 + sizeof(POINT) + sizeof(BYTE); // æ ‡è¯† + ç®—æ³• + å…‰æ ‡ä½ç½® + å…‰æ ‡ç±»å‹ç´¢å¼•
     //LPVOID	lpFirstScreen = m_lpScreenDIB;
     ////LPVOID	lpNextScreen = m_pContext->m_DeCompressionBuffer.GetBuffer(nHeadLength);
     ////DWORD	dwBytes = m_pContext->m_DeCompressionBuffer.GetBufferLen() - nHeadLength;
@@ -511,11 +511,11 @@ void CRemoteDesktopDlg::DrawNextScreenDiff()
     //memcpy(&oldPoint, &m_RemoteCursorPos, sizeof(POINT));
     ////memcpy(&m_RemoteCursorPos, m_pContext->m_DeCompressionBuffer.GetBuffer(2), sizeof(POINT));
 
-    //// Êó±êÒÆ¶¯ÁË
+    //// é¼ æ ‡ç§»åŠ¨äº†
     //if (memcmp(&oldPoint, &m_RemoteCursorPos, sizeof(POINT)) != 0)
     //    bIsReDraw = true;
 
-    //// ¹â±êÀàĞÍ·¢Éú±ä»¯
+    //// å…‰æ ‡ç±»å‹å‘ç”Ÿå˜åŒ–
     //int	nOldCursorIndex = m_bCursorIndex;
     ////m_bCursorIndex = m_pContext->m_DeCompressionBuffer.GetBuffer(10)[0];
     //if (nOldCursorIndex != m_bCursorIndex)
@@ -525,7 +525,7 @@ void CRemoteDesktopDlg::DrawNextScreenDiff()
     //        SetClassLong(m_hWnd, GCL_HCURSOR, (LONG)m_CursorInfo.getCursorHandle(m_bCursorIndex == (BYTE)-1 ? 1 : m_bCursorIndex));
     //}
 
-    //// ÆÁÄ»ÊÇ·ñ±ä»¯
+    //// å±å¹•æ˜¯å¦å˜åŒ–
     ////if (dwBytes > 0)
     ////    bIsReDraw = true;
 
@@ -536,15 +536,15 @@ void CRemoteDesktopDlg::DrawNextScreenDiff()
     //        jmp	CopyEnd
     //    CopyNextBlock :
     //    mov edi, [lpFirstScreen]
-    //        lodsd	// °ÑlpNextScreenµÄµÚÒ»¸öË«×Ö½Ú£¬·Åµ½eaxÖĞ,¾ÍÊÇDIBÖĞ¸Ä±äÇøÓòµÄÆ«ÒÆ
-    //        add edi, eax	// lpFirstScreenÆ«ÒÆeax	
-    //        lodsd // °ÑlpNextScreenµÄÏÂÒ»¸öË«×Ö½Ú£¬·Åµ½eaxÖĞ, ¾ÍÊÇ¸Ä±äÇøÓòµÄ´óĞ¡
+    //        lodsd	// æŠŠlpNextScreençš„ç¬¬ä¸€ä¸ªåŒå­—èŠ‚ï¼Œæ”¾åˆ°eaxä¸­,å°±æ˜¯DIBä¸­æ”¹å˜åŒºåŸŸçš„åç§»
+    //        add edi, eax	// lpFirstScreenåç§»eax	
+    //        lodsd // æŠŠlpNextScreençš„ä¸‹ä¸€ä¸ªåŒå­—èŠ‚ï¼Œæ”¾åˆ°eaxä¸­, å°±æ˜¯æ”¹å˜åŒºåŸŸçš„å¤§å°
     //        mov ecx, eax
-    //        sub ebx, 8 // ebx ¼õÈ¥ Á½¸ödword
-    //        sub ebx, ecx // ebx ¼õÈ¥DIBÊı¾İµÄ´óĞ¡
+    //        sub ebx, 8 // ebx å‡å» ä¸¤ä¸ªdword
+    //        sub ebx, ecx // ebx å‡å»DIBæ•°æ®çš„å¤§å°
     //        rep movsb
     //    CopyEnd :
-    //    cmp ebx, 0 // ÊÇ·ñĞ´ÈëÍê±Ï
+    //    cmp ebx, 0 // æ˜¯å¦å†™å…¥å®Œæ¯•
     //        jnz CopyNextBlock
     //}
 
@@ -557,15 +557,15 @@ void CRemoteDesktopDlg::DrawNextScreenDiff()
 
 void CRemoteDesktopDlg::DrawNextScreenRect()
 {
-    // ¸ù¾İÊó±êÊÇ·ñÒÆ¶¯ºÍÊó±êÊÇ·ñÔÚ±ä»¯µÄÇøÓòÅĞ¶ÏÊÇ·ñÖØ»æÊó±ê£¬·ÀÖ¹Êó±êÉÁË¸
+    // æ ¹æ®é¼ æ ‡æ˜¯å¦ç§»åŠ¨å’Œé¼ æ ‡æ˜¯å¦åœ¨å˜åŒ–çš„åŒºåŸŸåˆ¤æ–­æ˜¯å¦é‡ç»˜é¼ æ ‡ï¼Œé˜²æ­¢é¼ æ ‡é—ªçƒ
     bool	bIsReDraw = false;
-    int		nHeadLength = 1 + 1 + sizeof(POINT) + sizeof(BYTE); // ±êÊ¶ + Ëã·¨ + ¹â±êÎ»ÖÃ + ¹â±êÀàĞÍË÷Òı
+    int		nHeadLength = 1 + 1 + sizeof(POINT) + sizeof(BYTE); // æ ‡è¯† + ç®—æ³• + å…‰æ ‡ä½ç½® + å…‰æ ‡ç±»å‹ç´¢å¼•
     LPVOID	lpFirstScreen = m_lpScreenDIB;
     //LPVOID	lpNextScreen = m_pContext->m_DeCompressionBuffer.GetBuffer(nHeadLength);
     //DWORD	dwBytes = m_pContext->m_DeCompressionBuffer.GetBufferLen() - nHeadLength;
 
 
-    // ±£´æÉÏ´ÎÊó±êËùÔÚµÄÎ»ÖÃ
+    // ä¿å­˜ä¸Šæ¬¡é¼ æ ‡æ‰€åœ¨çš„ä½ç½®
     RECT	rectOldPoint;
     ::SetRect(&rectOldPoint, m_RemoteCursorPos.x, m_RemoteCursorPos.y,
         m_RemoteCursorPos.x + m_dwCursor_xHotspot, m_RemoteCursorPos.y + m_dwCursor_yHotspot);
@@ -573,12 +573,12 @@ void CRemoteDesktopDlg::DrawNextScreenRect()
     //memcpy(&m_RemoteCursorPos, m_pContext->m_DeCompressionBuffer.GetBuffer(2), sizeof(POINT));
 
     //////////////////////////////////////////////////////////////////////////
-    // ÅĞ¶ÏÊó±êÊÇ·ñÒÆ¶¯
+    // åˆ¤æ–­é¼ æ ‡æ˜¯å¦ç§»åŠ¨
     if ((rectOldPoint.left != m_RemoteCursorPos.x) || (rectOldPoint.top !=
         m_RemoteCursorPos.y))
         bIsReDraw = true;
 
-    // ¹â±êÀàĞÍ·¢Éú±ä»¯
+    // å…‰æ ‡ç±»å‹å‘ç”Ÿå˜åŒ–
     int	nOldCursorIndex = m_bCursorIndex;
     //m_bCursorIndex = m_pContext->m_DeCompressionBuffer.GetBuffer(10)[0];
     if (nOldCursorIndex != m_bCursorIndex)
@@ -588,7 +588,7 @@ void CRemoteDesktopDlg::DrawNextScreenRect()
             SetClassLong(m_hWnd, GCL_HCURSOR, (LONG)m_CursorInfo.getCursorHandle(m_bCursorIndex == (BYTE)-1 ? 1 : m_bCursorIndex));
     }
 
-    // ÅĞ¶ÏÊó±êËùÔÚÇøÓòÊÇ·ñ·¢Éú±ä»¯
+    // åˆ¤æ–­é¼ æ ‡æ‰€åœ¨åŒºåŸŸæ˜¯å¦å‘ç”Ÿå˜åŒ–
     //DWORD	dwOffset = 0;
     //while (dwOffset < dwBytes && !bIsReDraw)
     //{
@@ -617,7 +617,7 @@ void CRemoteDesktopDlg::DrawNextScreenRect()
     //        nRectHeight, 0, 0, nRectWidth, nRectHeight, (LPBYTE)lpNextScreen + dwOffset + sizeof(RECT),
     //        m_lpbmi_rect, DIB_RGB_COLORS, SRCCOPY);
 
-    //    // ²»ĞèÒªÖØ»æÊó±êµÄ»°£¬Ö±½ÓÖØ»æ±ä»¯µÄ²¿·Ö
+    //    // ä¸éœ€è¦é‡ç»˜é¼ æ ‡çš„è¯ï¼Œç›´æ¥é‡ç»˜å˜åŒ–çš„éƒ¨åˆ†
     //    if (!bIsReDraw)
     //        StretchDIBits(m_hDC, lpRect->left - m_HScrollPos, lpRect->top - m_VScrollPos, nRectWidth,
     //        nRectHeight, 0, 0, nRectWidth, nRectHeight, (LPBYTE)lpNextScreen + dwOffset + sizeof(RECT),
@@ -645,7 +645,7 @@ void CRemoteDesktopDlg::OnPaint(CDCHandle dc)
     }
 
     BitBlt
-        (
+    (
         m_hDC,
         0,
         0,
@@ -655,20 +655,20 @@ void CRemoteDesktopDlg::OnPaint(CDCHandle dc)
         m_HScrollPos,
         m_VScrollPos,
         SRCCOPY
-        );
+    );
 
     // (BYTE)-1 = 255;
     // Draw the cursor
     if (m_bIsTraceCursor)
         DrawIconEx(
-        m_hDC,									// handle to device context 
-        m_RemoteCursorPos.x - ((int)m_dwCursor_xHotspot) - m_HScrollPos,
-        m_RemoteCursorPos.y - ((int)m_dwCursor_yHotspot) - m_VScrollPos,
-        m_CursorInfo.getCursorHandle(m_bCursorIndex == (BYTE)-1 ? 1 : m_bCursorIndex),	// handle to icon to draw 
-        0, 0,										// width of the icon 
-        0,											// index of frame in animated cursor 
-        NULL,										// handle to background brush 
-        DI_NORMAL | DI_COMPAT						// icon-drawing flags 
+            m_hDC,									// handle to device context 
+            m_RemoteCursorPos.x - ((int)m_dwCursor_xHotspot) - m_HScrollPos,
+            m_RemoteCursorPos.y - ((int)m_dwCursor_yHotspot) - m_VScrollPos,
+            m_CursorInfo.getCursorHandle(m_bCursorIndex == (BYTE)-1 ? 1 : m_bCursorIndex),	// handle to icon to draw 
+            0, 0,										// width of the icon 
+            0,											// index of frame in animated cursor 
+            NULL,										// handle to background brush 
+            DI_NORMAL | DI_COMPAT						// icon-drawing flags 
         );
     // Do not call CDialog::OnPaint() for painting messages
 }
@@ -701,18 +701,25 @@ void CRemoteDesktopDlg::OnSize(UINT nType, CSize size)
         GetWindowRect(&rectWindow);
         GetClientRect(&rectClient);
         ClientToScreen(&rectClient);
-        // ±ß¿òµÄ¿í¶È
+        // è¾¹æ¡†çš„å®½åº¦
         int	nBorderWidth = rectClient.left - rectWindow.left;
 
         rectWindow.right = rectClient.left + nBorderWidth + m_lpbmi->bmiHeader.biWidth;
         rectWindow.bottom = rectClient.top + m_lpbmi->bmiHeader.biHeight + nBorderWidth;
         MoveWindow(&rectWindow);
-    }
-    else ShowScrollBar(SB_BOTH, true);
+    } else ShowScrollBar(SB_BOTH, true);
 }
 
 void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
 {
+    if (nID == SC_CLOSE)
+    {
+        ShowWindow(SW_HIDE);
+        return;
+    }
+
+    SetMsgHandled(FALSE);
+
     //CMenu* pSysMenu = GetSystemMenu(FALSE);
     //switch (nID)
     //{
@@ -738,7 +745,7 @@ void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
     //    m_iocpServer->Send(m_pContext, &bToken, sizeof(bToken));
     //}
     //break;
-    //case IDM_TRACE_CURSOR: // ¸ú×Ù·şÎñ¶ËÊó±ê
+    //case IDM_TRACE_CURSOR: // è·Ÿè¸ªæœåŠ¡ç«¯é¼ æ ‡
     //{
     //    m_bIsTraceCursor = !m_bIsTraceCursor;
     //    pSysMenu->CheckMenuItem(IDM_TRACE_CURSOR, m_bIsTraceCursor ? MF_CHECKED : MF_UNCHECKED);
@@ -749,11 +756,11 @@ void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
     //        else
     //            SetClassLong(m_hWnd, GCL_HCURSOR, (LONG)AfxGetApp()->LoadCursor(IDC_DOT));
     //    }
-    //    // ÖØ»æÏû³ı»òÏÔÊ¾Êó±ê
+    //    // é‡ç»˜æ¶ˆé™¤æˆ–æ˜¾ç¤ºé¼ æ ‡
     //    OnPaint();
     //}
     //break;
-    //case IDM_BLOCK_INPUT: // Ëø¶¨·şÎñ¶ËÊó±êºÍ¼üÅÌ
+    //case IDM_BLOCK_INPUT: // é”å®šæœåŠ¡ç«¯é¼ æ ‡å’Œé”®ç›˜
     //{
     //    bool bIsChecked = pSysMenu->GetMenuState(IDM_BLOCK_INPUT, MF_BYCOMMAND) & MF_CHECKED;
     //    pSysMenu->CheckMenuItem(IDM_BLOCK_INPUT, bIsChecked ? MF_UNCHECKED : MF_CHECKED);
@@ -764,7 +771,7 @@ void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
     //    m_iocpServer->Send(m_pContext, bToken, sizeof(bToken));
     //}
     //break;
-    //case IDM_BLANK_SCREEN: // ·şÎñ¶ËºÚÆÁ
+    //case IDM_BLANK_SCREEN: // æœåŠ¡ç«¯é»‘å±
     //{
     //    bool bIsChecked = pSysMenu->GetMenuState(IDM_BLANK_SCREEN, MF_BYCOMMAND) & MF_CHECKED;
     //    pSysMenu->CheckMenuItem(IDM_BLANK_SCREEN, bIsChecked ? MF_UNCHECKED : MF_CHECKED);
@@ -775,7 +782,7 @@ void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
     //    m_iocpServer->Send(m_pContext, bToken, sizeof(bToken));
     //}
     //break;
-    //case IDM_CAPTURE_LAYER: // ²¶×½²ã
+    //case IDM_CAPTURE_LAYER: // æ•æ‰å±‚
     //{
     //    bool bIsChecked = pSysMenu->GetMenuState(IDM_CAPTURE_LAYER, MF_BYCOMMAND) & MF_CHECKED;
     //    pSysMenu->CheckMenuItem(IDM_CAPTURE_LAYER, bIsChecked ? MF_UNCHECKED : MF_CHECKED);
@@ -789,24 +796,24 @@ void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
     //case IDM_SAVEDIB:
     //    SaveSnapshot();
     //    break;
-    //case IDM_GET_CLIPBOARD: // »ñÈ¡¼ôÌù°å
+    //case IDM_GET_CLIPBOARD: // è·å–å‰ªè´´æ¿
     //{
     //    BYTE	bToken = COMMAND_SCREEN_GET_CLIPBOARD;
     //    m_iocpServer->Send(m_pContext, &bToken, sizeof(bToken));
     //}
     //break;
-    //case IDM_SET_CLIPBOARD: // ÉèÖÃ¼ôÌù°å
+    //case IDM_SET_CLIPBOARD: // è®¾ç½®å‰ªè´´æ¿
     //{
     //    SendLocalClipboard();
     //}
     //break;
-    //case IDM_ALGORITHM_SCAN: // ¸ôĞĞÉ¨ÃèËã·¨
+    //case IDM_ALGORITHM_SCAN: // éš”è¡Œæ‰«æç®—æ³•
     //{
     //    SendResetAlgorithm(ALGORITHM_SCAN);
     //    pSysMenu->CheckMenuRadioItem(IDM_ALGORITHM_SCAN, IDM_ALGORITHM_DIFF, IDM_ALGORITHM_SCAN, MF_BYCOMMAND);
     //}
     //break;
-    //case IDM_ALGORITHM_DIFF: // ²îÒì±È½ÏËã·¨
+    //case IDM_ALGORITHM_DIFF: // å·®å¼‚æ¯”è¾ƒç®—æ³•
     //{
     //    SendResetAlgorithm(ALGORITHM_DIFF);
     //    pSysMenu->CheckMenuRadioItem(IDM_ALGORITHM_SCAN, IDM_ALGORITHM_DIFF, IDM_ALGORITHM_DIFF, MF_BYCOMMAND);
@@ -861,7 +868,7 @@ void CRemoteDesktopDlg::OnSysCommand(UINT nID, CPoint point)
 
 void CRemoteDesktopDlg::OnGetMiniMaxInfo(LPMINMAXINFO lpMMI)
 {
-    // Èç¹ûm_MMIÒÑ¾­±»¸³Öµ
+    // å¦‚æœm_MMIå·²ç»è¢«èµ‹å€¼
     //if (m_MMI.ptMaxSize.x > 0)
      //   memcpy((void *)lparam, &m_MMI, sizeof(MINMAXINFO));
 
@@ -891,8 +898,8 @@ void CRemoteDesktopDlg::InitMMI()
     GetClientRect(&rectClient);
     ClientToScreen(&rectClient);
 
-    int	nBorderWidth = rectClient.left - rectWindow.left; // ±ß¿ò¿í
-    int	nTitleWidth = rectClient.top - rectWindow.top; // ±êÌâÀ¸µÄ¸ß¶È
+    int	nBorderWidth = rectClient.left - rectWindow.left; // è¾¹æ¡†å®½
+    int	nTitleWidth = rectClient.top - rectWindow.top; // æ ‡é¢˜æ çš„é«˜åº¦
 
     int	nWidthAdd = nBorderWidth * 2 + GetSystemMetrics(SM_CYHSCROLL);
     int	nHeightAdd = nTitleWidth + nBorderWidth + GetSystemMetrics(SM_CYVSCROLL);
@@ -902,19 +909,19 @@ void CRemoteDesktopDlg::InitMMI()
     int	nMaxHeight = m_lpbmi->bmiHeader.biHeight + nHeightAdd;
 
 
-    // ×îĞ¡µÄTrack³ß´ç
+    // æœ€å°çš„Trackå°ºå¯¸
     m_MMI.ptMinTrackSize.x = nMinWidth;
     m_MMI.ptMinTrackSize.y = nMinHeight;
 
-    // ×î´ó»¯Ê±´°¿ÚµÄÎ»ÖÃ
+    // æœ€å¤§åŒ–æ—¶çª—å£çš„ä½ç½®
     m_MMI.ptMaxPosition.x = 1;
     m_MMI.ptMaxPosition.y = 1;
 
-    // ´°¿Ú×î´ó³ß´ç
+    // çª—å£æœ€å¤§å°ºå¯¸
     m_MMI.ptMaxSize.x = nMaxWidth;
     m_MMI.ptMaxSize.y = nMaxHeight;
 
-    // ×î´óµÄTrack³ß´çÒ²Òª¸Ä±ä
+    // æœ€å¤§çš„Trackå°ºå¯¸ä¹Ÿè¦æ”¹å˜
     m_MMI.ptMaxTrackSize.x = nMaxWidth;
     m_MMI.ptMaxTrackSize.y = nMaxHeight;
 }
@@ -980,7 +987,7 @@ void CRemoteDesktopDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar
 
     HDC hdc = ::GetDC(m_hWnd);
     OnPaint(hdc);
-    
+
     //__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -1025,11 +1032,11 @@ void CRemoteDesktopDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar
 
     HDC hdc = ::GetDC(m_hWnd);
     OnPaint(hdc);
-    
+
     //CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
-void CRemoteDesktopDlg::UpdateLocalClipboard(char *buf, int len)
+void CRemoteDesktopDlg::UpdateLocalClipboard(char* buf, int len)
 {
     if (!::OpenClipboard(NULL))
         return;

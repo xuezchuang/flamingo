@@ -1,12 +1,12 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "BuddyInfoFloatWnd.h"
 #include "GDIFactory.h"
 
 CBuddyInfoFloatWnd::CBuddyInfoFloatWnd(void)
 {
-	m_lpBgImg = NULL;
+    m_lpBgImg = NULL;
     m_lpHeadImg = NULL;
-	m_bTransparent = FALSE;
+    m_bTransparent = FALSE;
     m_bMouseTracking = FALSE;
 }
 
@@ -17,8 +17,8 @@ CBuddyInfoFloatWnd::~CBuddyInfoFloatWnd(void)
 
 BOOL CBuddyInfoFloatWnd::SetBgPic(LPCTSTR lpszFileName)
 {
-	CSkinManager::GetInstance()->ReleaseImage(m_lpBgImg);
-	m_lpBgImg = CSkinManager::GetInstance()->GetImage(lpszFileName);
+    CSkinManager::GetInstance()->ReleaseImage(m_lpBgImg);
+    m_lpBgImg = CSkinManager::GetInstance()->GetImage(lpszFileName);
     return (m_lpBgImg != NULL) ? TRUE : FALSE;
 }
 
@@ -41,7 +41,7 @@ void CBuddyInfoFloatWnd::SetDataText(LPCTSTR pszNickName, LPCTSTR pszSignature, 
     m_strSignature.Empty();
     m_strMail.Empty();
     m_strAddress.Empty();
-    
+
     if (pszNickName != NULL && pszNickName[0] != NULL)
         m_strNickName = pszNickName;
 
@@ -54,57 +54,57 @@ void CBuddyInfoFloatWnd::SetDataText(LPCTSTR pszNickName, LPCTSTR pszSignature, 
     if (pszAddress != NULL && pszAddress[0] != NULL)
         m_strAddress = pszAddress;
 
-    //TODO: ‘Ÿ∫√ «±Íº«“ªœ¬£¨”–√ª”–∏ƒ±‰µƒŒƒ◊÷‘Ÿæˆ∂® «∑ÒÀ¢–¬
+    //TODO: ÂÜçÂ•ΩÊòØÊ†áËÆ∞‰∏Ä‰∏ãÔºåÊúâÊ≤°ÊúâÊîπÂèòÁöÑÊñáÂ≠óÂÜçÂÜ≥ÂÆöÊòØÂê¶Âà∑Êñ∞
     Invalidate();
 }
 
 int CBuddyInfoFloatWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	CRect rcClient;
-	GetClientRect(&rcClient);
+    CRect rcClient;
+    GetClientRect(&rcClient);
 
-	CRect rc = CRect(rcClient.Width()-14, 0, rcClient.Width(), rcClient.Height());
-	m_VScrollBar.Create(m_hWnd, 1, &rc, 1, FALSE, FALSE);
+    CRect rc = CRect(rcClient.Width() - 14, 0, rcClient.Width(), rcClient.Height());
+    m_VScrollBar.Create(m_hWnd, 1, &rc, 1, FALSE, FALSE);
 
-	m_VScrollBar.SetBgNormalPic(_T("ScrollBar\\scrollbar_bkg.png"));
-	m_VScrollBar.SetBgHotPic(_T("ScrollBar\\scrollbar_bkg.png"));
-	m_VScrollBar.SetBgPushedPic(_T("ScrollBar\\scrollbar_bkg.png"));
-	m_VScrollBar.SetBgDisabledPic(_T("ScrollBar\\scrollbar_bkg.png"));
+    m_VScrollBar.SetBgNormalPic(_T("ScrollBar\\scrollbar_bkg.png"));
+    m_VScrollBar.SetBgHotPic(_T("ScrollBar\\scrollbar_bkg.png"));
+    m_VScrollBar.SetBgPushedPic(_T("ScrollBar\\scrollbar_bkg.png"));
+    m_VScrollBar.SetBgDisabledPic(_T("ScrollBar\\scrollbar_bkg.png"));
 
-	m_VScrollBar.SetShowLeftUpBtn(TRUE);
-	m_VScrollBar.SetLeftUpBtnNormalPic(_T("ScrollBar\\scrollbar_arrowup_normal.png"));
-	m_VScrollBar.SetLeftUpBtnHotPic(_T("ScrollBar\\scrollbar_arrowup_highlight.png"));
-	m_VScrollBar.SetLeftUpBtnPushedPic(_T("ScrollBar\\scrollbar_arrowup_down.png"));
-	m_VScrollBar.SetLeftUpBtnDisabledPic(_T("ScrollBar\\scrollbar_arrowup_normal.png"));
+    m_VScrollBar.SetShowLeftUpBtn(TRUE);
+    m_VScrollBar.SetLeftUpBtnNormalPic(_T("ScrollBar\\scrollbar_arrowup_normal.png"));
+    m_VScrollBar.SetLeftUpBtnHotPic(_T("ScrollBar\\scrollbar_arrowup_highlight.png"));
+    m_VScrollBar.SetLeftUpBtnPushedPic(_T("ScrollBar\\scrollbar_arrowup_down.png"));
+    m_VScrollBar.SetLeftUpBtnDisabledPic(_T("ScrollBar\\scrollbar_arrowup_normal.png"));
 
-	m_VScrollBar.SetShowRightDownBtn(TRUE);
-	m_VScrollBar.SetRightDownBtnNormalPic(_T("ScrollBar\\scrollbar_arrowdown_normal.png"));
-	m_VScrollBar.SetRightDownBtnHotPic(_T("ScrollBar\\scrollbar_arrowdown_highlight.png"));
-	m_VScrollBar.SetRightDownBtnPushedPic(_T("ScrollBar\\scrollbar_arrowdown_down.png"));
-	m_VScrollBar.SetRightDownBtnDisabledPic(_T("ScrollBar\\scrollbar_arrowdown_normal.png"));
+    m_VScrollBar.SetShowRightDownBtn(TRUE);
+    m_VScrollBar.SetRightDownBtnNormalPic(_T("ScrollBar\\scrollbar_arrowdown_normal.png"));
+    m_VScrollBar.SetRightDownBtnHotPic(_T("ScrollBar\\scrollbar_arrowdown_highlight.png"));
+    m_VScrollBar.SetRightDownBtnPushedPic(_T("ScrollBar\\scrollbar_arrowdown_down.png"));
+    m_VScrollBar.SetRightDownBtnDisabledPic(_T("ScrollBar\\scrollbar_arrowdown_normal.png"));
 
-	m_VScrollBar.SetThumbNormalPic(_T("ScrollBar\\scrollbar_bar_normal.png"), CRect(0,1,0,1));
-	m_VScrollBar.SetThumbHotPic(_T("ScrollBar\\scrollbar_bar_highlight.png"), CRect(0,1,0,1));
-	m_VScrollBar.SetThumbPushedPic(_T("ScrollBar\\scrollbar_bar_down.png"), CRect(0,1,0,1));
-	m_VScrollBar.SetThumbDisabledPic(_T("ScrollBar\\scrollbar_bar_normal.png"), CRect(0,1,0,1));
-	
-	return 0;
+    m_VScrollBar.SetThumbNormalPic(_T("ScrollBar\\scrollbar_bar_normal.png"), CRect(0, 1, 0, 1));
+    m_VScrollBar.SetThumbHotPic(_T("ScrollBar\\scrollbar_bar_highlight.png"), CRect(0, 1, 0, 1));
+    m_VScrollBar.SetThumbPushedPic(_T("ScrollBar\\scrollbar_bar_down.png"), CRect(0, 1, 0, 1));
+    m_VScrollBar.SetThumbDisabledPic(_T("ScrollBar\\scrollbar_bar_normal.png"), CRect(0, 1, 0, 1));
+
+    return 0;
 }
 
 BOOL CBuddyInfoFloatWnd::OnEraseBkgnd(CDCHandle dc)
 {
-	return TRUE;
-	//return FALSE;
+    return TRUE;
+    //return FALSE;
 }
 
 void CBuddyInfoFloatWnd::OnPaint(CDCHandle dc)
 {
-	CRect rcClient;
-	GetClientRect(&rcClient);
+    CRect rcClient;
+    GetClientRect(&rcClient);
 
-	CPaintDC PaintDC(m_hWnd);
+    CPaintDC PaintDC(m_hWnd);
 
-	CMemoryDC MemDC(PaintDC.m_hDC, rcClient);
+    CMemoryDC MemDC(PaintDC.m_hDC, rcClient);
 
 
     MemDC.FillSolidRect(&rcClient, RGB(168, 229, 226));
@@ -126,14 +126,14 @@ void CBuddyInfoFloatWnd::OnPaint(CDCHandle dc)
 
     //::SetTextColor(MemDC.m_hDC, RGB(182, 182, 182));
 
-    //m_strNickName = _T("ÒÆÕ∑…Æ");
+    //m_strNickName = _T("ÁôûÂ§¥ÂÉß");
     if (!m_strNickName.IsEmpty())
     {
-        RECT rtNickName = {80, 5, 150, 30};
+        RECT rtNickName = { 80, 5, 150, 30 };
         ::DrawText(MemDC.m_hDC, m_strNickName, m_strNickName.GetLength(), &rtNickName, DT_LEFT | DT_SINGLELINE | DT_END_ELLIPSIS);
     }
 
-    //m_strSignature = _T("ƒ«“ª–© «∑«Ã‚£¨◊‹»√»À…ÀÕ∏ƒ‘ΩÓ°£");
+    //m_strSignature = _T("ÈÇ£‰∏Ä‰∫õÊòØÈùûÈ¢òÔºåÊÄªËÆ©‰∫∫‰º§ÈÄèËÑëÁ≠ã„ÄÇ");
     if (!m_strSignature.IsEmpty())
     {
         RECT rtSignature = { 80, 30, 300, 55 };
@@ -150,7 +150,7 @@ void CBuddyInfoFloatWnd::OnPaint(CDCHandle dc)
 
     ::SelectObject(MemDC.m_hDC, hFontAddress);
 
-    //m_strAddress = _T("…œ∫£ –∆÷∂´–¬«¯∂´∑Ω¬∑’Òª™π„≥°7890∫≈9¬•201");
+    //m_strAddress = _T("‰∏äÊµ∑Â∏ÇÊµ¶‰∏úÊñ∞Âå∫‰∏úÊñπË∑ØÊåØÂçéÂπøÂú∫7890Âè∑9Ê•º201");
     if (!m_strAddress.IsEmpty())
     {
         RECT rtAddress = { 5, 130, 300, 150 };
@@ -164,70 +164,71 @@ void CBuddyInfoFloatWnd::OnPaint(CDCHandle dc)
 
 void CBuddyInfoFloatWnd::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
-	SetFocus();
+    SetFocus();
 
-	int nTeamIndex = -1, nIndex = -1;
-	HitTest(point, nTeamIndex, nIndex);
+    int nTeamIndex = -1, nIndex = -1;
+    HitTest(point, nTeamIndex, nIndex);
 
-	Invalidate();
+    Invalidate();
 
-	NMHDR stNmhdr = {m_hWnd, GetDlgCtrlID(), NM_DBLCLK};
-	::SendMessage(::GetParent(m_hWnd), WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&stNmhdr);
+    UINT_PTR dlgCtrlID = (UINT_PTR)GetDlgCtrlID();
+    NMHDR stNmhdr = { m_hWnd, dlgCtrlID, NM_DBLCLK };
+    ::SendMessage(::GetParent(m_hWnd), WM_NOTIFY, dlgCtrlID, (LPARAM)&stNmhdr);
 }
 
 void CBuddyInfoFloatWnd::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
-	SetFocus();
+    SetFocus();
 
-	int nTeamIndex = -1, nIndex = -1;
-	HitTest(point, nTeamIndex, nIndex);
+    int nTeamIndex = -1, nIndex = -1;
+    HitTest(point, nTeamIndex, nIndex);
 
-	m_VScrollBar.OnLButtonDown(nFlags, point);
+    m_VScrollBar.OnLButtonDown(nFlags, point);
 }
 
 void CBuddyInfoFloatWnd::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
-	int nTeamIndex = -1, nIndex = -1;
-	HitTest(point, nTeamIndex, nIndex);
+    int nTeamIndex = -1, nIndex = -1;
+    HitTest(point, nTeamIndex, nIndex);
 }
 
 void CBuddyInfoFloatWnd::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
-	SetFocus();
+    SetFocus();
 
-	int nTeamIndex = -1, nIndex = -1;
-	HitTest(point, nTeamIndex, nIndex);
+    int nTeamIndex = -1, nIndex = -1;
+    HitTest(point, nTeamIndex, nIndex);
 
-	
-	Invalidate();
 
-	//BLNMHDREx stNmhdr;
-	//stNmhdr.hdr.hwndFrom = m_hWnd;
-	//stNmhdr.hdr.idFrom = GetDlgCtrlID();
-	//stNmhdr.hdr.code = NM_RCLICK;
-	//
-	//if(nTeamIndex!=-1 && nIndex!=-1)
-	//	stNmhdr.nPostionFlag = POSITION_ON_ITEM;
-	//else if(nTeamIndex!=-1 && nIndex==-1)
-	//	stNmhdr.nPostionFlag = POSITION_ON_TEAM;
-	//else if(nTeamIndex==-1 && nIndex==-1)
-	//	stNmhdr.nPostionFlag = POSITION_ON_BLANK;
+    Invalidate();
 
-	//::SendMessage(::GetParent(m_hWnd), WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&stNmhdr);
+    //BLNMHDREx stNmhdr;
+    //stNmhdr.hdr.hwndFrom = m_hWnd;
+    //stNmhdr.hdr.idFrom = GetDlgCtrlID();
+    //stNmhdr.hdr.code = NM_RCLICK;
+    //
+    //if(nTeamIndex!=-1 && nIndex!=-1)
+    //	stNmhdr.nPostionFlag = POSITION_ON_ITEM;
+    //else if(nTeamIndex!=-1 && nIndex==-1)
+    //	stNmhdr.nPostionFlag = POSITION_ON_TEAM;
+    //else if(nTeamIndex==-1 && nIndex==-1)
+    //	stNmhdr.nPostionFlag = POSITION_ON_BLANK;
+
+    //::SendMessage(::GetParent(m_hWnd), WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&stNmhdr);
 }
 
 void CBuddyInfoFloatWnd::OnMouseMove(UINT nFlags, CPoint point)
 {
-	SetMsgHandled(FALSE);
-	
+    SetMsgHandled(FALSE);
+
     if (!m_bMouseTracking)
     {
         StartTrackMouseLeave();
@@ -246,7 +247,7 @@ void CBuddyInfoFloatWnd::OnMouseLeave()
 
 void CBuddyInfoFloatWnd::OnTimer(UINT_PTR nIDEvent)
 {
-	m_VScrollBar.OnTimer(nIDEvent);
+    m_VScrollBar.OnTimer(nIDEvent);
 }
 
 void CBuddyInfoFloatWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -255,72 +256,72 @@ void CBuddyInfoFloatWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CBuddyInfoFloatWnd::OnSize(UINT nType, CSize size)
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
-	CRect rcClient;
-	GetClientRect(&rcClient);
+    CRect rcClient;
+    GetClientRect(&rcClient);
 
-	CRect rc = CRect(rcClient.Width()-14, 0, rcClient.Width(), rcClient.Height());
-	m_VScrollBar.SetRect(&rc);
-	Invalidate();
+    CRect rc = CRect(rcClient.Width() - 14, 0, rcClient.Width(), rcClient.Height());
+    m_VScrollBar.SetRect(&rc);
+    Invalidate();
 }
 
 UINT CBuddyInfoFloatWnd::OnGetDlgCode(LPMSG lpMsg)
 {
-	return DLGC_HASSETSEL | DLGC_WANTARROWS | DLGC_WANTCHARS | DLGC_WANTTAB;
+    return DLGC_HASSETSEL | DLGC_WANTARROWS | DLGC_WANTCHARS | DLGC_WANTTAB;
 }
 
 LRESULT CBuddyInfoFloatWnd::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	SetMsgHandled(FALSE);
-	MSG msg = { m_hWnd, uMsg, wParam, lParam };
-	if (m_ToolTipCtrl.IsWindow())
-		m_ToolTipCtrl.RelayEvent(&msg);
-	return 1;
+    SetMsgHandled(FALSE);
+    MSG msg = { m_hWnd, uMsg, wParam, lParam };
+    if (m_ToolTipCtrl.IsWindow())
+        m_ToolTipCtrl.RelayEvent(&msg);
+    return 1;
 }
 
 void CBuddyInfoFloatWnd::OnDestroy()
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
 
-	if (m_ToolTipCtrl.IsWindow())	// ToolTipCtrl‘Á‘⁄÷Æ«∞µƒ≤ª÷™µ¿ ≤√¥µÿ∑Ω“—œ˙ªŸ£¨’‚¿Ôœ‘ Ω÷√ø’m_hWnd
-		m_ToolTipCtrl.DestroyWindow();
-	m_ToolTipCtrl.m_hWnd = NULL;
+    if (m_ToolTipCtrl.IsWindow())	// ToolTipCtrlÊó©Âú®‰πãÂâçÁöÑ‰∏çÁü•ÈÅì‰ªÄ‰πàÂú∞ÊñπÂ∑≤ÈîÄÊØÅÔºåËøôÈáåÊòæÂºèÁΩÆÁ©∫m_hWnd
+        m_ToolTipCtrl.DestroyWindow();
+    m_ToolTipCtrl.m_hWnd = NULL;
 
-	m_VScrollBar.Destroy();
+    m_VScrollBar.Destroy();
 
-	CSkinManager::GetInstance()->ReleaseImage(m_lpBgImg);
+    CSkinManager::GetInstance()->ReleaseImage(m_lpBgImg);
     CSkinManager::GetInstance()->ReleaseImage(m_lpHeadImg);
 }
 
 void CBuddyInfoFloatWnd::DrawParentWndBg(HDC hDC)
 {
-	HWND hParentWnd = ::GetParent(m_hWnd);
+    HWND hParentWnd = ::GetParent(m_hWnd);
 
-	CRect rcWindow;
-	GetWindowRect(&rcWindow);
-	::ScreenToClient(hParentWnd, (LPPOINT)&rcWindow); 
-	::ScreenToClient(hParentWnd, ((LPPOINT)&rcWindow)+1);
+    CRect rcWindow;
+    GetWindowRect(&rcWindow);
+    ::ScreenToClient(hParentWnd, (LPPOINT)&rcWindow);
+    ::ScreenToClient(hParentWnd, ((LPPOINT)&rcWindow) + 1);
 
-	//::BitBlt(hDC, 0, 0, rcWindow.Width(), rcWindow.Height(), m_hBgDC, rcWindow.left, rcWindow.top, SRCCOPY);
+    //::BitBlt(hDC, 0, 0, rcWindow.Width(), rcWindow.Height(), m_hBgDC, rcWindow.left, rcWindow.top, SRCCOPY);
 }
 
 BOOL CBuddyInfoFloatWnd::StartTrackMouseLeave()
 {
-	TRACKMOUSEEVENT tme = { 0 };
-	tme.cbSize = sizeof(tme);
-	tme.dwFlags = TME_LEAVE;
-	tme.hwndTrack = m_hWnd;
-	return _TrackMouseEvent(&tme);
+    TRACKMOUSEEVENT tme = { 0 };
+    tme.cbSize = sizeof(tme);
+    tme.dwFlags = TME_LEAVE;
+    tme.hwndTrack = m_hWnd;
+    return _TrackMouseEvent(&tme);
 }
 
 void CBuddyInfoFloatWnd::CalcCenterRect(CRect& rcDest, int cx, int cy, CRect& rcCenter)
 {
-	int x = (rcDest.Width() - cx + 1) / 2;
-	int y = (rcDest.Height() - cy + 1) / 2;
+    int x = (rcDest.Width() - cx + 1) / 2;
+    int y = (rcDest.Height() - cy + 1) / 2;
 
-	rcCenter = CRect(rcDest.left+x, rcDest.top+y, rcDest.left+x+cx, rcDest.top+y+cy);
+    rcCenter = CRect(rcDest.left + x, rcDest.top + y, rcDest.left + x + cx, rcDest.top + y + cy);
 }
 
 void CBuddyInfoFloatWnd::HitTest(POINT pt, int& nTeamIndex, int& nIndex)
@@ -330,7 +331,7 @@ void CBuddyInfoFloatWnd::HitTest(POINT pt, int& nTeamIndex, int& nIndex)
 
     //POINT ptCursor;
     //::GetCursorPos(&ptCursor);
-    ////À„…œ◊Û”“±ﬂæ‡µƒrect
+    ////ÁÆó‰∏äÂ∑¶Âè≥ËæπË∑ùÁöÑrect
     //RECT rtBuddyInfoFloatWndPlusGap;
     //rtBuddyInfoFloatWndPlusGap.top = rtBuddyInfoFloatWnd.top;
     //rtBuddyInfoFloatWndPlusGap.bottom = rtBuddyInfoFloatWnd.bottom;

@@ -1,19 +1,19 @@
-#ifndef __winlinux_unzip__
-#define __winlinux_unzip__
+﻿#ifndef __WINLINUX_UNZIP__
+#define __WINLINUX_UNZIP__
 
 #ifdef LINUX
-	#include <time.h>
-	#define DECLARE_HANDLE(name) struct name##__{int unused;};typedef struct name##__*name
-	#ifndef MAX_PATH
-		#define MAX_PATH 1024
-	#endif
-	typedef unsigned int UINT;
-	typedef unsigned short WORD;
-	typedef unsigned char BYTE;
-	typedef unsigned long DWORD;
-	typedef char TCHAR;
-	typedef FILE* HANDLE;
-	typedef time_t FILETIME;
+#include <time.h>
+#define DECLARE_HANDLE(name) struct name##__{int unused;};typedef struct name##__*name
+#ifndef MAX_PATH
+#define MAX_PATH 1024
+#endif
+typedef unsigned int UINT;
+typedef unsigned short WORD;
+typedef unsigned char BYTE;
+typedef unsigned long DWORD;
+typedef char TCHAR;
+typedef FILE* HANDLE;
+typedef time_t FILETIME;
 #endif
 // UNZIPPING functions -- for unzipping.
 // This file is a repackaged form of extracts from the zlib code available
@@ -23,7 +23,7 @@
 // encryption and unicode filenames have been added.
 
 #ifndef __winlinux_zip__
-	DECLARE_HANDLE(HZIP);
+DECLARE_HANDLE(HZIP);
 #endif
 // An HZIP identifies a zip file that has been opened
 
@@ -32,17 +32,17 @@ typedef DWORD ZRESULT;
 
 typedef struct
 {
-	int	index;					// index of this file within the zip
-	TCHAR	name[MAX_PATH];		// filename within the zip
-	DWORD	attr;				// attributes, as in GetFileAttributes.
-	FILETIME atime,ctime,mtime;	// access, create, modify filetimes
-	long	comp_size;			// sizes of item, compressed and uncompressed. These
-	long	unc_size;			// may be -1 if not yet known (e.g. being streamed in)
+    int	index;					// index of this file within the zip
+    TCHAR	name[MAX_PATH];		// filename within the zip
+    DWORD	attr;				// attributes, as in GetFileAttributes.
+    FILETIME atime, ctime, mtime;	// access, create, modify filetimes
+    long	comp_size;			// sizes of item, compressed and uncompressed. These
+    long	unc_size;			// may be -1 if not yet known (e.g. being streamed in)
 }ZIPENTRY;
 
-HZIP OpenZip(const TCHAR*fn,const char*password);
-HZIP OpenZip(void*z,UINT len,const char*password);
-HZIP OpenZipHandle(HANDLE h, const char*password);
+HZIP OpenZip(const TCHAR* fn, const char* password);
+HZIP OpenZip(void* z, UINT len, const char* password);
+HZIP OpenZipHandle(HANDLE h, const char* password);
 // OpenZip - opens a zip file and returns a handle with which you can
 // subsequently examine its contents. You can open a zip file from:
 // from a pipe:             OpenZipHandle(hpipe_read,0);
@@ -59,7 +59,7 @@ HZIP OpenZipHandle(HANDLE h, const char*password);
 // but for real windows, the zip makes its own copy of your handle, so you
 // can close yours anytime.
 
-ZRESULT GetZipItem(HZIP hz,int index,ZIPENTRY*ze);
+ZRESULT GetZipItem(HZIP hz, int index, ZIPENTRY* ze);
 // GetZipItem - call this to get information about an item in the zip.
 // If index is -1 and the file wasn't opened through a pipe,
 // then it returns information about the whole zipfile
@@ -74,15 +74,15 @@ ZRESULT GetZipItem(HZIP hz,int index,ZIPENTRY*ze);
 // then then comp_size and sometimes unc_size as well may not be known until
 // after the item has been unzipped.
 
-ZRESULT FindZipItem(HZIP hz,const TCHAR*name,bool ic,int*index,ZIPENTRY*ze);
+ZRESULT FindZipItem(HZIP hz, const TCHAR* name, bool ic, int* index, ZIPENTRY* ze);
 // FindZipItem - finds an item by name. ic means 'insensitive to case'.
 // It returns the index of the item, and returns information about it.
 // If nothing was found, then index is set to -1 and the function returns
 // an error code.
 
-ZRESULT UnzipItem(HZIP hz,int index,const TCHAR*fn);
-ZRESULT UnzipItem(HZIP hz,int index,void*z,UINT len);
-ZRESULT UnzipItemHandle(HZIP hz,int index,HANDLE h);
+ZRESULT UnzipItem(HZIP hz, int index, const TCHAR* fn);
+ZRESULT UnzipItem(HZIP hz, int index, void* z, UINT len);
+ZRESULT UnzipItemHandle(HZIP hz, int index, HANDLE h);
 // UnzipItem - given an index to an item, unzips it. You can unzip to:
 // to a pipe:             UnzipItemHandle(hz,i, hpipe_write);
 // to a file (by handle): UnzipItemHandle(hz,i, hfile);
@@ -98,7 +98,7 @@ ZRESULT UnzipItemHandle(HZIP hz,int index,HANDLE h);
 // If you unzip a directory with ZIP_FILENAME, then the directory gets created.
 // If you unzip it to a handle or a memory block, then nothing gets created
 // and it emits 0 bytes.
-ZRESULT SetUnzipBaseDir(HZIP hz,const TCHAR*dir);
+ZRESULT SetUnzipBaseDir(HZIP hz, const TCHAR* dir);
 // if unzipping to a filename, and it's a relative filename, then it will be relative to here.
 // (defaults to current-directory).
 
@@ -106,7 +106,7 @@ ZRESULT SetUnzipBaseDir(HZIP hz,const TCHAR*dir);
 ZRESULT CloseZip(HZIP hz);
 // CloseZip - the zip handle must be closed with this function.
 
-UINT FormatZipMessage(ZRESULT code,TCHAR*buf,UINT len);
+UINT FormatZipMessage(ZRESULT code, TCHAR* buf, UINT len);
 // FormatZipMessage - given an error code, formats it as a string.
 // It returns the length of the error message. If buf/len points
 // to a real buffer, then it also writes as much as possible into there.
@@ -204,15 +204,15 @@ UINT FormatZipMessage(ZRESULT code,TCHAR*buf,UINT len);
 // one or the other of them based on a dynamic choice. If the header file
 // for only one is present, then we will bind to that particular one.
 ZRESULT CloseZipU(HZIP hz);
-UINT FormatZipMessageU(ZRESULT code,TCHAR*buf,UINT len);
+UINT FormatZipMessageU(ZRESULT code, TCHAR* buf, UINT len);
 bool IsZipHandleU(HZIP hz);
 
 #ifdef __winlinux_zip__
-	#undef	CloseZip
-	#define	CloseZip(hz) (IsZipHandleU(hz)?CloseZipU(hz):CloseZipZ(hz))
+#undef	CloseZip
+#define	CloseZip(hz) (IsZipHandleU(hz)?CloseZipU(hz):CloseZipZ(hz))
 #else
-	#define	CloseZip	CloseZipU
-	#define	FormatZipMessage	FormatZipMessageU
+#define	CloseZip	CloseZipU
+#define	FormatZipMessage	FormatZipMessageU
 #endif
 
-#endif //__winlinux_zip__
+#endif //!__WINLINUX_UNZIP__
