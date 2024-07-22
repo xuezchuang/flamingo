@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include <sstream>
 #include "SendMsgThread.h"
 #include "IULog.h"
@@ -10,40 +10,40 @@
 #include "File2.h"
 #include "net/Msg.h"
 #include "net/IUSocket.h"
-#include "net/protocolstream.h"
+#include "net/ProtocolStream.h"
 
 CMsgItem::CMsgItem(void)
 {
-	m_nType = FMG_MSG_TYPE_BUDDY;
-	m_lpMsg = NULL;
-	m_nGroupNum = m_nUTalkNum = 0;
-	m_hwndFrom = NULL;
+    m_nType = FMG_MSG_TYPE_BUDDY;
+    m_lpMsg = NULL;
+    m_nGroupNum = m_nUTalkNum = 0;
+    m_hwndFrom = NULL;
 }
 
 CMsgItem::~CMsgItem(void)
 {
-	if (m_lpMsg != NULL)
-	{
-		switch (m_nType)
-		{
-		case FMG_MSG_TYPE_BUDDY:
-			delete (CBuddyMessage*)m_lpMsg;
-			break;
-		case FMG_MSG_TYPE_GROUP:
-			delete (CGroupMessage*)m_lpMsg;
-			break;
-		case FMG_MSG_TYPE_SESS:
-			delete (CSessMessage*)m_lpMsg;
-			break;
-		}
-	}
+    if (m_lpMsg != NULL)
+    {
+        switch (m_nType)
+        {
+        case FMG_MSG_TYPE_BUDDY:
+            delete (CBuddyMessage*)m_lpMsg;
+            break;
+        case FMG_MSG_TYPE_GROUP:
+            delete (CGroupMessage*)m_lpMsg;
+            break;
+        case FMG_MSG_TYPE_SESS:
+            delete (CSessMessage*)m_lpMsg;
+            break;
+        }
+    }
 }
 
 CSendMsgThread::CSendMsgThread()
 {
-	m_lpFMGClient = NULL;
-	m_lpUserMgr = NULL;
-	m_nMsgId = 0;
+    m_lpFMGClient = NULL;
+    m_lpUserMgr = NULL;
+    m_nMsgId = 0;
 }
 
 CSendMsgThread::~CSendMsgThread(void)
@@ -53,8 +53,8 @@ CSendMsgThread::~CSendMsgThread(void)
 
 void CSendMsgThread::Stop()
 {
-	m_bStop = true;
-	m_cvItems.notify_one();
+    m_bStop = true;
+    m_cvItems.notify_one();
 }
 
 void CSendMsgThread::Run()
@@ -83,7 +83,7 @@ void CSendMsgThread::Run()
 void CSendMsgThread::AddItem(CNetData* pItem)
 {
     std::lock_guard<std::mutex> guard(m_mtItems);
-	m_listItems.push_back(pItem);
+    m_listItems.push_back(pItem);
     m_cvItems.notify_one();
 }
 
@@ -91,31 +91,31 @@ void CSendMsgThread::DeleteAllItems()
 {
     std::lock_guard<std::mutex> guard(m_mtItems);
     for (auto iter : m_listItems)
-	{
+    {
         delete iter;
-	}
+    }
 
     m_listItems.clear();
 }
 
 void CSendMsgThread::HandleItem(CNetData* pNetData)
 {
-	if(pNetData == NULL)
-		return;
+    if (pNetData == NULL)
+        return;
 
-	switch(pNetData->m_uType)
-	{
-	case NET_DATA_REGISTER:
-		HandleRegister((const CRegisterRequest*)pNetData);
-		break;
+    switch (pNetData->m_uType)
+    {
+    case NET_DATA_REGISTER:
+        HandleRegister((const CRegisterRequest*)pNetData);
+        break;
 
-	case NET_DATA_LOGIN:
-		HandleLogon((const CLoginRequest*)pNetData);
-		break;
+    case NET_DATA_LOGIN:
+        HandleLogon((const CLoginRequest*)pNetData);
+        break;
 
-	case NET_DATA_USER_BASIC_INFO:
-		HandleUserBasicInfo((const CUserBasicInfoRequest*)pNetData);
-		break;
+    case NET_DATA_USER_BASIC_INFO:
+        HandleUserBasicInfo((const CUserBasicInfoRequest*)pNetData);
+        break;
 
     case NET_DATA_CHANGE_STATUS:
         HandleChangeUserStatus((const CChangeUserStatusRequest*)pNetData);
@@ -124,38 +124,38 @@ void CSendMsgThread::HandleItem(CNetData* pNetData)
     case NET_DATA_GROUP_BASIC_INFO:
         HandleGroupBasicInfo((const CGroupBasicInfoRequest*)pNetData);
         break;
-	
-	case NET_DATA_FIND_FRIEND:
-		HandleFindFriendMessage((const CFindFriendRequest*)pNetData);
-		break;
 
-	case NET_DATA_OPERATE_FRIEND:
-		HandleOperateFriendMessage((const COperateFriendRequest*)pNetData);
-		break;
+    case NET_DATA_FIND_FRIEND:
+        HandleFindFriendMessage((const CFindFriendRequest*)pNetData);
+        break;
 
-	case NET_DATA_CHAT_MSG:
-		HandleSentChatMessage((const CSentChatMessage*)pNetData);
-		break;
+    case NET_DATA_OPERATE_FRIEND:
+        HandleOperateFriendMessage((const COperateFriendRequest*)pNetData);
+        break;
 
-	case NET_DATA_CHAT_CONFIRM_IMAGE_MSG:
-		HandleSentConfirmImageMessage((const CSentChatConfirmImageMessage*)pNetData);
-		break;
+    case NET_DATA_CHAT_MSG:
+        HandleSentChatMessage((const CSentChatMessage*)pNetData);
+        break;
 
-	case NET_DATA_HEARTBEAT:
-		HandleHeartbeatMessage((const CHeartbeatMessageRequest*)pNetData);
-		break;
+    case NET_DATA_CHAT_CONFIRM_IMAGE_MSG:
+        HandleSentConfirmImageMessage((const CSentChatConfirmImageMessage*)pNetData);
+        break;
 
-	case NET_DATA_UPDATE_LOGON_USER_INFO:
-		HandleUpdateLogonUserInfoMessage((const CUpdateLogonUserInfoRequest*)pNetData);
-		break;
+    case NET_DATA_HEARTBEAT:
+        HandleHeartbeatMessage((const CHeartbeatMessageRequest*)pNetData);
+        break;
 
-	case NET_DATA_MODIFY_PASSWORD:
-		HandleModifyPassword((const CModifyPasswordRequest*)pNetData);
-		break;
+    case NET_DATA_UPDATE_LOGON_USER_INFO:
+        HandleUpdateLogonUserInfoMessage((const CUpdateLogonUserInfoRequest*)pNetData);
+        break;
 
-	case NET_DATA_CREATE_NEW_GROUP:
-		HandleCreateNewGroup((const CCreateNewGroupRequest*)pNetData);
-		break;
+    case NET_DATA_MODIFY_PASSWORD:
+        HandleModifyPassword((const CModifyPasswordRequest*)pNetData);
+        break;
+
+    case NET_DATA_CREATE_NEW_GROUP:
+        HandleCreateNewGroup((const CCreateNewGroupRequest*)pNetData);
+        break;
 
     case NET_DATA_OPERATE_TEAM:
         HandleOperateTeam((const CAddTeamInfoRequest*)pNetData);
@@ -169,31 +169,31 @@ void CSendMsgThread::HandleItem(CNetData* pNetData)
         HandleMoveFriendMessage((const CMoveFriendRequest*)pNetData);
         break;
 
-	default:
+    default:
 #ifdef _DEBUG
-		::MessageBox(::GetForegroundWindow(), _T("Be cautious! Unhandled data type in send queen."), _T("Warning"), MB_OK|MB_ICONERROR);
+        ::MessageBox(::GetForegroundWindow(), _T("Be cautious! Unhandled data type in send queen."), _T("Warning"), MB_OK | MB_ICONERROR);
 #else
-		LOG_WARNING("Be cautious! Unhandled data type in send queen.");
+        LOG_WARNING("Be cautious! Unhandled data type in send queen.");
 #endif
-	}
+    }
 
     m_seq++;
-	
-	delete pNetData;	
+
+    delete pNetData;
 }
 
 void CSendMsgThread::HandleRegister(const CRegisterRequest* pRegisterRequest)
 {
-	if (pRegisterRequest == NULL)
-		return;
+    if (pRegisterRequest == NULL)
+        return;
 
     char szRegisterInfo[256] = { 0 };
     sprintf_s(szRegisterInfo,
-                256,
-                "{\"username\": \"%s\", \"nickname\": \"%s\", \"password\": \"%s\"}",
-                pRegisterRequest->m_szAccountName,
-                pRegisterRequest->m_szNickName,
-                pRegisterRequest->m_szPassword);
+        256,
+        "{\"username\": \"%s\", \"nickname\": \"%s\", \"password\": \"%s\"}",
+        pRegisterRequest->m_szAccountName,
+        pRegisterRequest->m_szNickName,
+        pRegisterRequest->m_szPassword);
 
     std::string outbuf;
     net::BinaryStreamWriter writeStream(&outbuf);
@@ -209,25 +209,25 @@ void CSendMsgThread::HandleRegister(const CRegisterRequest* pRegisterRequest)
 }
 
 void CSendMsgThread::HandleLogon(const CLoginRequest* pLoginRequest)
-{ 
-    if(pLoginRequest == NULL)
-		return;
+{
+    if (pLoginRequest == NULL)
+        return;
 
     char szLoginInfo[256] = { 0 };
-    sprintf_s(szLoginInfo, 
-             ARRAYSIZE(szLoginInfo), 
-             "{\"username\": \"%s\", \"password\": \"%s\", \"clienttype\": %d, \"status\": %d}", 
-             pLoginRequest->m_szAccountName,
-             pLoginRequest->m_szPassword,
-             (long)pLoginRequest->m_nLoginType,
-             pLoginRequest->m_nStatus);
+    sprintf_s(szLoginInfo,
+        ARRAYSIZE(szLoginInfo),
+        "{\"username\": \"%s\", \"password\": \"%s\", \"clienttype\": %d, \"status\": %d}",
+        pLoginRequest->m_szAccountName,
+        pLoginRequest->m_szPassword,
+        (long)pLoginRequest->m_nLoginType,
+        pLoginRequest->m_nStatus);
 
-    
+
     std::string strReturnData;
-    //≥¨ ± ±º‰…Ë÷√Œ™3√Î
+    //Ë∂ÖÊó∂Êó∂Èó¥ËÆæÁΩÆ‰∏∫3Áßí
     bool bRet = CIUSocket::GetInstance().Login(pLoginRequest->m_szAccountName, pLoginRequest->m_szPassword, (long)pLoginRequest->m_nLoginType, pLoginRequest->m_nStatus, 3000, strReturnData);
     LOG_INFO("Request logon: Account=%s, Password=*****, Status=%d, LoginType=%d.", pLoginRequest->m_szAccountName, pLoginRequest->m_szPassword, pLoginRequest->m_nStatus, (long)pLoginRequest->m_nLoginType);
-    
+
     int nRet = LOGIN_FAILED;
     CLoginResult* pLoginResult = new CLoginResult();
     pLoginResult->m_LoginResultCode = LOGIN_FAILED;
@@ -250,8 +250,7 @@ void CSendMsgThread::HandleLogon(const CLoginRequest* pLoginRequest)
                 {
                     LOG_ERROR(_T("login failed, login response json is invalid, json=%s"), strReturnData.c_str());
                     pLoginResult->m_LoginResultCode = LOGIN_FAILED;
-                }
-                else
+                } else
                 {
                     pLoginResult->m_LoginResultCode = 0;
                     pLoginResult->m_uAccountID = JsonRoot["userid"].asInt();
@@ -267,8 +266,7 @@ void CSendMsgThread::HandleLogon(const CLoginRequest* pLoginRequest)
                     strcpy_s(pLoginResult->m_szPhoneNumber, ARRAYSIZE(pLoginResult->m_szPhoneNumber), JsonRoot["phonenumber"].asCString());
                     strcpy_s(pLoginResult->m_szMail, ARRAYSIZE(pLoginResult->m_szMail), JsonRoot["mail"].asCString());
                 }
-            }
-            else if (nRetCode == 102)
+            } else if (nRetCode == 102)
                 pLoginResult->m_LoginResultCode = LOGIN_UNREGISTERED;
             else if (nRetCode == 103)
                 pLoginResult->m_LoginResultCode = LOGIN_PASSWORD_ERROR;
@@ -282,18 +280,18 @@ void CSendMsgThread::HandleLogon(const CLoginRequest* pLoginRequest)
 
 void CSendMsgThread::HandleUserBasicInfo(const CUserBasicInfoRequest* pUserBasicInfo)
 {
-	if(pUserBasicInfo == NULL)
-		return;
-	
-	std::string outbuf;
-	net::BinaryStreamWriter writeStream(&outbuf);
+    if (pUserBasicInfo == NULL)
+        return;
+
+    std::string outbuf;
+    net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_getofriendlist);
     writeStream.WriteInt32(m_seq);
-	std::string dummy;
-	writeStream.WriteString(dummy);
-	writeStream.Flush();
+    std::string dummy;
+    writeStream.WriteString(dummy);
+    writeStream.Flush();
 
-	LOG_INFO("Request to get userinfo.");
+    LOG_INFO("Request to get userinfo.");
 
     CIUSocket::GetInstance().Send(outbuf);
 }
@@ -326,7 +324,7 @@ void CSendMsgThread::HandleGroupBasicInfo(const CGroupBasicInfoRequest* pGroupBa
     net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_getgroupmembers);
     writeStream.WriteInt32(m_seq);
-    char szData[32] = {0};
+    char szData[32] = { 0 };
     sprintf_s(szData, ARRAYSIZE(szData), "{\"groupid\": %d}", pGroupBasicInfo->m_groupid);
     writeStream.WriteCString(szData, strlen(szData));
     writeStream.Flush();
@@ -338,8 +336,8 @@ void CSendMsgThread::HandleGroupBasicInfo(const CGroupBasicInfoRequest* pGroupBa
 
 void CSendMsgThread::HandleFindFriendMessage(const CFindFriendRequest* pFindFriendRequest)
 {
-	if(pFindFriendRequest == NULL)
-		return;
+    if (pFindFriendRequest == NULL)
+        return;
 
     char szData[64] = { 0 };
     sprintf_s(szData, 64, "{\"type\": %d, \"username\": \"%s\"}", pFindFriendRequest->m_nType, pFindFriendRequest->m_szAccountName);
@@ -359,19 +357,17 @@ void CSendMsgThread::HandleFindFriendMessage(const CFindFriendRequest* pFindFrie
 
 void CSendMsgThread::HandleOperateFriendMessage(const COperateFriendRequest* pOperateFriendRequest)
 {
-	if(pOperateFriendRequest == NULL)
-		return;
+    if (pOperateFriendRequest == NULL)
+        return;
 
     char szData[64] = { 0 };
     if (pOperateFriendRequest->m_uCmd == Apply)
     {
         sprintf_s(szData, 64, "{\"userid\": %d, \"type\": 1}", pOperateFriendRequest->m_uAccountID);
-    }
-    else if (pOperateFriendRequest->m_uCmd == Agree || pOperateFriendRequest->m_uCmd == Refuse)
+    } else if (pOperateFriendRequest->m_uCmd == Agree || pOperateFriendRequest->m_uCmd == Refuse)
     {
-        sprintf_s(szData, 64, "{\"userid\": %d, \"type\": 3, \"accept\": %d}", pOperateFriendRequest->m_uAccountID, pOperateFriendRequest->m_uCmd != Agree?0:1);
-    }
-    else if (pOperateFriendRequest->m_uCmd == Delete)
+        sprintf_s(szData, 64, "{\"userid\": %d, \"type\": 3, \"accept\": %d}", pOperateFriendRequest->m_uAccountID, pOperateFriendRequest->m_uCmd != Agree ? 0 : 1);
+    } else if (pOperateFriendRequest->m_uCmd == Delete)
     {
         sprintf_s(szData, 64, "{\"userid\": %d, \"type\": 4}", pOperateFriendRequest->m_uAccountID);
     }
@@ -391,25 +387,25 @@ void CSendMsgThread::HandleOperateFriendMessage(const COperateFriendRequest* pOp
 
 BOOL CSendMsgThread::HandleHeartbeatMessage(const CHeartbeatMessageRequest* pHeartbeatRequest)
 {
-	if(pHeartbeatRequest == NULL)
-		return FALSE;
+    if (pHeartbeatRequest == NULL)
+        return FALSE;
 
-	//return m_pProtocol->RequestHeartbeat();
+    //return m_pProtocol->RequestHeartbeat();
     return FALSE;
 }
 
 void CSendMsgThread::HandleUpdateLogonUserInfoMessage(const CUpdateLogonUserInfoRequest* pRequest)
 {
-	if(pRequest == NULL)
-		return;
+    if (pRequest == NULL)
+        return;
 
-	char szCustomFace[MAX_PATH] = {0};
-	EncodeUtil::UnicodeToUtf8(pRequest->m_szCustomFace, szCustomFace, ARRAYSIZE(szCustomFace));
-	
+    char szCustomFace[MAX_PATH] = { 0 };
+    EncodeUtil::UnicodeToUtf8(pRequest->m_szCustomFace, szCustomFace, ARRAYSIZE(szCustomFace));
+
     std::ostringstream os;
     os << "{\"nickname\": \"" << pRequest->m_szNickName << "\", \"facetype\":" << pRequest->m_uFaceID
         << ", \"customface\": \"" << szCustomFace << "\", \"gender\":" << pRequest->m_uGender
-        << ", \"birthday\":" << pRequest->m_nBirthday << ", \"signature\": \"" << pRequest->m_szSignature 
+        << ", \"birthday\":" << pRequest->m_nBirthday << ", \"signature\": \"" << pRequest->m_szSignature
         << "\",\"address\": \"" << pRequest->m_szAddress << "\", \"phonenumber\": \""
         << pRequest->m_szPhone << "\", \"mail\": \"" << pRequest->m_szMail << "\"}";
 
@@ -428,8 +424,8 @@ void CSendMsgThread::HandleUpdateLogonUserInfoMessage(const CUpdateLogonUserInfo
 
 void CSendMsgThread::HandleModifyPassword(const CModifyPasswordRequest* pModifyPassword)
 {
-	if(pModifyPassword == NULL)
-		return;
+    if (pModifyPassword == NULL)
+        return;
 
     char szData[256] = { 0 };
     sprintf_s(szData, ARRAYSIZE(szData), "{\"oldpassword\": \"%s\", \"newpassword\": \"%s\"}", pModifyPassword->m_szOldPassword, pModifyPassword->m_szNewPassword);
@@ -447,8 +443,8 @@ void CSendMsgThread::HandleModifyPassword(const CModifyPasswordRequest* pModifyP
 
 void CSendMsgThread::HandleCreateNewGroup(const CCreateNewGroupRequest* pCreateNewGroup)
 {
-	if(pCreateNewGroup == NULL)
-		return;
+    if (pCreateNewGroup == NULL)
+        return;
 
     char szData[256] = { 0 };
     sprintf_s(szData, ARRAYSIZE(szData), "{\"groupname\": \"%s\", \"type\": 0}", pCreateNewGroup->m_szGroupName);
@@ -468,7 +464,7 @@ void CSendMsgThread::HandleOperateTeam(const CAddTeamInfoRequest* pAddNewTeam)
 {
     if (pAddNewTeam == NULL)
         return;
-   
+
     std::string outbuf;
     net::BinaryStreamWriter writeStream(&outbuf);
     writeStream.WriteInt32(msg_type_updateteaminfo);
@@ -535,67 +531,67 @@ void CSendMsgThread::HandleMoveFriendMessage(const CMoveFriendRequest* pMoveFrie
 
 BOOL CSendMsgThread::HandleSentChatMessage(const CSentChatMessage* pSentChatMessage)
 {
-	if(pSentChatMessage == NULL)
-		return FALSE;
+    if (pSentChatMessage == NULL)
+        return FALSE;
 
-	CMsgItem* lpMsgItem = pSentChatMessage->m_pMsgItem;
-	if (lpMsgItem == NULL)
-	{
-		return FALSE;
-	}
-	
-	BOOL bRet = FALSE;
-	switch (lpMsgItem->m_nType)
-	{
-	case FMG_MSG_TYPE_BUDDY:		// ∫√”—œ˚œ¢
-		{
-			bRet = SendBuddyMsg(lpMsgItem);
-			if (!bRet)
-				::OutputDebugString(_T("∑¢ÀÕ∫√”—œ˚œ¢ ß∞‹\n"));
-		}
-		break;
-	case FMG_MSG_TYPE_GROUP:		// »∫œ˚œ¢
-		{
-			bRet = SendBuddyMsg(lpMsgItem);
-			if (!bRet)
-				::OutputDebugString(_T("∑¢ÀÕ»∫œ˚œ¢ ß∞‹\n"));
-		}
-		break;
-	case FMG_MSG_TYPE_MULTI:		//»∫∑¢œ˚œ¢
-		{
-			bRet = SendMultiMsg(lpMsgItem);
-			if (!bRet)
-				::OutputDebugString(_T("»∫∑¢œ˚œ¢ ß∞‹\n"));
-		}
-		break;
+    CMsgItem* lpMsgItem = pSentChatMessage->m_pMsgItem;
+    if (lpMsgItem == NULL)
+    {
+        return FALSE;
+    }
 
-	case FMG_MSG_TYPE_SESS:		// »∫≥…‘±œ˚œ¢
-		{
-			bRet = SendSessMsg(lpMsgItem);
-			if (!bRet)
-				::OutputDebugString(_T("∑¢ÀÕ»∫≥…‘±œ˚œ¢ ß∞‹\n"));
-		}
-		break;
-	}
-	
-	if(bRet)
-		delete lpMsgItem;
-	
-	return bRet;
+    BOOL bRet = FALSE;
+    switch (lpMsgItem->m_nType)
+    {
+    case FMG_MSG_TYPE_BUDDY:		// Â•ΩÂèãÊ∂àÊÅØ
+    {
+        bRet = SendBuddyMsg(lpMsgItem);
+        if (!bRet)
+            ::OutputDebugString(_T("ÂèëÈÄÅÂ•ΩÂèãÊ∂àÊÅØÂ§±Ë¥•\n"));
+    }
+    break;
+    case FMG_MSG_TYPE_GROUP:		// Áæ§Ê∂àÊÅØ
+    {
+        bRet = SendBuddyMsg(lpMsgItem);
+        if (!bRet)
+            ::OutputDebugString(_T("ÂèëÈÄÅÁæ§Ê∂àÊÅØÂ§±Ë¥•\n"));
+    }
+    break;
+    case FMG_MSG_TYPE_MULTI:		//Áæ§ÂèëÊ∂àÊÅØ
+    {
+        bRet = SendMultiMsg(lpMsgItem);
+        if (!bRet)
+            ::OutputDebugString(_T("Áæ§ÂèëÊ∂àÊÅØÂ§±Ë¥•\n"));
+    }
+    break;
+
+    case FMG_MSG_TYPE_SESS:		// Áæ§ÊàêÂëòÊ∂àÊÅØ
+    {
+        bRet = SendSessMsg(lpMsgItem);
+        if (!bRet)
+            ::OutputDebugString(_T("ÂèëÈÄÅÁæ§ÊàêÂëòÊ∂àÊÅØÂ§±Ë¥•\n"));
+    }
+    break;
+    }
+
+    if (bRet)
+        delete lpMsgItem;
+
+    return bRet;
 }
 
 BOOL CSendMsgThread::HandleSentConfirmImageMessage(const CSentChatConfirmImageMessage* pConfirmImageMessage)
 {
-	if(pConfirmImageMessage==NULL || pConfirmImageMessage->m_pszConfirmBody==NULL)
-		return FALSE;
+    if (pConfirmImageMessage == NULL || pConfirmImageMessage->m_pszConfirmBody == NULL)
+        return FALSE;
 
-	BOOL bRet = FALSE;
-	size_t nTargetCount = pConfirmImageMessage->m_setTargetIDs.size();
-	std::set<UINT>::const_iterator iter = pConfirmImageMessage->m_setTargetIDs.begin();
-	if(pConfirmImageMessage->m_nType == CHAT_CONFIRM_TYPE_SINGLE)
-	{
-		UINT uTargetID =*iter;
-		//bRet = m_pProtocol->SendChatMessage(pConfirmImageMessage->m_pszConfirmBody, pConfirmImageMessage->m_uConfirmBodySize, FALSE, uTargetID, 0);
+    BOOL bRet = FALSE;
+    size_t nTargetCount = pConfirmImageMessage->m_setTargetIDs.size();
+    std::set<UINT>::const_iterator iter = pConfirmImageMessage->m_setTargetIDs.begin();
+    if (pConfirmImageMessage->m_nType == CHAT_CONFIRM_TYPE_SINGLE)
+    {
+        UINT uTargetID = *iter;
+        //bRet = m_pProtocol->SendChatMessage(pConfirmImageMessage->m_pszConfirmBody, pConfirmImageMessage->m_uConfirmBodySize, FALSE, uTargetID, 0);
         long nChatMsgLength = pConfirmImageMessage->m_uConfirmBodySize;
         std::string outbuf;
         net::BinaryStreamWriter writeStream(&outbuf);
@@ -603,7 +599,7 @@ BOOL CSendMsgThread::HandleSentConfirmImageMessage(const CSentChatConfirmImageMe
         writeStream.WriteInt32(m_seq);
         //senderId
         //writeStream.Write((int32_t)lpBuddyMsg->m_nFromUin);
-        //œ˚œ¢ƒ⁄»›
+        //Ê∂àÊÅØÂÜÖÂÆπ
         writeStream.WriteCString(pConfirmImageMessage->m_pszConfirmBody, nChatMsgLength);
         //targetId
         writeStream.WriteInt32((int32_t)uTargetID);
@@ -611,389 +607,388 @@ BOOL CSendMsgThread::HandleSentConfirmImageMessage(const CSentChatConfirmImageMe
 
         LOG_INFO("Send chat msg: msgID=%u, senderId=%u, targetId=%u.", m_nMsgId, pConfirmImageMessage->m_uSenderID, uTargetID);
 
-        CIUSocket::GetInstance().Send(outbuf);        
+        CIUSocket::GetInstance().Send(outbuf);
+    } else if (pConfirmImageMessage->m_nType == CHAT_CONFIRM_TYPE_MULTI)
+    {
+        CMiniBuffer miniBuffer(nTargetCount * sizeof(UINT));
+        UINT* pAccountIDs = (UINT*)miniBuffer.GetBuffer();
+        long j = 0;
+        for (; iter != pConfirmImageMessage->m_setTargetIDs.end(); ++iter)
+        {
+            pAccountIDs[j] = *iter;
+            ++j;
+        }
+
+        bRet = SendMultiChatMessage(pConfirmImageMessage->m_pszConfirmBody, pConfirmImageMessage->m_uConfirmBodySize, pAccountIDs, nTargetCount);
     }
-	else if(pConfirmImageMessage->m_nType == CHAT_CONFIRM_TYPE_MULTI)
-	{
-		CMiniBuffer miniBuffer(nTargetCount*sizeof(UINT));
-		UINT* pAccountIDs = (UINT*)miniBuffer.GetBuffer();
-		long j = 0;
-		for(; iter!=pConfirmImageMessage->m_setTargetIDs.end(); ++iter)
-		{
-			pAccountIDs[j] =*iter;
-			++j;
-		}
 
-		bRet = SendMultiChatMessage(pConfirmImageMessage->m_pszConfirmBody, pConfirmImageMessage->m_uConfirmBodySize, pAccountIDs, nTargetCount);
-	}
+    if (bRet)
+    {
+        delete[] pConfirmImageMessage->m_pszConfirmBody;
+    }
 
-	if(bRet)
-	{
-		delete[] pConfirmImageMessage->m_pszConfirmBody;
-	}
-
-	return bRet;
+    return bRet;
 }
 
 BOOL CSendMsgThread::AddBuddyMsg(UINT nFromUin, const tstring& strFromNickName, UINT nToUin, const tstring& strToNickName, time_t nTime, const tstring& strChatMsg, HWND hwndFrom /*= NULL*/)
 {
-	//TODO: ªπ «‘⁄÷˜œﬂ≥Ã
-	CMsgItem* lpMsgItem = new CMsgItem();
-	CBuddyMessage* lpBuddyMsg = new CBuddyMessage();
-	
-	//m_nMsgId = m_lpUserMgr->GetMsgID(nToUin);
-	lpBuddyMsg->m_nMsgId = m_nMsgId;
-	lpBuddyMsg->m_nTime = nTime;
+    //TODO: ËøòÊòØÂú®‰∏ªÁ∫øÁ®ã
+    CMsgItem* lpMsgItem = new CMsgItem();
+    CBuddyMessage* lpBuddyMsg = new CBuddyMessage();
+
+    //m_nMsgId = m_lpUserMgr->GetMsgID(nToUin);
+    lpBuddyMsg->m_nMsgId = m_nMsgId;
+    lpBuddyMsg->m_nTime = nTime;
     lpBuddyMsg->m_nFromUin = nFromUin;
-	lpBuddyMsg->m_nToUin = nToUin;
-	lpBuddyMsg->m_hwndFrom = hwndFrom;
+    lpBuddyMsg->m_nToUin = nToUin;
+    lpBuddyMsg->m_hwndFrom = hwndFrom;
 
     CreateMsgContent(strChatMsg, lpBuddyMsg->m_arrContent);
 
-	lpMsgItem->m_nType = FMG_MSG_TYPE_BUDDY;
-	lpMsgItem->m_lpMsg = (void*)lpBuddyMsg;
-	lpMsgItem->m_hwndFrom = hwndFrom;
-	
+    lpMsgItem->m_nType = FMG_MSG_TYPE_BUDDY;
+    lpMsgItem->m_lpMsg = (void*)lpBuddyMsg;
+    lpMsgItem->m_hwndFrom = hwndFrom;
+
     //lpMsgItem->m_nUTalkNum = lpBuddyInfo->m_uUserID;
     lpMsgItem->m_strNickName = strFromNickName;
-	
-	CSentChatMessage* pSentChatMessage = new CSentChatMessage();
-	pSentChatMessage->m_pMsgItem = lpMsgItem;
-	pSentChatMessage->m_hwndChat = hwndFrom;
 
-    //º”»Î∂”¡–£¨¿Îø™÷˜œﬂ≥Ã
-	std::lock_guard<std::mutex> guard(m_mtItems);
-	m_listItems.push_back(pSentChatMessage);
-	m_cvItems.notify_one();
+    CSentChatMessage* pSentChatMessage = new CSentChatMessage();
+    pSentChatMessage->m_pMsgItem = lpMsgItem;
+    pSentChatMessage->m_hwndChat = hwndFrom;
 
-	return TRUE;
+    //Âä†ÂÖ•ÈòüÂàóÔºåÁ¶ªÂºÄ‰∏ªÁ∫øÁ®ã
+    std::lock_guard<std::mutex> guard(m_mtItems);
+    m_listItems.push_back(pSentChatMessage);
+    m_cvItems.notify_one();
+
+    return TRUE;
 }
 
 BOOL CSendMsgThread::AddGroupMsg(UINT nGroupId, time_t nTime, LPCTSTR lpMsg, HWND hwndFrom)
 {
-	if (0 == nGroupId || NULL == lpMsg || NULL ==*lpMsg)
-		return FALSE;
+    if (0 == nGroupId || NULL == lpMsg || NULL == *lpMsg)
+        return FALSE;
 
-	CMsgItem* lpMsgItem = new CMsgItem();
-	CGroupMessage* lpGroupMsg = new CGroupMessage;
-	
-	m_nMsgId++;
-	lpGroupMsg->m_nMsgId = m_nMsgId;
-	lpGroupMsg->m_nTime = (UINT)nTime;
-	lpGroupMsg->m_nToUin = nGroupId;
-	lpGroupMsg->m_nGroupCode = nGroupId;
-	lpGroupMsg->m_nSendUin = m_lpUserMgr->m_UserInfo.m_uUserID;
-	lpGroupMsg->m_hwndFrom = hwndFrom;
-	//if (m_lpUserMgr != NULL)
-	//	lpGroupMsg->m_nGroupCode = m_lpUserMgr->m_GroupList.GetGroupCodeById(nGroupId);
+    CMsgItem* lpMsgItem = new CMsgItem();
+    CGroupMessage* lpGroupMsg = new CGroupMessage;
 
-	CreateMsgContent(lpMsg, lpGroupMsg->m_arrContent);
+    m_nMsgId++;
+    lpGroupMsg->m_nMsgId = m_nMsgId;
+    lpGroupMsg->m_nTime = (UINT)nTime;
+    lpGroupMsg->m_nToUin = nGroupId;
+    lpGroupMsg->m_nGroupCode = nGroupId;
+    lpGroupMsg->m_nSendUin = m_lpUserMgr->m_UserInfo.m_uUserID;
+    lpGroupMsg->m_hwndFrom = hwndFrom;
+    //if (m_lpUserMgr != NULL)
+    //	lpGroupMsg->m_nGroupCode = m_lpUserMgr->m_GroupList.GetGroupCodeById(nGroupId);
 
-	lpMsgItem->m_nType = FMG_MSG_TYPE_GROUP;
-	lpMsgItem->m_lpMsg = (void*)lpGroupMsg;
-	//  π”√µΩŒ¥º”À¯µƒ÷˜œﬂ≥Ã ˝æ›£¨≤ª“™‘⁄÷˜œﬂ≥Ã÷ÆÕ‚µƒœﬂ≥Ãµ˜”√¥À∫Ø ˝
-	CGroupInfo* lpGroupInfo = m_lpUserMgr->m_GroupList.GetGroupByCode(nGroupId);
-	if (lpGroupInfo != NULL)
-	{
-		lpMsgItem->m_nGroupNum = nGroupId;
-		lpMsgItem->m_nUTalkNum = m_lpUserMgr->m_UserInfo.m_uUserID;
-		CBuddyInfo* lpBuddyInfo = lpGroupInfo->GetMemberByUin(m_lpUserMgr->m_UserInfo.m_uUserID);
-		if (lpBuddyInfo != NULL)
-		{
-			lpMsgItem->m_strNickName = lpBuddyInfo->m_strNickName;
-		}
-	}
+    CreateMsgContent(lpMsg, lpGroupMsg->m_arrContent);
 
-	CSentChatMessage* pSentChatMessage = new CSentChatMessage();
-	pSentChatMessage->m_pMsgItem = lpMsgItem;
-	pSentChatMessage->m_hwndChat = hwndFrom;
-	
-	
-	std::lock_guard<std::mutex> guard(m_mtItems);
-	m_listItems.push_back(pSentChatMessage);
-	m_cvItems.notify_one();
+    lpMsgItem->m_nType = FMG_MSG_TYPE_GROUP;
+    lpMsgItem->m_lpMsg = (void*)lpGroupMsg;
+    // ‰ΩøÁî®Âà∞Êú™Âä†ÈîÅÁöÑ‰∏ªÁ∫øÁ®ãÊï∞ÊçÆÔºå‰∏çË¶ÅÂú®‰∏ªÁ∫øÁ®ã‰πãÂ§ñÁöÑÁ∫øÁ®ãË∞ÉÁî®Ê≠§ÂáΩÊï∞
+    CGroupInfo* lpGroupInfo = m_lpUserMgr->m_GroupList.GetGroupByCode(nGroupId);
+    if (lpGroupInfo != NULL)
+    {
+        lpMsgItem->m_nGroupNum = nGroupId;
+        lpMsgItem->m_nUTalkNum = m_lpUserMgr->m_UserInfo.m_uUserID;
+        CBuddyInfo* lpBuddyInfo = lpGroupInfo->GetMemberByUin(m_lpUserMgr->m_UserInfo.m_uUserID);
+        if (lpBuddyInfo != NULL)
+        {
+            lpMsgItem->m_strNickName = lpBuddyInfo->m_strNickName;
+        }
+    }
 
-	return TRUE;
+    CSentChatMessage* pSentChatMessage = new CSentChatMessage();
+    pSentChatMessage->m_pMsgItem = lpMsgItem;
+    pSentChatMessage->m_hwndChat = hwndFrom;
+
+
+    std::lock_guard<std::mutex> guard(m_mtItems);
+    m_listItems.push_back(pSentChatMessage);
+    m_cvItems.notify_one();
+
+    return TRUE;
 }
 
-//  π”√µΩŒ¥º”À¯µƒ÷˜œﬂ≥Ã ˝æ›£¨≤ª“™‘⁄÷˜œﬂ≥Ã÷ÆÕ‚µƒœﬂ≥Ãµ˜”√¥À∫Ø ˝
+// ‰ΩøÁî®Âà∞Êú™Âä†ÈîÅÁöÑ‰∏ªÁ∫øÁ®ãÊï∞ÊçÆÔºå‰∏çË¶ÅÂú®‰∏ªÁ∫øÁ®ã‰πãÂ§ñÁöÑÁ∫øÁ®ãË∞ÉÁî®Ê≠§ÂáΩÊï∞
 BOOL CSendMsgThread::AddMultiMsg(const std::set<UINT> setAccountID, time_t nTime, LPCTSTR lpMsg, HWND hwndFrom/*=NULL*/)
 {
-	if (setAccountID.empty() || NULL == lpMsg || NULL ==*lpMsg)
-		return FALSE;
+    if (setAccountID.empty() || NULL == lpMsg || NULL == *lpMsg)
+        return FALSE;
 
-	CMsgItem* lpMsgItem = new CMsgItem();
+    CMsgItem* lpMsgItem = new CMsgItem();
 
-	CBuddyMessage* lpBuddyMsg = new CBuddyMessage();
+    CBuddyMessage* lpBuddyMsg = new CBuddyMessage();
 
-	//m_nMsgId = m_lpUserMgr->GetMsgID(nToUin);
-	lpBuddyMsg->m_nMsgId = m_nMsgId;
-	lpBuddyMsg->m_nTime = nTime;
-	lpBuddyMsg->m_nFromUin = m_lpUserMgr->m_UserInfo.m_uUserID;
-	lpBuddyMsg->m_nToUin = -1;
-	lpBuddyMsg->m_hwndFrom = hwndFrom;
-	lpBuddyMsg->m_nMsgType = (CONTENT_TYPE)FMG_MSG_TYPE_MULTI;
-	for(std::set<UINT>::const_iterator iter=setAccountID.begin(); iter!=setAccountID.end(); ++iter)
-	{
-		lpMsgItem->m_arrTargetIDs.push_back(*iter);
-	}
+    //m_nMsgId = m_lpUserMgr->GetMsgID(nToUin);
+    lpBuddyMsg->m_nMsgId = m_nMsgId;
+    lpBuddyMsg->m_nTime = nTime;
+    lpBuddyMsg->m_nFromUin = m_lpUserMgr->m_UserInfo.m_uUserID;
+    lpBuddyMsg->m_nToUin = -1;
+    lpBuddyMsg->m_hwndFrom = hwndFrom;
+    lpBuddyMsg->m_nMsgType = (CONTENT_TYPE)FMG_MSG_TYPE_MULTI;
+    for (std::set<UINT>::const_iterator iter = setAccountID.begin(); iter != setAccountID.end(); ++iter)
+    {
+        lpMsgItem->m_arrTargetIDs.push_back(*iter);
+    }
 
-	CreateMsgContent(lpMsg, lpBuddyMsg->m_arrContent);
+    CreateMsgContent(lpMsg, lpBuddyMsg->m_arrContent);
 
-	lpMsgItem->m_nType = FMG_MSG_TYPE_MULTI;
-	lpMsgItem->m_lpMsg = (void*)lpBuddyMsg;
-	lpMsgItem->m_hwndFrom = hwndFrom;
-	lpMsgItem->m_nUTalkNum = -1;
-		
-	CSentChatMessage* pSentChatMessage = new CSentChatMessage();
-	pSentChatMessage->m_pMsgItem = lpMsgItem;
-	pSentChatMessage->m_hwndChat = hwndFrom;
+    lpMsgItem->m_nType = FMG_MSG_TYPE_MULTI;
+    lpMsgItem->m_lpMsg = (void*)lpBuddyMsg;
+    lpMsgItem->m_hwndFrom = hwndFrom;
+    lpMsgItem->m_nUTalkNum = -1;
 
-	std::lock_guard<std::mutex> guard(m_mtItems);
-	m_listItems.push_back(pSentChatMessage);
-	m_cvItems.notify_one();
+    CSentChatMessage* pSentChatMessage = new CSentChatMessage();
+    pSentChatMessage->m_pMsgItem = lpMsgItem;
+    pSentChatMessage->m_hwndChat = hwndFrom;
 
-	return TRUE;
+    std::lock_guard<std::mutex> guard(m_mtItems);
+    m_listItems.push_back(pSentChatMessage);
+    m_cvItems.notify_one();
+
+    return TRUE;
 }
 
 BOOL CSendMsgThread::AddSessMsg(UINT nGroupId, UINT nToUin, time_t nTime, LPCTSTR lpMsg)
 {
-	if (0 == nGroupId || 0 == nToUin || NULL == lpMsg || NULL ==*lpMsg)
-		return FALSE;
+    if (0 == nGroupId || 0 == nToUin || NULL == lpMsg || NULL == *lpMsg)
+        return FALSE;
 
-	CMsgItem* lpMsgItem = new CMsgItem;
-	if (NULL == lpMsgItem)
-		return FALSE;
+    CMsgItem* lpMsgItem = new CMsgItem;
+    if (NULL == lpMsgItem)
+        return FALSE;
 
-	CSessMessage* lpSessMsg = new CSessMessage;
-	if (NULL == lpSessMsg)
-	{
-		delete lpMsgItem;
-		return FALSE;
-	}
+    CSessMessage* lpSessMsg = new CSessMessage;
+    if (NULL == lpSessMsg)
+    {
+        delete lpMsgItem;
+        return FALSE;
+    }
 
-	m_nMsgId++;
-	lpSessMsg->m_nMsgId = m_nMsgId;
-	lpSessMsg->m_nTime = (UINT)nTime;
-	lpSessMsg->m_nToUin = nToUin;
-	lpSessMsg->m_nGroupId = nGroupId;
-	
-	CreateMsgContent(lpMsg, lpSessMsg->m_arrContent);
+    m_nMsgId++;
+    lpSessMsg->m_nMsgId = m_nMsgId;
+    lpSessMsg->m_nTime = (UINT)nTime;
+    lpSessMsg->m_nToUin = nToUin;
+    lpSessMsg->m_nGroupId = nGroupId;
 
-	lpMsgItem->m_nType = FMG_MSG_TYPE_SESS;
-	lpMsgItem->m_lpMsg = (void*)lpSessMsg;
-	if (m_lpUserMgr != NULL)	//  π”√µΩŒ¥º”À¯µƒ÷˜œﬂ≥Ã ˝æ›£¨≤ª“™‘⁄÷˜œﬂ≥Ã÷ÆÕ‚µƒœﬂ≥Ãµ˜”√¥À∫Ø ˝
-	{
-		lpMsgItem->m_strNickName = m_lpUserMgr->m_UserInfo.m_strNickName;
+    CreateMsgContent(lpMsg, lpSessMsg->m_arrContent);
 
-		CBuddyInfo* lpBuddyInfo = m_lpUserMgr->m_GroupList.GetGroupMemberById(nGroupId, nToUin);
-		if (lpBuddyInfo != NULL)
-		{
-			lpMsgItem->m_nUTalkNum = lpBuddyInfo->m_uUserID;
-		}
-	}
+    lpMsgItem->m_nType = FMG_MSG_TYPE_SESS;
+    lpMsgItem->m_lpMsg = (void*)lpSessMsg;
+    if (m_lpUserMgr != NULL)	// ‰ΩøÁî®Âà∞Êú™Âä†ÈîÅÁöÑ‰∏ªÁ∫øÁ®ãÊï∞ÊçÆÔºå‰∏çË¶ÅÂú®‰∏ªÁ∫øÁ®ã‰πãÂ§ñÁöÑÁ∫øÁ®ãË∞ÉÁî®Ê≠§ÂáΩÊï∞
+    {
+        lpMsgItem->m_strNickName = m_lpUserMgr->m_UserInfo.m_strNickName;
 
-	//::EnterCriticalSection(&m_csItem);
-	//m_arrItem.push_back(lpMsgItem);
-	//::LeaveCriticalSection(&m_csItem);
+        CBuddyInfo* lpBuddyInfo = m_lpUserMgr->m_GroupList.GetGroupMemberById(nGroupId, nToUin);
+        if (lpBuddyInfo != NULL)
+        {
+            lpMsgItem->m_nUTalkNum = lpBuddyInfo->m_uUserID;
+        }
+    }
 
-	//::ReleaseSemaphore(m_hSemaphore, 1, NULL);
+    //::EnterCriticalSection(&m_csItem);
+    //m_arrItem.push_back(lpMsgItem);
+    //::LeaveCriticalSection(&m_csItem);
+
+    //::ReleaseSemaphore(m_hSemaphore, 1, NULL);
 
 
-	return TRUE;
+    return TRUE;
 }
 
 BOOL CSendMsgThread::HandleFontInfo(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strTemp = GetBetweenString(p+2, _T("[\""), _T("\"]")).c_str();
-	if (!strTemp.empty())
-	{
-		LPCTSTR lpFontFmt = _T("%[^,],%d,%[^,],%d,%d,%d");
-		TCHAR szName[32] = _T("ÀŒÃÂ");
-		TCHAR szColor[32] = _T("000000");
-		int nSize = 9;
-		BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE;
+    tstring strTemp = GetBetweenString(p + 2, _T("[\""), _T("\"]")).c_str();
+    if (!strTemp.empty())
+    {
+        LPCTSTR lpFontFmt = _T("%[^,],%d,%[^,],%d,%d,%d");
+        TCHAR szName[32] = _T("ÂÆã‰Ωì");
+        TCHAR szColor[32] = _T("000000");
+        int nSize = 9;
+        BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE;
 
-		int nCount = _stscanf(strTemp.c_str(), lpFontFmt, szName, 
-			&nSize, &szColor, &bBold, &bItalic, &bUnderLine);
-		if (nCount != 6)
-			return FALSE;
+        int nCount = _stscanf(strTemp.c_str(), lpFontFmt, szName,
+            &nSize, &szColor, &bBold, &bItalic, &bUnderLine);
+        if (nCount != 6)
+            return FALSE;
 
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FONT_INFO;
-			lpContent->m_FontInfo.m_nSize = nSize;
-			lpContent->m_FontInfo.m_clrText = HexStrToRGB(szColor);
-			lpContent->m_FontInfo.m_strName = szName;
-			lpContent->m_FontInfo.m_bBold = bBold;
-			lpContent->m_FontInfo.m_bItalic = bItalic;				
-			lpContent->m_FontInfo.m_bUnderLine = bUnderLine;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FONT_INFO;
+            lpContent->m_FontInfo.m_nSize = nSize;
+            lpContent->m_FontInfo.m_clrText = HexStrToRGB(szColor);
+            lpContent->m_FontInfo.m_strName = szName;
+            lpContent->m_FontInfo.m_bBold = bBold;
+            lpContent->m_FontInfo.m_bItalic = bItalic;
+            lpContent->m_FontInfo.m_bUnderLine = bUnderLine;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CSendMsgThread::HandleSysFaceId(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	int nFaceId = GetBetweenInt(p+2, _T("[\""), _T("\"]"), -1);
-	if (nFaceId != -1)
-	{
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    int nFaceId = GetBetweenInt(p + 2, _T("[\""), _T("\"]"), -1);
+    if (nFaceId != -1)
+    {
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FACE;
-			lpContent->m_nFaceId = nFaceId;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FACE;
+            lpContent->m_nFaceId = nFaceId;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CSendMsgThread::HandleShakeWindowMsg(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	int nShakeTimes = GetBetweenInt(p+2, _T("[\""), _T("\"]"), -1);
-	if (nShakeTimes > 0)
-	{
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    int nShakeTimes = GetBetweenInt(p + 2, _T("[\""), _T("\"]"), -1);
+    if (nShakeTimes > 0)
+    {
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_SHAKE_WINDOW;
-			lpContent->m_nShakeTimes = nShakeTimes;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_SHAKE_WINDOW;
+            lpContent->m_nShakeTimes = nShakeTimes;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CSendMsgThread::HandleCustomPic(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strFileName = GetBetweenString(p+2, _T("[\""), _T("\"]"));
-	if (!strFileName.empty())
-	{
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    tstring strFileName = GetBetweenString(p + 2, _T("[\""), _T("\"]"));
+    if (!strFileName.empty())
+    {
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent();
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_CHAT_IMAGE;
-			lpContent->m_CFaceInfo.m_strFileName = Hootina::CPath::GetFileName(strFileName.c_str());
-			lpContent->m_CFaceInfo.m_strFilePath = strFileName;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent();
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_CHAT_IMAGE;
+            lpContent->m_CFaceInfo.m_strFileName = Hootina::CPath::GetFileName(strFileName.c_str());
+            lpContent->m_CFaceInfo.m_strFilePath = strFileName;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CSendMsgThread::HandleFile(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strFileName = GetBetweenString(p+2, _T("[\""), _T("\"]"));
-	if (!strFileName.empty())
-	{
-		LPCTSTR lpFileFmt = _T("%[^,],%[^,],%d,%d");
-		TCHAR szFilePath[MAX_PATH] = {0};
-		TCHAR szFileName[MAX_PATH] = {0};
-		long nFileSize = 0;
-		BOOL bOnline = TRUE;
+    tstring strFileName = GetBetweenString(p + 2, _T("[\""), _T("\"]"));
+    if (!strFileName.empty())
+    {
+        LPCTSTR lpFileFmt = _T("%[^,],%[^,],%d,%d");
+        TCHAR szFilePath[MAX_PATH] = { 0 };
+        TCHAR szFileName[MAX_PATH] = { 0 };
+        long nFileSize = 0;
+        BOOL bOnline = TRUE;
 
-		int nCount = _stscanf(strFileName.c_str(), lpFileFmt, szFileName, szFilePath, &nFileSize, &bOnline);
-		if (nCount != 4)
-			return FALSE;
-		
-		
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+        int nCount = _stscanf(strFileName.c_str(), lpFileFmt, szFileName, szFilePath, &nFileSize, &bOnline);
+        if (nCount != 4)
+            return FALSE;
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FILE;
-			lpContent->m_CFaceInfo.m_strFilePath = szFilePath;
-			lpContent->m_CFaceInfo.m_strName = szFileName;
-			lpContent->m_CFaceInfo.m_strFileName = szFileName;
-			lpContent->m_CFaceInfo.m_dwFileSize = (DWORD)nFileSize;
-			lpContent->m_CFaceInfo.m_bOnline = bOnline;
 
-			arrContent.push_back(lpContent);
-		}
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FILE;
+            lpContent->m_CFaceInfo.m_strFilePath = szFilePath;
+            lpContent->m_CFaceInfo.m_strName = szFileName;
+            lpContent->m_CFaceInfo.m_strFileName = szFileName;
+            lpContent->m_CFaceInfo.m_dwFileSize = (DWORD)nFileSize;
+            lpContent->m_CFaceInfo.m_bOnline = bOnline;
+
+            arrContent.push_back(lpContent);
+        }
+
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CSendMsgThread::HandleRemoteDesktop(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
@@ -1031,188 +1026,182 @@ BOOL CSendMsgThread::HandleRemoteDesktop(LPCTSTR& p, tstring& strText, std::vect
 
 BOOL CSendMsgThread::CreateMsgContent(const tstring& strChatMsg, std::vector<CContent*>& arrContent)
 {
-	tstring strText;
-	CContent* lpContent;
-    for (LPCTSTR p = strChatMsg.c_str();*p != _T('\0'); p++)
-	{
-		if (*p == _T('/'))
-		{
-			if (*(p+1) == _T('/'))
-			{
-				strText +=*p;
-				p++;
-				continue;
-			}
-			else if (*(p+1) == _T('o'))						//◊÷ÃÂ–≈œ¢
-			{
-				if (HandleFontInfo(p, strText, arrContent))
-					continue;
-			}
-			else if (*(p+1) == _T('f'))						//±Ì«È–≈œ¢
-			{
-				if (HandleSysFaceId(p, strText, arrContent))
-					continue;
-			}
-			else if(*(p+1) == _T('s'))						//¥∞ø⁄∂∂∂Ø
-			{
-				if (HandleShakeWindowMsg(p, strText, arrContent))
-					continue;
-			}
-			else if (*(p+1) == _T('c'))						//◊‘∂®“ÂÕº∆¨
-			{
-				if (HandleCustomPic(p, strText, arrContent))
-					continue;
-			}
-			else if (*(p+1) == _T('i'))						//Œƒº˛
-			{
-				if (HandleFile(p, strText, arrContent))
-					continue;
-			}
-            else if (*(p + 1) == _T('r'))
+    tstring strText;
+    CContent* lpContent;
+    for (LPCTSTR p = strChatMsg.c_str(); *p != _T('\0'); p++)
+    {
+        if (*p == _T('/'))
+        {
+            if (*(p + 1) == _T('/'))
             {
-                if (HandleRemoteDesktop(p, strText, arrContent))     //‘∂≥Ã◊¿√Ê
+                strText += *p;
+                p++;
+                continue;
+            } else if (*(p + 1) == _T('o'))						//Â≠ó‰Ωì‰ø°ÊÅØ
+            {
+                if (HandleFontInfo(p, strText, arrContent))
+                    continue;
+            } else if (*(p + 1) == _T('f'))						//Ë°®ÊÉÖ‰ø°ÊÅØ
+            {
+                if (HandleSysFaceId(p, strText, arrContent))
+                    continue;
+            } else if (*(p + 1) == _T('s'))						//Á™óÂè£ÊäñÂä®
+            {
+                if (HandleShakeWindowMsg(p, strText, arrContent))
+                    continue;
+            } else if (*(p + 1) == _T('c'))						//Ëá™ÂÆö‰πâÂõæÁâá
+            {
+                if (HandleCustomPic(p, strText, arrContent))
+                    continue;
+            } else if (*(p + 1) == _T('i'))						//Êñá‰ª∂
+            {
+                if (HandleFile(p, strText, arrContent))
+                    continue;
+            } else if (*(p + 1) == _T('r'))
+            {
+                if (HandleRemoteDesktop(p, strText, arrContent))     //ËøúÁ®ãÊ°åÈù¢
                     continue;
             }
-		}
-		strText +=*p;
-	}
+        }
+        strText += *p;
+    }
 
-	if (!strText.empty())
-	{
-		lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_TEXT;
-			lpContent->m_strText = strText;
-			arrContent.push_back(lpContent);
-		}
-		strText = _T("");
-	}
+    if (!strText.empty())
+    {
+        lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_TEXT;
+            lpContent->m_strText = strText;
+            arrContent.push_back(lpContent);
+        }
+        strText = _T("");
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 
-// ∑¢ÀÕ∫√”—œ˚œ¢
+// ÂèëÈÄÅÂ•ΩÂèãÊ∂àÊÅØ
 BOOL CSendMsgThread::SendBuddyMsg(CMsgItem* lpMsgItem)
 {
-	if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
-		return FALSE;
+    if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
+        return FALSE;
 
-	CBuddyMessage* lpMsg = (CBuddyMessage*)lpMsgItem->m_lpMsg;
-	std::vector<CContent*>& arrContent = lpMsg->m_arrContent;
-	HWND hWndFrom = lpMsg->m_hwndFrom;
-	//CUploadBuddyChatPicResult uploadPicResult;
-	BOOL bRet;
-	CContent* lpContent = NULL;
-	CFileItemRequest* pFileItemRequest = NULL;
-	
-	// …œ¥´◊‘∂®“ÂÕº∆¨
-	CString strDestPath;
-	TCHAR szMd5[64];
-	size_t nSize = arrContent.size();
-	for (size_t i = 0; i < nSize; ++i)	
-	{
-		lpContent = arrContent[i];
-		if(lpContent==NULL || CONTENT_TYPE_CHAT_IMAGE!=lpContent->m_nType)
-			continue;
-		//Ω´Œƒº˛øΩ±¥÷¡¡ƒÃÏº«¬ºŒƒº˛º–
-		memset(szMd5, 0, sizeof(szMd5));
-		//TODO: ªÒ»°Œƒº˛md5÷µ ß∞‹‘ı√¥∞Ï£ø
-		if(!GetFileMd5ValueW(lpContent->m_CFaceInfo.m_strFilePath.c_str(), szMd5, ARRAYSIZE(szMd5)))
-			continue;
-		strDestPath.Format(_T("%s%s.%s"), m_lpUserMgr->GetChatPicFolder().c_str(), szMd5, Hootina::CPath::GetExtension(lpContent->m_CFaceInfo.m_strFilePath.c_str()).c_str());
-		::CopyFile(lpContent->m_CFaceInfo.m_strFilePath.c_str(), strDestPath, FALSE);
+    CBuddyMessage* lpMsg = (CBuddyMessage*)lpMsgItem->m_lpMsg;
+    std::vector<CContent*>& arrContent = lpMsg->m_arrContent;
+    HWND hWndFrom = lpMsg->m_hwndFrom;
+    //CUploadBuddyChatPicResult uploadPicResult;
+    BOOL bRet;
+    CContent* lpContent = NULL;
+    CFileItemRequest* pFileItemRequest = NULL;
 
-		pFileItemRequest = new CFileItemRequest();
-		pFileItemRequest->m_hwndReflection = hWndFrom;
-		_tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), lpContent->m_CFaceInfo.m_strFilePath.c_str());
-		pFileItemRequest->m_uSenderID = lpMsg->m_nFromUin;
-		pFileItemRequest->m_setTargetIDs.insert(lpMsg->m_nToUin);
-		pFileItemRequest->m_nFileType = FILE_ITEM_UPLOAD_CHAT_IMAGE;
+    // ‰∏ä‰º†Ëá™ÂÆö‰πâÂõæÁâá
+    CString strDestPath;
+    TCHAR szMd5[64];
+    size_t nSize = arrContent.size();
+    for (size_t i = 0; i < nSize; ++i)
+    {
+        lpContent = arrContent[i];
+        if (lpContent == NULL || CONTENT_TYPE_CHAT_IMAGE != lpContent->m_nType)
+            continue;
+        //Â∞ÜÊñá‰ª∂Êã∑Ë¥ùËá≥ËÅäÂ§©ËÆ∞ÂΩïÊñá‰ª∂Â§π
+        memset(szMd5, 0, sizeof(szMd5));
+        //TODO: Ëé∑ÂèñÊñá‰ª∂md5ÂÄºÂ§±Ë¥•ÊÄé‰πàÂäûÔºü
+        if (!GetFileMd5ValueW(lpContent->m_CFaceInfo.m_strFilePath.c_str(), szMd5, ARRAYSIZE(szMd5)))
+            continue;
+        strDestPath.Format(_T("%s%s.%s"), m_lpUserMgr->GetChatPicFolder().c_str(), szMd5, Hootina::CPath::GetExtension(lpContent->m_CFaceInfo.m_strFilePath.c_str()).c_str());
+        ::CopyFile(lpContent->m_CFaceInfo.m_strFilePath.c_str(), strDestPath, FALSE);
+
+        pFileItemRequest = new CFileItemRequest();
+        pFileItemRequest->m_hwndReflection = hWndFrom;
+        _tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), lpContent->m_CFaceInfo.m_strFilePath.c_str());
+        pFileItemRequest->m_uSenderID = lpMsg->m_nFromUin;
+        pFileItemRequest->m_setTargetIDs.insert(lpMsg->m_nToUin);
+        pFileItemRequest->m_nFileType = FILE_ITEM_UPLOAD_CHAT_IMAGE;
 
         m_lpFMGClient->m_ImageTask.AddItem(pFileItemRequest);
 
-		lpContent->m_CFaceInfo.m_strFileName = Hootina::CPath::GetFileName(strDestPath);
-	}
-	
-    
-	//º”π§œ˚œ¢ƒ⁄»›
-	bRet = ProcessBuddyMsg(lpMsg);
-	if (!bRet)
-	{
-		::PostMessage(hWndFrom, FMG_MSG_SENDCHATMSG_RESULT, SEND_WHOLE_MSG_FAILED, 0);
-		return FALSE;
-	}
-	
-	//»∫–≈œ¢
-	if(IsGroupTarget(lpMsg->m_nToUin))
-		WriteGroupMsgLog(m_lpUserMgr, lpMsg->m_nToUin, m_lpUserMgr->m_UserInfo.m_uUserID, m_lpUserMgr->m_UserInfo.m_strNickName.c_str(), lpMsg);
-	else
-        WriteBuddyMsgLog(m_lpUserMgr, lpMsg->m_nToUin, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);
-		//WriteBuddyMsgLog(m_lpUserMgr, lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);
+        lpContent->m_CFaceInfo.m_strFileName = Hootina::CPath::GetFileName(strDestPath);
+    }
 
-	return TRUE;
+
+    //Âä†Â∑•Ê∂àÊÅØÂÜÖÂÆπ
+    bRet = ProcessBuddyMsg(lpMsg);
+    if (!bRet)
+    {
+        ::PostMessage(hWndFrom, FMG_MSG_SENDCHATMSG_RESULT, SEND_WHOLE_MSG_FAILED, 0);
+        return FALSE;
+    }
+
+    //Áæ§‰ø°ÊÅØ
+    if (IsGroupTarget(lpMsg->m_nToUin))
+        WriteGroupMsgLog(m_lpUserMgr, lpMsg->m_nToUin, m_lpUserMgr->m_UserInfo.m_uUserID, m_lpUserMgr->m_UserInfo.m_strNickName.c_str(), lpMsg);
+    else
+        WriteBuddyMsgLog(m_lpUserMgr, lpMsg->m_nToUin, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);
+    //WriteBuddyMsgLog(m_lpUserMgr, lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);
+
+    return TRUE;
 }
 
 BOOL CSendMsgThread::SendMultiMsg(CMsgItem* lpMsgItem)
 {
-	if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
-		return FALSE;
+    if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
+        return FALSE;
 
-	CBuddyMessage* lpMsg = (CBuddyMessage*)lpMsgItem->m_lpMsg;
-	std::vector<CContent*>& arrContent = lpMsg->m_arrContent;
-	HWND hWndFrom = lpMsg->m_hwndFrom;
-	//CUploadBuddyChatPicResult uploadPicResult;
-	BOOL bRet;
-	CContent* lpContent = NULL;
-	CFileItemRequest* pFileItemRequest = NULL;
-	
-	// …œ¥´◊‘∂®“ÂÕº∆¨
-	CString strDestPath;
-	TCHAR szMd5[64];
-	size_t nSize = arrContent.size();
-	for (size_t i = 0; i < nSize; ++i)	
-	{
-		lpContent = arrContent[i];
-		if(lpContent==NULL || CONTENT_TYPE_CHAT_IMAGE!=lpContent->m_nType)
-			continue;
-		//Ω´Œƒº˛øΩ±¥÷¡¡ƒÃÏº«¬ºŒƒº˛º–
-		memset(szMd5, 0, sizeof(szMd5));
-		//TODO: ªÒ»°Œƒº˛md5÷µ ß∞‹‘ı√¥∞Ï£ø
-		if(!GetFileMd5ValueW(lpContent->m_CFaceInfo.m_strFilePath.c_str(), szMd5, ARRAYSIZE(szMd5)))
-			continue;
-		strDestPath.Format(_T("%s%s.%s"), m_lpUserMgr->GetChatPicFolder().c_str(), szMd5, Hootina::CPath::GetExtension(lpContent->m_CFaceInfo.m_strFilePath.c_str()).c_str());
-		::CopyFile(lpContent->m_CFaceInfo.m_strFilePath.c_str(), strDestPath, FALSE);
+    CBuddyMessage* lpMsg = (CBuddyMessage*)lpMsgItem->m_lpMsg;
+    std::vector<CContent*>& arrContent = lpMsg->m_arrContent;
+    HWND hWndFrom = lpMsg->m_hwndFrom;
+    //CUploadBuddyChatPicResult uploadPicResult;
+    BOOL bRet;
+    CContent* lpContent = NULL;
+    CFileItemRequest* pFileItemRequest = NULL;
 
-		pFileItemRequest = new CFileItemRequest();
-		pFileItemRequest->m_hwndReflection = hWndFrom;
-		_tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), lpContent->m_CFaceInfo.m_strFilePath.c_str());
-		pFileItemRequest->m_uSenderID = lpMsg->m_nFromUin;
-		pFileItemRequest->m_nFileType = FILE_ITEM_UPLOAD_CHAT_IMAGE;
-		pFileItemRequest->m_setTargetIDs.insert(lpMsgItem->m_arrTargetIDs.begin(), lpMsgItem->m_arrTargetIDs.end());
+    // ‰∏ä‰º†Ëá™ÂÆö‰πâÂõæÁâá
+    CString strDestPath;
+    TCHAR szMd5[64];
+    size_t nSize = arrContent.size();
+    for (size_t i = 0; i < nSize; ++i)
+    {
+        lpContent = arrContent[i];
+        if (lpContent == NULL || CONTENT_TYPE_CHAT_IMAGE != lpContent->m_nType)
+            continue;
+        //Â∞ÜÊñá‰ª∂Êã∑Ë¥ùËá≥ËÅäÂ§©ËÆ∞ÂΩïÊñá‰ª∂Â§π
+        memset(szMd5, 0, sizeof(szMd5));
+        //TODO: Ëé∑ÂèñÊñá‰ª∂md5ÂÄºÂ§±Ë¥•ÊÄé‰πàÂäûÔºü
+        if (!GetFileMd5ValueW(lpContent->m_CFaceInfo.m_strFilePath.c_str(), szMd5, ARRAYSIZE(szMd5)))
+            continue;
+        strDestPath.Format(_T("%s%s.%s"), m_lpUserMgr->GetChatPicFolder().c_str(), szMd5, Hootina::CPath::GetExtension(lpContent->m_CFaceInfo.m_strFilePath.c_str()).c_str());
+        ::CopyFile(lpContent->m_CFaceInfo.m_strFilePath.c_str(), strDestPath, FALSE);
+
+        pFileItemRequest = new CFileItemRequest();
+        pFileItemRequest->m_hwndReflection = hWndFrom;
+        _tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), lpContent->m_CFaceInfo.m_strFilePath.c_str());
+        pFileItemRequest->m_uSenderID = lpMsg->m_nFromUin;
+        pFileItemRequest->m_nFileType = FILE_ITEM_UPLOAD_CHAT_IMAGE;
+        pFileItemRequest->m_setTargetIDs.insert(lpMsgItem->m_arrTargetIDs.begin(), lpMsgItem->m_arrTargetIDs.end());
 
         m_lpFMGClient->m_ImageTask.AddItem(pFileItemRequest);
 
-		lpContent->m_CFaceInfo.m_strFileName = Hootina::CPath::GetFileName(strDestPath);
-	}
-	
+        lpContent->m_CFaceInfo.m_strFileName = Hootina::CPath::GetFileName(strDestPath);
+    }
 
-	//º”π§œ˚œ¢ƒ⁄»›
-	bRet = ProcessMultiMsg(lpMsgItem);
-	if (!bRet)
-	{
-		::PostMessage(hWndFrom, FMG_MSG_SENDCHATMSG_RESULT, SEND_WHOLE_MSG_FAILED, 0);
-		return FALSE;
-	}
-	
-	//»∫–≈œ¢
-	if(IsGroupTarget(lpMsg->m_nToUin))
-		WriteGroupMsgLog(m_lpUserMgr, lpMsg->m_nToUin, m_lpUserMgr->m_UserInfo.m_uUserID, m_lpUserMgr->m_UserInfo.m_strNickName.c_str(), lpMsg);
-	else
-		WriteBuddyMsgLog(m_lpUserMgr, lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);
 
-	return TRUE;
+    //Âä†Â∑•Ê∂àÊÅØÂÜÖÂÆπ
+    bRet = ProcessMultiMsg(lpMsgItem);
+    if (!bRet)
+    {
+        ::PostMessage(hWndFrom, FMG_MSG_SENDCHATMSG_RESULT, SEND_WHOLE_MSG_FAILED, 0);
+        return FALSE;
+    }
+
+    //Áæ§‰ø°ÊÅØ
+    if (IsGroupTarget(lpMsg->m_nToUin))
+        WriteGroupMsgLog(m_lpUserMgr, lpMsg->m_nToUin, m_lpUserMgr->m_UserInfo.m_uUserID, m_lpUserMgr->m_UserInfo.m_strNickName.c_str(), lpMsg);
+    else
+        WriteBuddyMsgLog(m_lpUserMgr, lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);
+
+    return TRUE;
 }
 
 BOOL CSendMsgThread::SendMultiChatMessage(const char* pszChatMsg, int nChatMsgLength, UINT* pAccountList, int nAccountNum)
@@ -1223,7 +1212,7 @@ BOOL CSendMsgThread::SendMultiChatMessage(const char* pszChatMsg, int nChatMsgLe
     writeStream.WriteInt32(m_seq);
     //senderId
     //writeStream.Write((int32_t)lpBuddyMsg->m_nFromUin);
-    //œ˚œ¢ƒ⁄»›
+    //Ê∂àÊÅØÂÜÖÂÆπ
     writeStream.WriteCString(pszChatMsg, nChatMsgLength);
     //targetId
 
@@ -1234,7 +1223,7 @@ BOOL CSendMsgThread::SendMultiChatMessage(const char* pszChatMsg, int nChatMsgLe
         osTargets << pAccountList[i] << ",";
     }
 
-    //»•≥˝◊Ó∫Û“ª∏ˆ∂‡”‡µƒ∂∫∫≈
+    //ÂéªÈô§ÊúÄÂêé‰∏Ä‰∏™Â§ö‰ΩôÁöÑÈÄóÂè∑
     std::string strTarget = osTargets.str().substr(0, osTargets.str().length() - 1);
     strTarget += "]}";
 
@@ -1244,248 +1233,242 @@ BOOL CSendMsgThread::SendMultiChatMessage(const char* pszChatMsg, int nChatMsgLe
     LOG_INFO("Send multi chat msg: nAccountNum=%d.", nAccountNum);
 
     CIUSocket::GetInstance().Send(outbuf);
-    
-    //TODO: ≤ª–Ë“™∑µªÿ÷µµƒ
+
+    //TODO: ‰∏çÈúÄË¶ÅËøîÂõûÂÄºÁöÑ
     return TRUE;
 }
 
-// ∑¢ÀÕ»∫œ˚œ¢
+// ÂèëÈÄÅÁæ§Ê∂àÊÅØ
 BOOL CSendMsgThread::SendGroupMsg(CMsgItem* lpMsgItem)
 {
-	return SendBuddyMsg(lpMsgItem);
-	
-	//if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
-	//	return FALSE;
+    return SendBuddyMsg(lpMsgItem);
 
-	//CGroupMessage* lpMsg = (CGroupMessage*)lpMsgItem->m_lpMsg;
-	//std::vector<CContent*>& arrContent = lpMsg->m_arrContent;
-	//CUploadGroupChatPicResult uploadPicResult;
-	//CGetGroupFaceSigResult sigResult;
-	//CSendGroupMsgResult sendMsgResult;
-	//BOOL bHasCustomFace = FALSE;
-	//int nRetry = 3;		//÷ÿ ‘¥Œ ˝
-	//BOOL bRet;
+    //if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
+    //	return FALSE;
 
-	//for (int i = 0; i < (int)arrContent.size(); i++)	// …œ¥´◊‘∂®“Â±Ì«È
-	//{
-	//	CContent* lpContent = arrContent[i];
-	//	if (lpContent != NULL && CONTENT_TYPE_CUSTOM_FACE == lpContent->m_nType)
-	//	{
-	//		bHasCustomFace = TRUE;
+    //CGroupMessage* lpMsg = (CGroupMessage*)lpMsgItem->m_lpMsg;
+    //std::vector<CContent*>& arrContent = lpMsg->m_arrContent;
+    //CUploadGroupChatPicResult uploadPicResult;
+    //CGetGroupFaceSigResult sigResult;
+    //CSendGroupMsgResult sendMsgResult;
+    //BOOL bHasCustomFace = FALSE;
+    //int nRetry = 3;		//ÈáçËØïÊ¨°Êï∞
+    //BOOL bRet;
 
-	//		for (int j = 0; j < nRetry; j++)
-	//		{
-	//			bRet = UploadGroupChatPic(lpContent->m_CFaceInfo.m_strName.c_str(), uploadPicResult);
-	//			if (bRet)
-	//				break;
-	//		}
+    //for (int i = 0; i < (int)arrContent.size(); i++)	// ‰∏ä‰º†Ëá™ÂÆö‰πâË°®ÊÉÖ
+    //{
+    //	CContent* lpContent = arrContent[i];
+    //	if (lpContent != NULL && CONTENT_TYPE_CUSTOM_FACE == lpContent->m_nType)
+    //	{
+    //		bHasCustomFace = TRUE;
 
-	//		if (!bRet)
-	//			return FALSE;
+    //		for (int j = 0; j < nRetry; j++)
+    //		{
+    //			bRet = UploadGroupChatPic(lpContent->m_CFaceInfo.m_strName.c_str(), uploadPicResult);
+    //			if (bRet)
+    //				break;
+    //		}
 
-	//		lpContent->m_CFaceInfo.m_strFilePath = uploadPicResult.m_strFilePath;
-	//	}
-	//}
+    //		if (!bRet)
+    //			return FALSE;
 
-	//if (bHasCustomFace && (m_strGFaceKey.empty() || m_strGFaceSig.empty()))
-	//{
-	//	//bRet = m_lpUTalkProtocol->GetGroupFaceSignal(m_HttpClient, WEBUTalk_CLIENT_ID, 
-	//	//	m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), &sigResult);
-	//	//if (!bRet || (sigResult.m_nRetCode != 0))
-	//	//	return FALSE;
+    //		lpContent->m_CFaceInfo.m_strFilePath = uploadPicResult.m_strFilePath;
+    //	}
+    //}
 
-	//	//m_strGFaceKey = sigResult.m_strGFaceKey;
-	//	//m_strGFaceSig = sigResult.m_strGFaceSig;
-	//}
+    //if (bHasCustomFace && (m_strGFaceKey.empty() || m_strGFaceSig.empty()))
+    //{
+    //	//bRet = m_lpUTalkProtocol->GetGroupFaceSignal(m_HttpClient, WEBUTalk_CLIENT_ID, 
+    //	//	m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), &sigResult);
+    //	//if (!bRet || (sigResult.m_nRetCode != 0))
+    //	//	return FALSE;
 
-	//bRet = m_lpUTalkProtocol->SendGroupMsg(m_HttpClient, lpMsg, 
-	//	WEBUTalk_CLIENT_ID, m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), 
-	//	m_strGFaceKey.c_str(), m_strGFaceSig.c_str(), &sendMsgResult);
-	//if (!bRet || (sendMsgResult.m_nRetCode != 0))
-	//	return FALSE;
+    //	//m_strGFaceKey = sigResult.m_strGFaceKey;
+    //	//m_strGFaceSig = sigResult.m_strGFaceSig;
+    //}
 
-	//WriteGroupMsgLog(m_lpUserMgr, lpMsgItem->m_nGroupNum, 
-	//	lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), lpMsg);
+    //bRet = m_lpUTalkProtocol->SendGroupMsg(m_HttpClient, lpMsg, 
+    //	WEBUTalk_CLIENT_ID, m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), 
+    //	m_strGFaceKey.c_str(), m_strGFaceSig.c_str(), &sendMsgResult);
+    //if (!bRet || (sendMsgResult.m_nRetCode != 0))
+    //	return FALSE;
 
-	//return TRUE;
+    //WriteGroupMsgLog(m_lpUserMgr, lpMsgItem->m_nGroupNum, 
+    //	lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), lpMsg);
+
+    //return TRUE;
 }
 
-// ∑¢ÀÕ»∫≥…‘±œ˚œ¢
+// ÂèëÈÄÅÁæ§ÊàêÂëòÊ∂àÊÅØ
 BOOL CSendMsgThread::SendSessMsg(CMsgItem* lpMsgItem)
 {
-	/*if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
-		return FALSE;
+    /*if (NULL == lpMsgItem || NULL == lpMsgItem->m_lpMsg)
+        return FALSE;
 
-	CSessMessage* lpMsg = (CSessMessage*)lpMsgItem->m_lpMsg;
-	CSendSessMsgResult sendMsgResult;
-	BOOL bRet;
+    CSessMessage* lpMsg = (CSessMessage*)lpMsgItem->m_lpMsg;
+    CSendSessMsgResult sendMsgResult;
+    BOOL bRet;
 
-	if (lpMsgItem->m_strGroupSig.empty())
-	{
-		CGetC2CMsgSigResult* lpGetC2CMsgSigResult = new CGetC2CMsgSigResult;
-		if (NULL == lpGetC2CMsgSigResult)
-			return FALSE;
-		
-		bRet = m_lpUTalkProtocol->GetC2CMsgSignal(m_HttpClient, 
-			lpMsg->m_nGroupId, lpMsg->m_nToUin, WEBUTalk_CLIENT_ID, 
-			m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), lpGetC2CMsgSigResult);
-		if (!bRet || lpGetC2CMsgSigResult->m_nRetCode != 0)
-		{
-			delete lpGetC2CMsgSigResult;
-			lpGetC2CMsgSigResult = NULL;
-			return FALSE;
-		}
-		lpMsgItem->m_strGroupSig = lpGetC2CMsgSigResult->m_strValue;
-		lpGetC2CMsgSigResult->m_nGroupId = lpMsg->m_nGroupId;
-		lpGetC2CMsgSigResult->m_nUTalkUin = lpMsg->m_nToUin;
-		::PostMessage(m_lpUserMgr->m_hProxyWnd, 
-			FMG_MSG_UPDATE_C2CMSGSIG, 0, (LPARAM)lpGetC2CMsgSigResult);
-	}
+    if (lpMsgItem->m_strGroupSig.empty())
+    {
+        CGetC2CMsgSigResult* lpGetC2CMsgSigResult = new CGetC2CMsgSigResult;
+        if (NULL == lpGetC2CMsgSigResult)
+            return FALSE;
 
-	bRet = m_lpUTalkProtocol->SendSessMsg(m_HttpClient, lpMsg, lpMsgItem->m_strGroupSig.c_str(), 
-		WEBUTalk_CLIENT_ID, m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), &sendMsgResult);
-	if (!bRet || (sendMsgResult.m_nRetCode != 0))
-		return FALSE;
+        bRet = m_lpUTalkProtocol->GetC2CMsgSignal(m_HttpClient,
+            lpMsg->m_nGroupId, lpMsg->m_nToUin, WEBUTalk_CLIENT_ID,
+            m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), lpGetC2CMsgSigResult);
+        if (!bRet || lpGetC2CMsgSigResult->m_nRetCode != 0)
+        {
+            delete lpGetC2CMsgSigResult;
+            lpGetC2CMsgSigResult = NULL;
+            return FALSE;
+        }
+        lpMsgItem->m_strGroupSig = lpGetC2CMsgSigResult->m_strValue;
+        lpGetC2CMsgSigResult->m_nGroupId = lpMsg->m_nGroupId;
+        lpGetC2CMsgSigResult->m_nUTalkUin = lpMsg->m_nToUin;
+        ::PostMessage(m_lpUserMgr->m_hProxyWnd,
+            FMG_MSG_UPDATE_C2CMSGSIG, 0, (LPARAM)lpGetC2CMsgSigResult);
+    }
 
-	WriteSessMsgLog(m_lpUserMgr, lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);*/
+    bRet = m_lpUTalkProtocol->SendSessMsg(m_HttpClient, lpMsg, lpMsgItem->m_strGroupSig.c_str(),
+        WEBUTalk_CLIENT_ID, m_lpUserMgr->m_LoginResult2.m_strPSessionId.c_str(), &sendMsgResult);
+    if (!bRet || (sendMsgResult.m_nRetCode != 0))
+        return FALSE;
 
-	return TRUE;
+    WriteSessMsgLog(m_lpUserMgr, lpMsgItem->m_nUTalkNum, lpMsgItem->m_strNickName.c_str(), TRUE, lpMsg);*/
+
+    return TRUE;
 }
 
 BOOL CSendMsgThread::ProcessBuddyMsg(CBuddyMessage* lpBuddyMsg)
 {
-	if (NULL==lpBuddyMsg)
- 		return FALSE;
-	
-	TCHAR cBuf[512] = {0};
- 
-	CString strChatContent;
-	CString strEscape;
-	CString strFont;
-	const long MAX_RECENT_MSG_LENGTH = 16;
-	CString strRecentMsg;
-	long nImageCount = 0;
-	std::vector<CString> aryImageInfo;
-	long nImageWidth = 0;
-	long nImageHeight = 0;
-	
-	//»∫◊È«∞√Êº”…œæﬂÃÂµƒ"ƒ≥ƒ≥»ÀÀµ£∫"
+    if (NULL == lpBuddyMsg)
+        return FALSE;
+
+    TCHAR cBuf[512] = { 0 };
+
+    CString strChatContent;
+    CString strEscape;
+    CString strFont;
+    const long MAX_RECENT_MSG_LENGTH = 16;
+    CString strRecentMsg;
+    long nImageCount = 0;
+    std::vector<CString> aryImageInfo;
+    long nImageWidth = 0;
+    long nImageHeight = 0;
+
+    //Áæ§ÁªÑÂâçÈù¢Âä†‰∏äÂÖ∑‰ΩìÁöÑ"ÊüêÊüê‰∫∫ËØ¥Ôºö"
     if (IsGroupTarget(lpBuddyMsg->m_nToUin))
-	{
-		strRecentMsg.Format(_T("%s:"), m_lpUserMgr->GetNickName(lpBuddyMsg->m_nFromUin).c_str());
-	}
-	for (int i = 0; i < (int)lpBuddyMsg->m_arrContent.size(); i++)
-	{
-		CContent* lpContent = lpBuddyMsg->m_arrContent[i];
-		if(lpContent == NULL)
-			continue;
+    {
+        strRecentMsg.Format(_T("%s:"), m_lpUserMgr->GetNickName(lpBuddyMsg->m_nFromUin).c_str());
+    }
+    for (int i = 0; i < (int)lpBuddyMsg->m_arrContent.size(); i++)
+    {
+        CContent* lpContent = lpBuddyMsg->m_arrContent[i];
+        if (lpContent == NULL)
+            continue;
 
-		if (lpContent->m_nType == CONTENT_TYPE_TEXT)							//Œƒ±æ
-		{
-			//strContent += _T("\\\"");
-			//strContent += UnicodeToHexStr(lpContent->m_strText.c_str(), TRUE);
-			//strContent += _T("\\\",");
+        if (lpContent->m_nType == CONTENT_TYPE_TEXT)							//ÊñáÊú¨
+        {
+            //strContent += _T("\\\"");
+            //strContent += UnicodeToHexStr(lpContent->m_strText.c_str(), TRUE);
+            //strContent += _T("\\\",");
 
-			strChatContent += _T("{\"msgText\":\"");
-			strEscape = lpContent->m_strText.data();
-			//∂‘À´“˝∫≈∫Õ∑¥–±∏‹Ω¯––◊™“Â
-			strEscape.Replace(_T("\\"), _T("\\\\"));
-			strEscape.Replace(_T("\""), _T("\\\""));
-			strChatContent += strEscape;
-			strChatContent += _T("\"},");
+            strChatContent += _T("{\"msgText\":\"");
+            strEscape = lpContent->m_strText.data();
+            //ÂØπÂèåÂºïÂè∑ÂíåÂèçÊñúÊù†ËøõË°åËΩ¨‰πâ
+            strEscape.Replace(_T("\\"), _T("\\\\"));
+            strEscape.Replace(_T("\""), _T("\\\""));
+            strChatContent += strEscape;
+            strChatContent += _T("\"},");
 
-			strRecentMsg += lpContent->m_strText.data();
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_FONT_INFO)			//◊÷ÃÂ
-		{
-			strFont.Format(_T("\"font\":[\"%s\",%d,%d,%d,%d,%d],"),
-							lpContent->m_FontInfo.m_strName.data(),
-							lpContent->m_FontInfo.m_nSize,
-							lpContent->m_FontInfo.m_clrText,
-							lpContent->m_FontInfo.m_bBold,
-							lpContent->m_FontInfo.m_bItalic,
-							lpContent->m_FontInfo.m_bUnderLine);
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_FACE)				//±Ì«È
-		{
-			strChatContent += _T("{\"faceID\":");
-			memset(cBuf, 0, sizeof(cBuf));
-			wsprintf(cBuf, _T("%d"), lpContent->m_nFaceId);
-			strChatContent += cBuf;
-			strChatContent += _T("},");
+            strRecentMsg += lpContent->m_strText.data();
+        } else if (lpContent->m_nType == CONTENT_TYPE_FONT_INFO)			//Â≠ó‰Ωì
+        {
+            strFont.Format(_T("\"font\":[\"%s\",%d,%d,%d,%d,%d],"),
+                lpContent->m_FontInfo.m_strName.data(),
+                lpContent->m_FontInfo.m_nSize,
+                lpContent->m_FontInfo.m_clrText,
+                lpContent->m_FontInfo.m_bBold,
+                lpContent->m_FontInfo.m_bItalic,
+                lpContent->m_FontInfo.m_bUnderLine);
+        } else if (lpContent->m_nType == CONTENT_TYPE_FACE)				//Ë°®ÊÉÖ
+        {
+            strChatContent += _T("{\"faceID\":");
+            memset(cBuf, 0, sizeof(cBuf));
+            wsprintf(cBuf, _T("%d"), lpContent->m_nFaceId);
+            strChatContent += cBuf;
+            strChatContent += _T("},");
 
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+4<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[±Ì«È]");
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_SHAKE_WINDOW)			//¥∞ø⁄∂∂∂Ø
-		{
-			strChatContent += _T("{\"shake\":1},");
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+6<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[¥∞ø⁄∂∂∂Ø]");
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_CHAT_IMAGE)			//Õº∆¨
-		{
-			GetImageWidthAndHeight(lpContent->m_CFaceInfo.m_strFilePath.c_str(), nImageWidth, nImageHeight);
-			memset(cBuf, 0, sizeof(cBuf));
-			wsprintf(cBuf, _T("{\"pic\":[\"%s\",\"%s\",%u,%d,%d]},"), 
-					lpContent->m_CFaceInfo.m_strFileName.c_str(),
-					lpContent->m_CFaceInfo.m_strFileName.c_str(),
-					lpContent->m_CFaceInfo.m_dwFileSize,
-					nImageWidth,
-					nImageHeight);
-			strChatContent += cBuf;
-			++nImageCount;
-			aryImageInfo.push_back(cBuf);
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 4 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[Ë°®ÊÉÖ]");
+        } else if (lpContent->m_nType == CONTENT_TYPE_SHAKE_WINDOW)			//Á™óÂè£ÊäñÂä®
+        {
+            strChatContent += _T("{\"shake\":1},");
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 6 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[Á™óÂè£ÊäñÂä®]");
+        } else if (lpContent->m_nType == CONTENT_TYPE_CHAT_IMAGE)			//ÂõæÁâá
+        {
+            GetImageWidthAndHeight(lpContent->m_CFaceInfo.m_strFilePath.c_str(), nImageWidth, nImageHeight);
+            memset(cBuf, 0, sizeof(cBuf));
+            wsprintf(cBuf, _T("{\"pic\":[\"%s\",\"%s\",%u,%d,%d]},"),
+                lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                lpContent->m_CFaceInfo.m_dwFileSize,
+                nImageWidth,
+                nImageHeight);
+            strChatContent += cBuf;
+            ++nImageCount;
+            aryImageInfo.push_back(cBuf);
 
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+4<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[Õº∆¨]");
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_FILE)			//Œƒº˛
-		{
-			memset(cBuf, 0, sizeof(cBuf));
-			wsprintf(cBuf, _T("{\"file\":[\"%s\",\"%s\",%u,%d]},"), 
-					lpContent->m_CFaceInfo.m_strFileName.c_str(),
-					lpContent->m_CFaceInfo.m_strFilePath.c_str(),
-					lpContent->m_CFaceInfo.m_dwFileSize,
-					lpContent->m_CFaceInfo.m_bOnline);
-			strChatContent += cBuf;
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 4 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[ÂõæÁâá]");
+        } else if (lpContent->m_nType == CONTENT_TYPE_FILE)			//Êñá‰ª∂
+        {
+            memset(cBuf, 0, sizeof(cBuf));
+            wsprintf(cBuf, _T("{\"file\":[\"%s\",\"%s\",%u,%d]},"),
+                lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                lpContent->m_CFaceInfo.m_strFilePath.c_str(),
+                lpContent->m_CFaceInfo.m_dwFileSize,
+                lpContent->m_CFaceInfo.m_bOnline);
+            strChatContent += cBuf;
 
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+4<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[Œƒº˛]");
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 4 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[Êñá‰ª∂]");
 
-		}
-        else if (lpContent->m_nType == CONTENT_TYPE_REMOTE_DESKTOP)
+        } else if (lpContent->m_nType == CONTENT_TYPE_REMOTE_DESKTOP)
         {
             strChatContent += _T("{\"remotedesktop\":1},");
-            if (strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 6 <= MAX_RECENT_MSG_LENGTH)
-                strRecentMsg += _T("[‘∂≥Ã◊¿√Ê]");
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 6 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[ËøúÁ®ãÊ°åÈù¢]");
         }
-		
-	}
 
-	strRecentMsg = strRecentMsg.Left(MAX_RECENT_MSG_LENGTH);
+    }
 
-	strChatContent.TrimRight(_T(","));
+    strRecentMsg = strRecentMsg.Left(MAX_RECENT_MSG_LENGTH);
 
-	CString strContent;
-	strContent.Format(_T("{\"msgType\":1,\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
-	//strContent.Format(_T("{\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
-	
-	//º”…œ◊÷ÃÂ–≈œ¢
-	strContent += strFont;
+    strChatContent.TrimRight(_T(","));
 
-	//º”…œ¡ƒÃÏ’˝Œƒƒ⁄»›
-	strContent += _T("\"content\":[");
-	strContent += strChatContent;
+    CString strContent;
+    strContent.Format(_T("{\"msgType\":1,\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
+    //strContent.Format(_T("{\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
 
-	strContent += _T("]}");
+    //Âä†‰∏äÂ≠ó‰Ωì‰ø°ÊÅØ
+    strContent += strFont;
 
-	//∑¢ÀÕ«∞œ»◊™ªª≥…utf8∏Ò Ω
-	//utf8¥Ê¥¢÷–Œƒ ±£¨∂‘”¶2°´4∏ˆ◊÷Ω⁄
-	long nLength = strContent.GetLength()*4;
-	CStringA strUtf8Msg;
-	EncodeUtil::UnicodeToUtf8(strContent, strUtf8Msg.GetBuffer(nLength), nLength);
-	strUtf8Msg.ReleaseBuffer();
+    //Âä†‰∏äËÅäÂ§©Ê≠£ÊñáÂÜÖÂÆπ
+    strContent += _T("\"content\":[");
+    strContent += strChatContent;
+
+    strContent += _T("]}");
+
+    //ÂèëÈÄÅÂâçÂÖàËΩ¨Êç¢Êàêutf8Ê†ºÂºè
+    //utf8Â≠òÂÇ®‰∏≠ÊñáÊó∂ÔºåÂØπÂ∫î2ÔΩû4‰∏™Â≠óËäÇ
+    long nLength = strContent.GetLength() * 4;
+    CStringA strUtf8Msg;
+    EncodeUtil::UnicodeToUtf8(strContent, strUtf8Msg.GetBuffer(nLength), nLength);
+    strUtf8Msg.ReleaseBuffer();
 
     long nChatMsgLength = strUtf8Msg.GetLength();
     std::string outbuf;
@@ -1494,7 +1477,7 @@ BOOL CSendMsgThread::ProcessBuddyMsg(CBuddyMessage* lpBuddyMsg)
     writeStream.WriteInt32(m_seq);
     //senderId
     //writeStream.Write((int32_t)lpBuddyMsg->m_nFromUin);
-    //œ˚œ¢ƒ⁄»›
+    //Ê∂àÊÅØÂÜÖÂÆπ
     writeStream.WriteCString(strUtf8Msg, nChatMsgLength);
     //targetId
     writeStream.WriteInt32((int32_t)lpBuddyMsg->m_nToUin);
@@ -1502,238 +1485,232 @@ BOOL CSendMsgThread::ProcessBuddyMsg(CBuddyMessage* lpBuddyMsg)
 
     CIUSocket::GetInstance().Send(outbuf);
     LOG_INFO("Send chat msg: msgID=%u, senderId=%u, targetId=%u.", m_nMsgId, lpBuddyMsg->m_nFromUin, lpBuddyMsg->m_nToUin);
-		
-	//TODO: ’‚∏ˆ¥Ûµƒ∏ˆ»À–≈œ¢¿‡–Ë“™’˚∏ƒ
-    //÷ª”–∑¢ÀÕ≥…π¶µƒœ˚œ¢≤≈ª·±ªÃÌº”µΩ◊ÓΩ¸¡ƒÃÏ¡–±Ì÷–
-	UINT uFaceID = m_lpUserMgr->GetFaceID(lpBuddyMsg->m_nToUin);
-	tstring strNickName;
-    if (IsGroupTarget(lpBuddyMsg->m_nToUin))
-		strNickName = m_lpUserMgr->GetGroupName(lpBuddyMsg->m_nToUin);
-	else
-		strNickName = m_lpUserMgr->GetNickName(lpBuddyMsg->m_nToUin);
-		
-	AddItemToRecentSessionList(lpBuddyMsg->m_nToUin, 0/*uFaceID*/, strNickName.c_str(), strRecentMsg, lpBuddyMsg->m_nTime);
 
-	
-	return TRUE;
+    //TODO: Ëøô‰∏™Â§ßÁöÑ‰∏™‰∫∫‰ø°ÊÅØÁ±ªÈúÄË¶ÅÊï¥Êîπ
+    //Âè™ÊúâÂèëÈÄÅÊàêÂäüÁöÑÊ∂àÊÅØÊâç‰ºöË¢´Ê∑ªÂä†Âà∞ÊúÄËøëËÅäÂ§©ÂàóË°®‰∏≠
+    UINT uFaceID = m_lpUserMgr->GetFaceID(lpBuddyMsg->m_nToUin);
+    tstring strNickName;
+    if (IsGroupTarget(lpBuddyMsg->m_nToUin))
+        strNickName = m_lpUserMgr->GetGroupName(lpBuddyMsg->m_nToUin);
+    else
+        strNickName = m_lpUserMgr->GetNickName(lpBuddyMsg->m_nToUin);
+
+    AddItemToRecentSessionList(lpBuddyMsg->m_nToUin, 0/*uFaceID*/, strNickName.c_str(), strRecentMsg, lpBuddyMsg->m_nTime);
+
+
+    return TRUE;
 }
 
 BOOL CSendMsgThread::ProcessMultiMsg(CMsgItem* pMsgItem)
 {
-	if(pMsgItem == NULL)
-		return FALSE;
+    if (pMsgItem == NULL)
+        return FALSE;
 
-	CBuddyMessage* lpBuddyMsg = (CBuddyMessage*)pMsgItem->m_lpMsg;
-	if (NULL == lpBuddyMsg)
- 		return FALSE;
-	
-	TCHAR cBuf[512] = {0};
- 
-	CString strChatContent;
-	CString strEscape;
-	CString strFont;
-	const long MAX_RECENT_MSG_LENGTH = 16;
-	CString strRecentMsg;
-	long nImageCount = 0;
-	std::vector<CString> aryImageInfo;
-	long nImageWidth = 0;
-	long nImageHeight = 0;
-	
-	//»∫◊È«∞√Êº”…œæﬂÃÂµƒ"ƒ≥ƒ≥»ÀÀµ£∫"
-	if(IsGroupTarget(lpBuddyMsg->m_nToUin))
-	{
-		strRecentMsg.Format(_T("%s:"), m_lpUserMgr->GetNickName(lpBuddyMsg->m_nFromUin).c_str());
-	}
-	for (int i = 0; i < (int)lpBuddyMsg->m_arrContent.size(); i++)
-	{
-		CContent* lpContent = lpBuddyMsg->m_arrContent[i];
-		if(lpContent == NULL)
-			continue;
+    CBuddyMessage* lpBuddyMsg = (CBuddyMessage*)pMsgItem->m_lpMsg;
+    if (NULL == lpBuddyMsg)
+        return FALSE;
 
-		if (lpContent->m_nType == CONTENT_TYPE_TEXT)							//Œƒ±æ
-		{
-			//strContent += _T("\\\"");
-			//strContent += UnicodeToHexStr(lpContent->m_strText.c_str(), TRUE);
-			//strContent += _T("\\\",");
+    TCHAR cBuf[512] = { 0 };
 
-			strChatContent += _T("{\"msgText\":\"");
-			strEscape = lpContent->m_strText.data();
-			//∂‘À´“˝∫≈∫Õ∑¥–±∏‹Ω¯––◊™“Â
-			strEscape.Replace(_T("\\"), _T("\\\\"));
-			strEscape.Replace(_T("\""), _T("\\\""));
-			strChatContent += strEscape;
-			strChatContent += _T("\"},");
+    CString strChatContent;
+    CString strEscape;
+    CString strFont;
+    const long MAX_RECENT_MSG_LENGTH = 16;
+    CString strRecentMsg;
+    long nImageCount = 0;
+    std::vector<CString> aryImageInfo;
+    long nImageWidth = 0;
+    long nImageHeight = 0;
 
-			strRecentMsg += lpContent->m_strText.data();
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_FONT_INFO)			//◊÷ÃÂ
-		{
-			strFont.Format(_T("\"font\":[\"%s\",%d,%d,%d,%d,%d],"),
-							lpContent->m_FontInfo.m_strName.data(),
-							lpContent->m_FontInfo.m_nSize,
-							lpContent->m_FontInfo.m_clrText,
-							lpContent->m_FontInfo.m_bBold,
-							lpContent->m_FontInfo.m_bItalic,
-							lpContent->m_FontInfo.m_bUnderLine);
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_FACE)				//±Ì«È
-		{
-			strChatContent += _T("{\"faceID\":");
-			memset(cBuf, 0, sizeof(cBuf));
-			wsprintf(cBuf, _T("%d"), lpContent->m_nFaceId);
-			strChatContent += cBuf;
-			strChatContent += _T("},");
+    //Áæ§ÁªÑÂâçÈù¢Âä†‰∏äÂÖ∑‰ΩìÁöÑ"ÊüêÊüê‰∫∫ËØ¥Ôºö"
+    if (IsGroupTarget(lpBuddyMsg->m_nToUin))
+    {
+        strRecentMsg.Format(_T("%s:"), m_lpUserMgr->GetNickName(lpBuddyMsg->m_nFromUin).c_str());
+    }
+    for (int i = 0; i < (int)lpBuddyMsg->m_arrContent.size(); i++)
+    {
+        CContent* lpContent = lpBuddyMsg->m_arrContent[i];
+        if (lpContent == NULL)
+            continue;
 
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+4<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[±Ì«È]");
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_SHAKE_WINDOW)			//¥∞ø⁄∂∂∂Ø
-		{
-			strChatContent += _T("{\"shake\":1},");
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+6<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[¥∞ø⁄∂∂∂Ø]");
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_CHAT_IMAGE)			//Õº∆¨
-		{
-			GetImageWidthAndHeight(lpContent->m_CFaceInfo.m_strFilePath.c_str(), nImageWidth, nImageHeight);
-			memset(cBuf, 0, sizeof(cBuf));
-			wsprintf(cBuf, _T("{\"pic\":[\"%s\",\"%s\",%u,%d,%d]},"), 
-					lpContent->m_CFaceInfo.m_strFileName.c_str(),
-					lpContent->m_CFaceInfo.m_strFileName.c_str(),
-					lpContent->m_CFaceInfo.m_dwFileSize,
-					nImageWidth,
-					nImageHeight);
-			strChatContent += cBuf;
-			++nImageCount;
-			aryImageInfo.push_back(cBuf);
+        if (lpContent->m_nType == CONTENT_TYPE_TEXT)							//ÊñáÊú¨
+        {
+            //strContent += _T("\\\"");
+            //strContent += UnicodeToHexStr(lpContent->m_strText.c_str(), TRUE);
+            //strContent += _T("\\\",");
 
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+4<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[Õº∆¨]");
-		}
-		else if (lpContent->m_nType == CONTENT_TYPE_FILE)			//Œƒº˛
-		{
-			memset(cBuf, 0, sizeof(cBuf));
-			wsprintf(cBuf, _T("{\"file\":[\"%s\",\"%s\",%u,%d]},"), 
-					lpContent->m_CFaceInfo.m_strFileName.c_str(),
-					lpContent->m_CFaceInfo.m_strFilePath.c_str(),
-					lpContent->m_CFaceInfo.m_dwFileSize,
-					lpContent->m_CFaceInfo.m_bOnline);
-			strChatContent += cBuf;
+            strChatContent += _T("{\"msgText\":\"");
+            strEscape = lpContent->m_strText.data();
+            //ÂØπÂèåÂºïÂè∑ÂíåÂèçÊñúÊù†ËøõË°åËΩ¨‰πâ
+            strEscape.Replace(_T("\\"), _T("\\\\"));
+            strEscape.Replace(_T("\""), _T("\\\""));
+            strChatContent += strEscape;
+            strChatContent += _T("\"},");
 
-			if(strRecentMsg.GetLength()<MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength()+4<=MAX_RECENT_MSG_LENGTH)
-				strRecentMsg += _T("[Œƒº˛]");
+            strRecentMsg += lpContent->m_strText.data();
+        } else if (lpContent->m_nType == CONTENT_TYPE_FONT_INFO)			//Â≠ó‰Ωì
+        {
+            strFont.Format(_T("\"font\":[\"%s\",%d,%d,%d,%d,%d],"),
+                lpContent->m_FontInfo.m_strName.data(),
+                lpContent->m_FontInfo.m_nSize,
+                lpContent->m_FontInfo.m_clrText,
+                lpContent->m_FontInfo.m_bBold,
+                lpContent->m_FontInfo.m_bItalic,
+                lpContent->m_FontInfo.m_bUnderLine);
+        } else if (lpContent->m_nType == CONTENT_TYPE_FACE)				//Ë°®ÊÉÖ
+        {
+            strChatContent += _T("{\"faceID\":");
+            memset(cBuf, 0, sizeof(cBuf));
+            wsprintf(cBuf, _T("%d"), lpContent->m_nFaceId);
+            strChatContent += cBuf;
+            strChatContent += _T("},");
 
-		}
-		
-	}
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 4 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[Ë°®ÊÉÖ]");
+        } else if (lpContent->m_nType == CONTENT_TYPE_SHAKE_WINDOW)			//Á™óÂè£ÊäñÂä®
+        {
+            strChatContent += _T("{\"shake\":1},");
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 6 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[Á™óÂè£ÊäñÂä®]");
+        } else if (lpContent->m_nType == CONTENT_TYPE_CHAT_IMAGE)			//ÂõæÁâá
+        {
+            GetImageWidthAndHeight(lpContent->m_CFaceInfo.m_strFilePath.c_str(), nImageWidth, nImageHeight);
+            memset(cBuf, 0, sizeof(cBuf));
+            wsprintf(cBuf, _T("{\"pic\":[\"%s\",\"%s\",%u,%d,%d]},"),
+                lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                lpContent->m_CFaceInfo.m_dwFileSize,
+                nImageWidth,
+                nImageHeight);
+            strChatContent += cBuf;
+            ++nImageCount;
+            aryImageInfo.push_back(cBuf);
 
-	strRecentMsg = strRecentMsg.Left(MAX_RECENT_MSG_LENGTH);
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 4 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[ÂõæÁâá]");
+        } else if (lpContent->m_nType == CONTENT_TYPE_FILE)			//Êñá‰ª∂
+        {
+            memset(cBuf, 0, sizeof(cBuf));
+            wsprintf(cBuf, _T("{\"file\":[\"%s\",\"%s\",%u,%d]},"),
+                lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                lpContent->m_CFaceInfo.m_strFilePath.c_str(),
+                lpContent->m_CFaceInfo.m_dwFileSize,
+                lpContent->m_CFaceInfo.m_bOnline);
+            strChatContent += cBuf;
 
-	strChatContent.TrimRight(_T(","));
+            if (strRecentMsg.GetLength() < MAX_RECENT_MSG_LENGTH && strRecentMsg.GetLength() + 4 <= MAX_RECENT_MSG_LENGTH)
+                strRecentMsg += _T("[Êñá‰ª∂]");
 
-	CString strContent;
-	strContent.Format(_T("{\"msgType\":1,\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
-	//strContent.Format(_T("{\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
-	
-	//º”…œ◊÷ÃÂ–≈œ¢
-	strContent += strFont;
+        }
 
-	//º”…œ¡ƒÃÏ’˝Œƒƒ⁄»›
-	strContent += _T("\"content\":[");
-	strContent += strChatContent;
+    }
 
-	strContent += _T("]}");
+    strRecentMsg = strRecentMsg.Left(MAX_RECENT_MSG_LENGTH);
 
-	//∑¢ÀÕ«∞œ»◊™ªª≥…utf8∏Ò Ω
-	//utf8¥Ê¥¢÷–Œƒ ±£¨∂‘”¶2°´4∏ˆ◊÷Ω⁄
-	long nLength = strContent.GetLength()*4;
-	CStringA strUtf8Msg;
-	EncodeUtil::UnicodeToUtf8(strContent, strUtf8Msg.GetBuffer(nLength), nLength);
-	strUtf8Msg.ReleaseBuffer();
+    strChatContent.TrimRight(_T(","));
 
-	size_t nSize = pMsgItem->m_arrTargetIDs.size();
-	CMiniBuffer miniBuffer(nSize* sizeof(UINT));
-	UINT* pAccountIDs = (UINT*)miniBuffer.GetBuffer();
-	for(size_t i=0; i<nSize; ++i)
-	{
-		pAccountIDs[i] = pMsgItem->m_arrTargetIDs[i];
-	}
+    CString strContent;
+    strContent.Format(_T("{\"msgType\":1,\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
+    //strContent.Format(_T("{\"time\":%llu,\"clientType\":1,"), lpBuddyMsg->m_nTime);
 
-	BOOL bRet = FALSE;
-	long nRetry = 3;
-	while(nRetry > 0)
-	{
-		bRet = SendMultiChatMessage(strUtf8Msg.GetString(), strUtf8Msg.GetLength(), pAccountIDs, (long)nSize);
+    //Âä†‰∏äÂ≠ó‰Ωì‰ø°ÊÅØ
+    strContent += strFont;
 
-		if(bRet)
-			break;
-		else
-		{
-			::Sleep(1000);
-			--nRetry;
-		}
+    //Âä†‰∏äËÅäÂ§©Ê≠£ÊñáÂÜÖÂÆπ
+    strContent += _T("\"content\":[");
+    strContent += strChatContent;
 
-	}
-	
-	
-	//÷ª”–∑¢ÀÕ≥…π¶µƒœ˚œ¢≤≈ª·±ªÃÌº”µΩ◊ÓΩ¸¡ƒÃÏ¡–±Ì÷–
-	if(bRet)
-	{
-		UINT uFaceID = m_lpUserMgr->GetFaceID(lpBuddyMsg->m_nToUin);
-		tstring strNickName;
-		if(IsGroupTarget(lpBuddyMsg->m_nToUin))
-			strNickName = m_lpUserMgr->GetGroupName(lpBuddyMsg->m_nToUin);
-		else
-			strNickName = m_lpUserMgr->GetNickName(lpBuddyMsg->m_nToUin);
-		
-		AddItemToRecentSessionList(lpBuddyMsg->m_nToUin, uFaceID, strNickName.c_str(), strRecentMsg, lpBuddyMsg->m_nTime);
-	}
-	
-	return bRet;
+    strContent += _T("]}");
+
+    //ÂèëÈÄÅÂâçÂÖàËΩ¨Êç¢Êàêutf8Ê†ºÂºè
+    //utf8Â≠òÂÇ®‰∏≠ÊñáÊó∂ÔºåÂØπÂ∫î2ÔΩû4‰∏™Â≠óËäÇ
+    long nLength = strContent.GetLength() * 4;
+    CStringA strUtf8Msg;
+    EncodeUtil::UnicodeToUtf8(strContent, strUtf8Msg.GetBuffer(nLength), nLength);
+    strUtf8Msg.ReleaseBuffer();
+
+    size_t nSize = pMsgItem->m_arrTargetIDs.size();
+    CMiniBuffer miniBuffer(nSize * sizeof(UINT));
+    UINT* pAccountIDs = (UINT*)miniBuffer.GetBuffer();
+    for (size_t i = 0; i < nSize; ++i)
+    {
+        pAccountIDs[i] = pMsgItem->m_arrTargetIDs[i];
+    }
+
+    BOOL bRet = FALSE;
+    long nRetry = 3;
+    while (nRetry > 0)
+    {
+        bRet = SendMultiChatMessage(strUtf8Msg.GetString(), strUtf8Msg.GetLength(), pAccountIDs, (long)nSize);
+
+        if (bRet)
+            break;
+        else
+        {
+            ::Sleep(1000);
+            --nRetry;
+        }
+
+    }
+
+
+    //Âè™ÊúâÂèëÈÄÅÊàêÂäüÁöÑÊ∂àÊÅØÊâç‰ºöË¢´Ê∑ªÂä†Âà∞ÊúÄËøëËÅäÂ§©ÂàóË°®‰∏≠
+    if (bRet)
+    {
+        UINT uFaceID = m_lpUserMgr->GetFaceID(lpBuddyMsg->m_nToUin);
+        tstring strNickName;
+        if (IsGroupTarget(lpBuddyMsg->m_nToUin))
+            strNickName = m_lpUserMgr->GetGroupName(lpBuddyMsg->m_nToUin);
+        else
+            strNickName = m_lpUserMgr->GetNickName(lpBuddyMsg->m_nToUin);
+
+        AddItemToRecentSessionList(lpBuddyMsg->m_nToUin, uFaceID, strNickName.c_str(), strRecentMsg, lpBuddyMsg->m_nTime);
+    }
+
+    return bRet;
 }
 
 void CSendMsgThread::AddItemToRecentSessionList(UINT uUserID, UINT uFaceID, PCTSTR pszNickName, PCTSTR pszText, time_t nMsgTime)
 {
-	CRecentInfo* pRecentInfo = new CRecentInfo();
-	pRecentInfo->m_nType = IsGroupTarget(uUserID) ? FMG_MSG_TYPE_GROUP : FMG_MSG_TYPE_BUDDY;
-	pRecentInfo->m_uUserID = uUserID;
-	pRecentInfo->m_uFaceID = uFaceID;
-	pRecentInfo->m_MsgTime = nMsgTime;
-	_tcscpy_s(pRecentInfo->m_szName, ARRAYSIZE(pRecentInfo->m_szName), pszNickName);
-	_tcscpy_s(pRecentInfo->m_szLastMsgText, ARRAYSIZE(pRecentInfo->m_szLastMsgText), pszText);
-	m_lpUserMgr->m_RecentList.AddRecent(pRecentInfo);
+    CRecentInfo* pRecentInfo = new CRecentInfo();
+    pRecentInfo->m_nType = IsGroupTarget(uUserID) ? FMG_MSG_TYPE_GROUP : FMG_MSG_TYPE_BUDDY;
+    pRecentInfo->m_uUserID = uUserID;
+    pRecentInfo->m_uFaceID = uFaceID;
+    pRecentInfo->m_MsgTime = nMsgTime;
+    _tcscpy_s(pRecentInfo->m_szName, ARRAYSIZE(pRecentInfo->m_szName), pszNickName);
+    _tcscpy_s(pRecentInfo->m_szLastMsgText, ARRAYSIZE(pRecentInfo->m_szLastMsgText), pszText);
+    m_lpUserMgr->m_RecentList.AddRecent(pRecentInfo);
 
-	::PostMessage(m_lpUserMgr->m_hProxyWnd, FMG_MSG_UPDATE_RECENT_LIST, 0, 0);
+    ::PostMessage(m_lpUserMgr->m_hProxyWnd, FMG_MSG_UPDATE_RECENT_LIST, 0, 0);
 }
 
 std::wstring CSendMsgThread::UnicodeToHexStr(const WCHAR* lpStr, BOOL bDblSlash)
 {
-	static const WCHAR* lpHexStr = _T("0123456789abcdef");
-	std::wstring strRet = _T("");
-	WCHAR* lpSlash;
+    static const WCHAR* lpHexStr = _T("0123456789abcdef");
+    std::wstring strRet = _T("");
+    WCHAR* lpSlash;
 
-	if (NULL == lpStr || NULL ==*lpStr)
-		return strRet;
+    if (NULL == lpStr || NULL == *lpStr)
+        return strRet;
 
-	lpSlash = (bDblSlash ? _T("\\\\u") : _T("\\u"));
+    lpSlash = (bDblSlash ? _T("\\\\u") : _T("\\u"));
 
-	for (int i = 0; i < (int)wcslen(lpStr); i++)
-	{
-		if (my_isalnum((WCHAR)lpStr[i]))	// ºÏ≤‚÷∏∂®◊÷∑˚ «∑Ò «◊÷ƒ∏(A-Z£¨a-z)ªÚ ˝◊÷(0-9)
-		{
-			strRet += lpStr[i];
-		}
-		else
-		{
-			CHAR* lpChar = (CHAR*)&lpStr[i];
+    for (int i = 0; i < (int)wcslen(lpStr); i++)
+    {
+        if (my_isalnum((WCHAR)lpStr[i]))	// Ê£ÄÊµãÊåáÂÆöÂ≠óÁ¨¶ÊòØÂê¶ÊòØÂ≠óÊØç(A-ZÔºåa-z)ÊàñÊï∞Â≠ó(0-9)
+        {
+            strRet += lpStr[i];
+        } else
+        {
+            CHAR* lpChar = (CHAR*)&lpStr[i];
 
-			strRet += lpSlash;
-			strRet += lpHexStr[((unsigned char)(*(lpChar+1)) >> 4) & 0x0f];
-			strRet += lpHexStr[(unsigned char)(*(lpChar+1)) & 0x0f];
-			strRet += lpHexStr[((unsigned char)(*lpChar) >> 4) & 0x0f];
-			strRet += lpHexStr[(unsigned char)(*lpChar) & 0x0f];
-		}
-	}
+            strRet += lpSlash;
+            strRet += lpHexStr[((unsigned char)(*(lpChar + 1)) >> 4) & 0x0f];
+            strRet += lpHexStr[(unsigned char)(*(lpChar + 1)) & 0x0f];
+            strRet += lpHexStr[((unsigned char)(*lpChar) >> 4) & 0x0f];
+            strRet += lpHexStr[(unsigned char)(*lpChar) & 0x0f];
+        }
+    }
 
-	return strRet;
+    return strRet;
 }

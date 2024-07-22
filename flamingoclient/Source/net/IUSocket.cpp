@@ -237,21 +237,19 @@ bool CIUSocket::Connect(int timeout /*= 3*/)
         {
             LOG_ERROR("Could not connect server:%s, port:%d.", m_strServer.c_str(), m_nPort);
             return false;
-        }
-        else
+        } else
             addrSrv.sin_addr.s_addr = *((unsigned long*)pHostent->h_addr);
     }
 
     addrSrv.sin_family = AF_INET;
     addrSrv.sin_port = htons((u_short)m_nPort);
-    int ret = ::connect(m_hSocket, (struct sockaddr*) & addrSrv, sizeof(addrSrv));
+    int ret = ::connect(m_hSocket, (struct sockaddr*)&addrSrv, sizeof(addrSrv));
     if (ret == 0)
     {
         LOG_INFO("Connect to server:%s, port:%d successfully.", m_strServer.c_str(), m_nPort);
         m_bConnected = true;
         return true;
-    }
-    else if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
+    } else if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
     {
         LOG_ERROR("Could not connect to server:%s, port:%d.", m_strServer.c_str(), m_nPort);
         return false;
@@ -325,21 +323,19 @@ bool CIUSocket::ConnectToFileServer(int timeout/* = 3*/)
         {
             LOG_ERROR("Could not connect file server:%s, port:%d.", m_strFileServer.c_str(), m_nFilePort);
             return false;
-        }
-        else
+        } else
             addrSrv.sin_addr.s_addr = *((unsigned long*)pHostent->h_addr);
     }
 
     addrSrv.sin_family = AF_INET;
     addrSrv.sin_port = htons((u_short)m_nFilePort);
-    int ret = ::connect(m_hFileSocket, (struct sockaddr*) & addrSrv, sizeof(addrSrv));
+    int ret = ::connect(m_hFileSocket, (struct sockaddr*)&addrSrv, sizeof(addrSrv));
     if (ret == 0)
     {
         LOG_INFO("Connect to file server:%s, port:%d successfully.", m_strFileServer.c_str(), m_nFilePort);
         m_bConnectedOnFileSocket = true;
         return true;
-    }
-    else if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
+    } else if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
     {
         LOG_ERROR("Could not connect to file server:%s, port:%d.", m_strFileServer.c_str(), m_nFilePort);
         return false;
@@ -394,21 +390,19 @@ bool CIUSocket::ConnectToImgServer(int timeout/* = 3*/)
         {
             LOG_ERROR("Could not connect to img server:%s, port:%d.", m_strImgServer.c_str(), m_nImgPort);
             return FALSE;
-        }
-        else
+        } else
             addrSrv.sin_addr.s_addr = *((unsigned long*)pHostent->h_addr);
     }
 
     addrSrv.sin_family = AF_INET;
     addrSrv.sin_port = htons((u_short)m_nImgPort);
-    int ret = ::connect(m_hImgSocket, (struct sockaddr*) & addrSrv, sizeof(addrSrv));
+    int ret = ::connect(m_hImgSocket, (struct sockaddr*)&addrSrv, sizeof(addrSrv));
     if (ret == 0)
     {
         LOG_INFO("Connect to img server:%s, port:%d successfully.", m_strImgServer.c_str(), m_nImgPort);
         m_bConnectedOnImgSocket = true;
         return true;
-    }
-    else if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
+    } else if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
     {
         LOG_ERROR("Could not connect to img server:%s, port:%d.", m_strImgServer.c_str(), m_nImgPort);
         return false;
@@ -487,8 +481,7 @@ bool CIUSocket::Send()
                 Close();
                 return false;
             }
-        }
-        else if (nRet < 1)
+        } else if (nRet < 1)
         {
             //一旦出现错误就立刻关闭Socket
             LOG_ERROR("Send data error, disconnect server:%s, port:%d.", m_strServer.c_str(), m_nPort);
@@ -530,8 +523,7 @@ bool CIUSocket::Recv()
                 //Close();
                 return false;
             }
-        }
-        else if (nRet < 1)
+        } else if (nRet < 1)
         {
             LOG_ERROR("Recv data error, errorNO=%d.", ::WSAGetLastError());
             //Close();
@@ -579,8 +571,7 @@ bool CIUSocket::SendOnFilePort(const char* pBuffer, int64_t nSize, int nTimeout/
                 LOG_ERROR("Send data timeout, now: %lld, nStartTime: %lld, nTimeout: %d, disconnect file server:%s, port:%d.", now, nStartTime, nTimeout, m_strFileServer.c_str(), m_nFilePort);
                 return false;
             }
-        }
-        else if (nRet < 1)
+        } else if (nRet < 1)
         {
             //一旦出现错误就立刻关闭Socket
             LOG_ERROR("Send data error, nRet: %d, disconnect file server: %s, port: %d, socket errorCode: %d", nRet, m_strFileServer.c_str(), m_nFilePort, ::WSAGetLastError());
@@ -675,8 +666,7 @@ bool CIUSocket::SendOnImgPort(const char* pBuffer, int64_t nSize, int nTimeout/*
                 LOG_ERROR("Send data timeout, now: %lld, nStartTime: %lld, nTimeout: %d, disconnect img server: %s, port: %d.", now, nStartTime, nTimeout, m_strImgServer.c_str(), m_nImgPort);
                 return false;
             }
-        }
-        else if (nRet < 1)
+        } else if (nRet < 1)
         {
             //一旦出现错误就立刻关闭Socket
             LOG_ERROR("Send data error, nRet:%d, disconnect img server:%s, port:%d, socket errorCode: %d.", nRet, m_strImgServer.c_str(), m_nImgPort, ::WSAGetLastError());
@@ -1057,8 +1047,7 @@ bool CIUSocket::Register(const char* pszUser, const char* pszNickname, const cha
         }
 
         strData = strUncompressBuf;
-    }
-    else
+    } else
     {
         if (header.originsize >= MAX_PACKAGE_SIZE || header.originsize <= 0)
         {
@@ -1175,8 +1164,7 @@ bool CIUSocket::Login(const char* pszUser, const char* pszPassword, int nClientT
         }
 
         strData = strUncompressBuf;
-    }
-    else
+    } else
     {
         if (header.originsize >= MAX_PACKAGE_SIZE || header.originsize <= 0)
         {
@@ -1228,11 +1216,9 @@ bool CIUSocket::SendData(const char* pBuffer, int nBuffSize, int nTimeout)
             if (::WSAGetLastError() == WSAEWOULDBLOCK && time(NULL) - nStartTime < nTimeout)
             {
                 continue;
-            }
-            else
+            } else
                 return false;
-        }
-        else if (nRet < 1)
+        } else if (nRet < 1)
         {
             //一旦出现错误就立刻关闭Socket
             LOG_ERROR("Send data error, disconnect server:%s, port:%d.", m_strServer.c_str(), m_nPort);
@@ -1287,8 +1273,7 @@ bool CIUSocket::RecvData(char* pszBuff, int nBufferSize, int nTimeout)
                 Close();
                 return false;
             }
-        }
-        else if (nRet < 1)
+        } else if (nRet < 1)
         {
             LOG_ERROR("Recv data error, disconnect server:%s, port:%d.", m_strServer.c_str(), m_nPort);
             Close();

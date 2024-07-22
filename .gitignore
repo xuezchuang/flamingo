@@ -4,9 +4,18 @@ flamingoclient/CatchScreen/debug/
 flamingoclient/Source/Release/
 flamingoclient/Source/flamingo.aps
 flamingoclient/iAutoUpdate/Release/
+
 flamingoserver/FlamingoServer.sdf
 flamingoserver/FlamingoServer.v12.suo
 flamingoserver/FlamingoServer.vcxproj.user
+flamingoserver/windowsproj/chatserver.exe
+flamingoserver/windowsproj/chatserver/
+flamingoserver/windowsproj/filecache/
+flamingoserver/windowsproj/fileserver.exe
+flamingoserver/windowsproj/fileserver/
+flamingoserver/windowsproj/imgserver.exe
+flamingoserver/windowsproj/imgserver/
+flamingoserver/windowsproj/x64/
 flamingoAndroid/build
 flamingoAndroid/.idea
 

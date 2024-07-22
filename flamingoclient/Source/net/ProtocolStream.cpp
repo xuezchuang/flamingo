@@ -1,4 +1,6 @@
-﻿#ifndef _WIN32
+﻿#include "stdafx.h"
+
+#ifndef _WIN32
 #include <arpa/inet.h>
 #else
 #include <Winsock2.h>
@@ -401,4 +403,3 @@ namespace net
         m_data->append(str, sizeof(str));
     }
 }// end namespace
-

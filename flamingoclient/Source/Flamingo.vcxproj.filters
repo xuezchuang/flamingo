@@ -267,9 +267,6 @@
     <ClCompile Include="net\IUSocket.cpp">
       <Filter>net</Filter>
     </ClCompile>
-    <ClCompile Include="net\protocolstream.cpp">
-      <Filter>net</Filter>
-    </ClCompile>
     <ClCompile Include="UserSessionData.cpp">
       <Filter>UserData</Filter>
     </ClCompile>
@@ -407,6 +404,9 @@
     </ClCompile>
     <ClCompile Include="EncodeUtil.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="net\ProtocolStream.cpp">
+      <Filter>net</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -603,9 +603,6 @@
       <Filter>net</Filter>
     </ClInclude>
     <ClInclude Include="net\Msg.h">
-      <Filter>net</Filter>
-    </ClInclude>
-    <ClInclude Include="net\protocolstream.h">
       <Filter>net</Filter>
     </ClInclude>
     <ClInclude Include="UserSessionData.h">
@@ -814,6 +811,9 @@
     </ClInclude>
     <ClInclude Include="EncodeUtil.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="net\ProtocolStream.h">
+      <Filter>net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

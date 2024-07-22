@@ -1,5 +1,5 @@
-/**
- * µ¥ÈËÁÄÌì´°¿Ú, BuddyChatDlg.cpp
+ï»¿/**
+ * å•äººèŠå¤©çª—å£, BuddyChatDlg.cpp
  * zhangyl 2017.05.26
  */
 #include "stdafx.h"
@@ -13,395 +13,390 @@
 #include "Utils.h"
 #include "GDIFactory.h"
 #include "EncodeUtil.h"
-#include "net/protocolstream.h"
+#include "net/ProtocolStream.h"
 #include "net/Msg.h"
 #include "UIText.h"
 
 
 #define CHAT_BG_IMAGE_NAME			_T("BuddyChatDlgBg.png")
 #define CHAT_EXPAND_BG_IMAGE_NAME   _T("BuddyChatDlgExpandBg.png")
-//#define CHAT_BG_IMAGE_NAME			_T("1449046375909.png")
-//#define CHAT_EXPAND_BG_IMAGE_NAME   _T("1449046375909.png")
+ //#define CHAT_BG_IMAGE_NAME			_T("1449046375909.png")
+ //#define CHAT_EXPAND_BG_IMAGE_NAME   _T("1449046375909.png")
 
 
-const long CHATDLG_WIDTH        = 587;
-const long CHATDLG_HEIGHT       = 535;
+const long CHATDLG_WIDTH = 587;
+const long CHATDLG_HEIGHT = 535;
 const long CHATDLG_EXPAND_WIDTH = 960;
-const long RIGHT_CHAT_WINDOW_WIDTH = CHATDLG_EXPAND_WIDTH-CHATDLG_WIDTH;
+const long RIGHT_CHAT_WINDOW_WIDTH = CHATDLG_EXPAND_WIDTH - CHATDLG_WIDTH;
 
 
 BOOL CBuddyChatDlg::HandleText(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strTemp = GetBetweenString(p+2, _T("[\""), _T("\"]")).c_str();
+    tstring strTemp = GetBetweenString(p + 2, _T("[\""), _T("\"]")).c_str();
 
-	if (!strTemp.empty())
-	{
-		LPCTSTR lpFontFmt = _T("%[^,],%d,%[^,],%d,%d,%d");
-		TCHAR szName[32] = _T("ËÎÌå");
-		TCHAR szColor[32] = _T("000000");
-		int nSize = 9;
-		BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE;
+    if (!strTemp.empty())
+    {
+        LPCTSTR lpFontFmt = _T("%[^,],%d,%[^,],%d,%d,%d");
+        TCHAR szName[32] = _T("å®‹ä½“");
+        TCHAR szColor[32] = _T("000000");
+        int nSize = 9;
+        BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE;
 
-		int nCount = _stscanf(strTemp.c_str(), lpFontFmt, szName, 
-			&nSize, &szColor, &bBold, &bItalic, &bUnderLine);
+        int nCount = _stscanf(strTemp.c_str(), lpFontFmt, szName,
+            &nSize, &szColor, &bBold, &bItalic, &bUnderLine);
 
-		strText = strTemp;
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+        strText = strTemp;
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FONT_INFO;
-			lpContent->m_FontInfo.m_nSize = nSize;
-			lpContent->m_FontInfo.m_clrText = HexStrToRGB(szColor);
-			lpContent->m_FontInfo.m_strName = szName;
-			lpContent->m_FontInfo.m_bBold = bBold;
-			lpContent->m_FontInfo.m_bItalic = bItalic;				
-			lpContent->m_FontInfo.m_bUnderLine = bUnderLine;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FONT_INFO;
+            lpContent->m_FontInfo.m_nSize = nSize;
+            lpContent->m_FontInfo.m_clrText = HexStrToRGB(szColor);
+            lpContent->m_FontInfo.m_strName = szName;
+            lpContent->m_FontInfo.m_bBold = bBold;
+            lpContent->m_FontInfo.m_bItalic = bItalic;
+            lpContent->m_FontInfo.m_bUnderLine = bUnderLine;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleShake(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strTemp = GetBetweenString(p, _T("["), _T("]")).c_str();
-	if (!strTemp.empty())
-	{
-		if(strTemp == _T("\"1\""))
-		{	
-			strText = _T("·¢ËÍÁËÒ»¸ö´°¿Ú¶¶¶¯¡£");
-		}
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    tstring strTemp = GetBetweenString(p, _T("["), _T("]")).c_str();
+    if (!strTemp.empty())
+    {
+        if (strTemp == _T("\"1\""))
+        {
+            strText = _T("å‘é€äº†ä¸€ä¸ªçª—å£æŠ–åŠ¨ã€‚");
+        }
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleFontInfo(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strTemp = GetBetweenString(p+2, _T("[\""), _T("\"]")).c_str();
-	if (!strTemp.empty())
-	{
-		LPCTSTR lpFontFmt = _T("%[^,],%d,%[^,],%d,%d,%d");
-		TCHAR szName[32] = _T("ËÎÌå");
-		TCHAR szColor[32] = _T("000000");
-		int nSize = 9;
-		BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE;
+    tstring strTemp = GetBetweenString(p + 2, _T("[\""), _T("\"]")).c_str();
+    if (!strTemp.empty())
+    {
+        LPCTSTR lpFontFmt = _T("%[^,],%d,%[^,],%d,%d,%d");
+        TCHAR szName[32] = _T("å®‹ä½“");
+        TCHAR szColor[32] = _T("000000");
+        int nSize = 9;
+        BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE;
 
-		int nCount = _stscanf(strTemp.c_str(), lpFontFmt, szName, 
-			&nSize, &szColor, &bBold, &bItalic, &bUnderLine);
-		if (nCount != 6)
-			return FALSE;
+        int nCount = _stscanf(strTemp.c_str(), lpFontFmt, szName,
+            &nSize, &szColor, &bBold, &bItalic, &bUnderLine);
+        if (nCount != 6)
+            return FALSE;
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FONT_INFO;
-			lpContent->m_FontInfo.m_nSize = nSize;
-			lpContent->m_FontInfo.m_clrText = HexStrToRGB(szColor);
-			lpContent->m_FontInfo.m_strName = szName;
-			lpContent->m_FontInfo.m_bBold = bBold;
-			lpContent->m_FontInfo.m_bItalic = bItalic;				
-			lpContent->m_FontInfo.m_bUnderLine = bUnderLine;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FONT_INFO;
+            lpContent->m_FontInfo.m_nSize = nSize;
+            lpContent->m_FontInfo.m_clrText = HexStrToRGB(szColor);
+            lpContent->m_FontInfo.m_strName = szName;
+            lpContent->m_FontInfo.m_bBold = bBold;
+            lpContent->m_FontInfo.m_bItalic = bItalic;
+            lpContent->m_FontInfo.m_bUnderLine = bUnderLine;
+            arrContent.push_back(lpContent);
+        }
 
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleSysFaceId(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	int nFaceId = GetBetweenInt(p+2, _T("[\""), _T("\"]"), -1);
-	if (nFaceId != -1)
-	{
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    int nFaceId = GetBetweenInt(p + 2, _T("[\""), _T("\"]"), -1);
+    if (nFaceId != -1)
+    {
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FACE;
-			lpContent->m_nFaceId = nFaceId;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FACE;
+            lpContent->m_nFaceId = nFaceId;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleCustomPic(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strFileName = GetBetweenString(p+2, _T("[\""), _T("\"]"));
-	if (!strFileName.empty())
-	{
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    tstring strFileName = GetBetweenString(p + 2, _T("[\""), _T("\"]"));
+    if (!strFileName.empty())
+    {
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_CHAT_IMAGE;
-			lpContent->m_CFaceInfo.m_strName = strFileName;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_CHAT_IMAGE;
+            lpContent->m_CFaceInfo.m_strName = strFileName;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleFile(LPCTSTR& p, tstring& strText, std::vector<CContent*>& arrContent)
 {
-	tstring strFileName = GetBetweenString(p+2, _T("[\""), _T("\"]"));
-	if (!strFileName.empty())
-	{
-		if (!strText.empty())
-		{
-			CContent* lpContent = new CContent;
-			if (lpContent != NULL)
-			{
-				lpContent->m_nType = CONTENT_TYPE_TEXT;
-				lpContent->m_strText = strText;
-				arrContent.push_back(lpContent);
-			}
-			strText = _T("");
-		}
+    tstring strFileName = GetBetweenString(p + 2, _T("[\""), _T("\"]"));
+    if (!strFileName.empty())
+    {
+        if (!strText.empty())
+        {
+            CContent* lpContent = new CContent;
+            if (lpContent != NULL)
+            {
+                lpContent->m_nType = CONTENT_TYPE_TEXT;
+                lpContent->m_strText = strText;
+                arrContent.push_back(lpContent);
+            }
+            strText = _T("");
+        }
 
-		CContent* lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_FILE;
-			lpContent->m_CFaceInfo.m_strFilePath = strFileName;
-			lpContent->m_CFaceInfo.m_strName = Hootina::CPath::GetFileName(strFileName.c_str());
-			lpContent->m_CFaceInfo.m_strFileName = lpContent->m_CFaceInfo.m_strName;
-			arrContent.push_back(lpContent);
-		}
+        CContent* lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_FILE;
+            lpContent->m_CFaceInfo.m_strFilePath = strFileName;
+            lpContent->m_CFaceInfo.m_strName = Hootina::CPath::GetFileName(strFileName.c_str());
+            lpContent->m_CFaceInfo.m_strFileName = lpContent->m_CFaceInfo.m_strName;
+            arrContent.push_back(lpContent);
+        }
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 
 
-// "/f["ÏµÍ³±íÇéid"] /c["×Ô¶¨Òå±íÇéÎÄ¼şÃû"] /o[×ÖÌåÃû³Æ£¬´óĞ¡£¬ÑÕÉ«£¬¼Ó´Ö£¬ÇãĞ±£¬ÏÂ»®Ïß]"
+// "/f["ç³»ç»Ÿè¡¨æƒ…id"] /c["è‡ªå®šä¹‰è¡¨æƒ…æ–‡ä»¶å"] /o[å­—ä½“åç§°ï¼Œå¤§å°ï¼Œé¢œè‰²ï¼ŒåŠ ç²—ï¼Œå€¾æ–œï¼Œä¸‹åˆ’çº¿]"
 void CBuddyChatDlg::AnalyseContent(tstring& strContent, HWND hRichWnd/*=NULL*/)
 {
-	//CONTENT_TYPE m_nType;			// ÄÚÈİÀàĞÍ
-	//CFontInfo m_FontInfo;			// ×ÖÌåĞÅÏ¢
-	//tstring m_strText;			// ÎÄ±¾ĞÅÏ¢
-	//int m_nFaceId;				// ÏµÍ³±íÇéId
-	//CCustomFaceInfo m_CFaceInfo;	// ×Ô¶¨Òå±íÇéĞÅÏ¢
+    //CONTENT_TYPE m_nType;			// å†…å®¹ç±»å‹
+    //CFontInfo m_FontInfo;			// å­—ä½“ä¿¡æ¯
+    //tstring m_strText;			// æ–‡æœ¬ä¿¡æ¯
+    //int m_nFaceId;				// ç³»ç»Ÿè¡¨æƒ…Id
+    //CCustomFaceInfo m_CFaceInfo;	// è‡ªå®šä¹‰è¡¨æƒ…ä¿¡æ¯
 
-	tstring strText;
-	CContent* lpContent = NULL;
-	LPCTSTR lpMsg = strContent.c_str();
-	std::vector<CContent*> arrContent;
+    tstring strText;
+    CContent* lpContent = NULL;
+    LPCTSTR lpMsg = strContent.c_str();
+    std::vector<CContent*> arrContent;
 
-	for (LPCTSTR p = lpMsg;*p != _T('\0'); p++)
-	{
-		arrContent.clear();
-		if (*p == _T('/'))
-		{
-			if (*(p+1) == _T('/'))
-			{
-				strText +=*p;
-				p++;
-				continue;
-			}
-			else if (*(p+1) == _T('o'))
-			{
-				//strText +=*p;
-				//arrContent.clear();
-				if (HandleFontInfo(p, strText, arrContent))
-				{
-					if(hRichWnd == NULL)
-						AddMsgToMsgLogEdit(arrContent);
-					else
-						AddMsgToRecvEdit(arrContent);
-					continue;
-				}
-			}
-			else if (*(p+1) == _T('f'))
-			{
-				//strText +=*p;
-				//arrContent.clear();
-				if (HandleSysFaceId(p, strText, arrContent))
-				{
-					if(hRichWnd == NULL)
-						AddMsgToMsgLogEdit(arrContent);
-					else
-						AddMsgToRecvEdit(arrContent);
-					continue;
-				}
-			}
-			else if (*(p+1) == _T('c'))
-			{
-				//strText +=*p;
-				//arrContent.clear();
-				if (HandleCustomPic(p, strText, arrContent))
-				{
-					if(hRichWnd == NULL)
-						AddMsgToMsgLogEdit(arrContent);
-					else
-						AddMsgToRecvEdit(arrContent);
-					continue;
-				}
-			}
-			else if (*(p+1) == _T('s'))						//´°¿Ú¶¶¶¯
-			{
-				//arrContent.clear();
-				if (HandleShake(p, strText, arrContent))
-				{
-					if(hRichWnd == NULL)
-						AddMsgToMsgLogEdit(arrContent);
-					else
-						AddMsgToRecvEdit(arrContent);
-					continue;
-				}
-			}
-			else if (*(p+1) == _T('i'))					   //ÎÄ¼ş
-			{
-				if (HandleFile(p, strText, arrContent))
-				{
-					if(hRichWnd == NULL)
-						AddMsgToMsgLogEdit(arrContent);
-					else
-						AddMsgToRecvEdit(arrContent);
-					continue;
-				}
-			}
-		}
-		
-		strText +=*p;
-	}
+    for (LPCTSTR p = lpMsg; *p != _T('\0'); p++)
+    {
+        arrContent.clear();
+        if (*p == _T('/'))
+        {
+            if (*(p + 1) == _T('/'))
+            {
+                strText += *p;
+                p++;
+                continue;
+            } else if (*(p + 1) == _T('o'))
+            {
+                //strText +=*p;
+                //arrContent.clear();
+                if (HandleFontInfo(p, strText, arrContent))
+                {
+                    if (hRichWnd == NULL)
+                        AddMsgToMsgLogEdit(arrContent);
+                    else
+                        AddMsgToRecvEdit(arrContent);
+                    continue;
+                }
+            } else if (*(p + 1) == _T('f'))
+            {
+                //strText +=*p;
+                //arrContent.clear();
+                if (HandleSysFaceId(p, strText, arrContent))
+                {
+                    if (hRichWnd == NULL)
+                        AddMsgToMsgLogEdit(arrContent);
+                    else
+                        AddMsgToRecvEdit(arrContent);
+                    continue;
+                }
+            } else if (*(p + 1) == _T('c'))
+            {
+                //strText +=*p;
+                //arrContent.clear();
+                if (HandleCustomPic(p, strText, arrContent))
+                {
+                    if (hRichWnd == NULL)
+                        AddMsgToMsgLogEdit(arrContent);
+                    else
+                        AddMsgToRecvEdit(arrContent);
+                    continue;
+                }
+            } else if (*(p + 1) == _T('s'))						//çª—å£æŠ–åŠ¨
+            {
+                //arrContent.clear();
+                if (HandleShake(p, strText, arrContent))
+                {
+                    if (hRichWnd == NULL)
+                        AddMsgToMsgLogEdit(arrContent);
+                    else
+                        AddMsgToRecvEdit(arrContent);
+                    continue;
+                }
+            } else if (*(p + 1) == _T('i'))					   //æ–‡ä»¶
+            {
+                if (HandleFile(p, strText, arrContent))
+                {
+                    if (hRichWnd == NULL)
+                        AddMsgToMsgLogEdit(arrContent);
+                    else
+                        AddMsgToRecvEdit(arrContent);
+                    continue;
+                }
+            }
+        }
 
-	if (!strText.empty())
-	{
-		lpContent = new CContent;
-		if (lpContent != NULL)
-		{
-			lpContent->m_nType = CONTENT_TYPE_TEXT;
-			lpContent->m_strText = strText;
-			arrContent.push_back(lpContent);
-			if(hRichWnd == NULL)
-				AddMsgToMsgLogEdit(arrContent);
-			else
-				AddMsgToRecvEdit(arrContent);
-		}
-		strText = _T("");
-	}
+        strText += *p;
+    }
+
+    if (!strText.empty())
+    {
+        lpContent = new CContent;
+        if (lpContent != NULL)
+        {
+            lpContent->m_nType = CONTENT_TYPE_TEXT;
+            lpContent->m_strText = strText;
+            arrContent.push_back(lpContent);
+            if (hRichWnd == NULL)
+                AddMsgToMsgLogEdit(arrContent);
+            else
+                AddMsgToRecvEdit(arrContent);
+        }
+        strText = _T("");
+    }
 
 }
 
 CBuddyChatDlg::CBuddyChatDlg(void)
 {
-	//m_lpFMGClient = NULL;
-	m_lpFaceList = NULL;
-	m_lpCascadeWinManager = NULL;
-	m_hMainDlg = NULL;
-	m_nUTalkUin = NULL;
+    //m_lpFMGClient = NULL;
+    m_lpFaceList = NULL;
+    m_lpCascadeWinManager = NULL;
+    m_hMainDlg = NULL;
+    m_nUTalkUin = NULL;
 
-	m_hDlgIcon = m_hDlgSmallIcon = NULL;
-	m_hRBtnDownWnd = NULL;
-	memset(&m_ptRBtnDown, 0, sizeof(m_ptRBtnDown));
-	m_pLastImageOle = NULL;
-	m_cxPicBarDlg = 122;
-	m_cyPicBarDlg = 24;
+    m_hDlgIcon = m_hDlgSmallIcon = NULL;
+    m_hRBtnDownWnd = NULL;
+    memset(&m_ptRBtnDown, 0, sizeof(m_ptRBtnDown));
+    m_pLastImageOle = NULL;
+    m_cxPicBarDlg = 122;
+    m_cyPicBarDlg = 24;
 
-	m_nMsgLogIndexInToolbar = -1;
+    m_nMsgLogIndexInToolbar = -1;
 
-	m_nUTalkNumber = 0;
-	m_nUserNumber = 0;
-	m_strBuddyName = _T("ºÃÓÑêÇ³Æ");
+    m_nUTalkNumber = 0;
+    m_nUserNumber = 0;
+    m_strBuddyName = _T("å¥½å‹æ˜µç§°");
 
 
-	m_bPressEnterToSendMessage = TRUE; 
-	m_bMsgLogWindowVisible = FALSE;
-	m_bFileTransferVisible = FALSE;
+    m_bPressEnterToSendMessage = TRUE;
+    m_bMsgLogWindowVisible = FALSE;
+    m_bFileTransferVisible = FALSE;
 
-	m_HotRgn = NULL;
+    m_HotRgn = NULL;
 
-	m_bEnableAutoReply = FALSE;
-	m_nMsgLogRecordOffset = 1;	
-	m_nMsgLogCurrentPageIndex = 0;
+    m_bEnableAutoReply = FALSE;
+    m_nMsgLogRecordOffset = 1;
+    m_nMsgLogCurrentPageIndex = 0;
 
-	m_bDraged = FALSE;
+    m_bDraged = FALSE;
 
-	::SetRectEmpty(&m_rtRichRecv);
-	::SetRectEmpty(&m_rtMidToolBar);
-	::SetRectEmpty(&m_rtSplitter);
-	::SetRectEmpty(&m_rtRichSend);
+    ::SetRectEmpty(&m_rtRichRecv);
+    ::SetRectEmpty(&m_rtMidToolBar);
+    ::SetRectEmpty(&m_rtSplitter);
+    ::SetRectEmpty(&m_rtRichSend);
 
     m_nLastSendShakeWindowTime = 0;
 }
@@ -413,273 +408,264 @@ CBuddyChatDlg::~CBuddyChatDlg(void)
 
 BOOL CBuddyChatDlg::PreTranslateMessage(MSG* pMsg)
 {
-	//if (::GetForegroundWindow() == m_hWnd && !m_Accelerator.IsNull() && 
-	//	m_Accelerator.TranslateAccelerator(m_hWnd, pMsg))
-	//	return TRUE;
+    //if (::GetForegroundWindow() == m_hWnd && !m_Accelerator.IsNull() && 
+    //	m_Accelerator.TranslateAccelerator(m_hWnd, pMsg))
+    //	return TRUE;
 
-	if (pMsg->hwnd == m_richRecv.m_hWnd || pMsg->hwnd == m_richSend.m_hWnd || pMsg->hwnd == m_richMsgLog.m_hWnd)
-	{
-		if (pMsg->message == WM_MOUSEMOVE)			// ·¢ËÍ/½ÓÊÕÎÄ±¾¿òµÄÊó±êÒÆ¶¯ÏûÏ¢
-		{
-			if (OnRichEdit_MouseMove(pMsg))
-				return TRUE;
-		}
-		else if (pMsg->message == WM_LBUTTONDBLCLK) // ·¢ËÍ/½ÓÊÕÎÄ±¾¿òµÄÊó±êË«»÷ÏûÏ¢
-		{
-			if (OnRichEdit_LBtnDblClk(pMsg))
-				return TRUE;
-		}
-		else if (pMsg->message == WM_RBUTTONDOWN)	// ·¢ËÍ/½ÓÊÕÎÄ±¾¿òµÄÊó±êÓÒ¼ü°´ÏÂÏûÏ¢
-		{
-			if (OnRichEdit_RBtnDown(pMsg))
-				return TRUE;
-		}
+    if (pMsg->hwnd == m_richRecv.m_hWnd || pMsg->hwnd == m_richSend.m_hWnd || pMsg->hwnd == m_richMsgLog.m_hWnd)
+    {
+        if (pMsg->message == WM_MOUSEMOVE)			// å‘é€/æ¥æ”¶æ–‡æœ¬æ¡†çš„é¼ æ ‡ç§»åŠ¨æ¶ˆæ¯
+        {
+            if (OnRichEdit_MouseMove(pMsg))
+                return TRUE;
+        } else if (pMsg->message == WM_LBUTTONDBLCLK) // å‘é€/æ¥æ”¶æ–‡æœ¬æ¡†çš„é¼ æ ‡åŒå‡»æ¶ˆæ¯
+        {
+            if (OnRichEdit_LBtnDblClk(pMsg))
+                return TRUE;
+        } else if (pMsg->message == WM_RBUTTONDOWN)	// å‘é€/æ¥æ”¶æ–‡æœ¬æ¡†çš„é¼ æ ‡å³é”®æŒ‰ä¸‹æ¶ˆæ¯
+        {
+            if (OnRichEdit_RBtnDown(pMsg))
+                return TRUE;
+        }
 
-		if ( (pMsg->hwnd == m_richSend.m_hWnd) && (pMsg->message == WM_KEYDOWN) 
-			&& (pMsg->wParam == 'V') && (::GetAsyncKeyState(VK_CONTROL)&0x8000) )	// ·¢ËÍÎÄ±¾¿òµÄCtrl+VÏûÏ¢
-		{
-			m_richSend.PasteSpecial(CF_TEXT);
-			return TRUE;
-		}
+        if ((pMsg->hwnd == m_richSend.m_hWnd) && (pMsg->message == WM_KEYDOWN)
+            && (pMsg->wParam == 'V') && (::GetAsyncKeyState(VK_CONTROL) & 0x8000))	// å‘é€æ–‡æœ¬æ¡†çš„Ctrl+Væ¶ˆæ¯
+        {
+            m_richSend.PasteSpecial(CF_TEXT);
+            return TRUE;
+        }
 
-		if ((pMsg->hwnd == m_richSend.m_hWnd) && (pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN) )	
-		{
-			BOOL bCtrlPressed = ::GetAsyncKeyState(VK_CONTROL) & 0x8000;
-			if(m_bPressEnterToSendMessage && !bCtrlPressed)
-			{
-				::SendMessage(m_hWnd, WM_COMMAND, ID_BTN_SEND, 0);
-				return TRUE;
-			}
-			else if(m_bPressEnterToSendMessage && bCtrlPressed)
-			{
-				::SendMessage(m_richSend.m_hWnd, WM_KEYDOWN, VK_RETURN, 0);
-				return TRUE;
-			}
-			else if(!m_bPressEnterToSendMessage && bCtrlPressed)
-			{
-				::SendMessage(m_hWnd, WM_COMMAND, ID_BTN_SEND, 0);
-				return TRUE;
-			}
-			else if(!m_bPressEnterToSendMessage && !bCtrlPressed)
-			{
-				::SendMessage(m_richSend.m_hWnd, WM_KEYDOWN, VK_RETURN, 0);
-				return TRUE;
-			}
-		}
+        if ((pMsg->hwnd == m_richSend.m_hWnd) && (pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN))
+        {
+            BOOL bCtrlPressed = ::GetAsyncKeyState(VK_CONTROL) & 0x8000;
+            if (m_bPressEnterToSendMessage && !bCtrlPressed)
+            {
+                ::SendMessage(m_hWnd, WM_COMMAND, ID_BTN_SEND, 0);
+                return TRUE;
+            } else if (m_bPressEnterToSendMessage && bCtrlPressed)
+            {
+                ::SendMessage(m_richSend.m_hWnd, WM_KEYDOWN, VK_RETURN, 0);
+                return TRUE;
+            } else if (!m_bPressEnterToSendMessage && bCtrlPressed)
+            {
+                ::SendMessage(m_hWnd, WM_COMMAND, ID_BTN_SEND, 0);
+                return TRUE;
+            } else if (!m_bPressEnterToSendMessage && !bCtrlPressed)
+            {
+                ::SendMessage(m_richSend.m_hWnd, WM_KEYDOWN, VK_RETURN, 0);
+                return TRUE;
+            }
+        }
 
-	}
+    }
 
-	return CWindow::IsDialogMessage(pMsg);
+    return CWindow::IsDialogMessage(pMsg);
 }
 
 void CBuddyChatDlg::OnRecvMsg(UINT nUTalkUin, UINT nMsgId)
 {
-	if (NULL == m_lpFMGClient/* || m_nUTalkUin != nUTalkUin*/)
-		return;
+    if (NULL == m_lpFMGClient/* || m_nUTalkUin != nUTalkUin*/)
+        return;
 
-	if (::GetForegroundWindow() != m_hWnd)	
-		FlashWindowEx(m_hWnd, 3);
+    if (::GetForegroundWindow() != m_hWnd)
+        FlashWindowEx(m_hWnd, 3);
 
-	if (nMsgId == 0)
-	{
-		CMessageList* lpMsgList = m_lpFMGClient->GetMessageList();
-		if (lpMsgList != NULL)
-		{
-			CMessageSender* lpMsgSender = lpMsgList->GetMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
-			if (lpMsgSender != NULL)
-			{
-				int nMsgCnt = lpMsgSender->GetMsgCount();
-				for (int i = 0; i < nMsgCnt; i++)
-				{
-					CBuddyMessage* lpBuddyMsg = lpMsgSender->GetBuddyMsg(i);
-					if (lpBuddyMsg != NULL)
-					{
-						AddMsgToRecvEdit(lpBuddyMsg);
-					}
-				}
-				lpMsgList->DelMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
-				::PostMessage(m_hMainDlg, WM_DEL_MSG_SENDER, FMG_MSG_TYPE_BUDDY, nUTalkUin);
-			}
-		}
-	}
-	else
-	{
-		CMessageList* lpMsgList = m_lpFMGClient->GetMessageList();
-		if (lpMsgList != NULL)
-		{
-			CMessageSender* lpMsgSender = lpMsgList->GetMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
-			if (lpMsgSender != NULL)
-			{
-				CBuddyMessage* lpBuddyMsg = lpMsgSender->GetBuddyMsgById(nMsgId);
-				if (lpBuddyMsg != NULL)
-				{
-					AddMsgToRecvEdit(lpBuddyMsg);
-					lpMsgSender->DelMsgById(nMsgId);
-				}
+    if (nMsgId == 0)
+    {
+        CMessageList* lpMsgList = m_lpFMGClient->GetMessageList();
+        if (lpMsgList != NULL)
+        {
+            CMessageSender* lpMsgSender = lpMsgList->GetMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
+            if (lpMsgSender != NULL)
+            {
+                int nMsgCnt = lpMsgSender->GetMsgCount();
+                for (int i = 0; i < nMsgCnt; i++)
+                {
+                    CBuddyMessage* lpBuddyMsg = lpMsgSender->GetBuddyMsg(i);
+                    if (lpBuddyMsg != NULL)
+                    {
+                        AddMsgToRecvEdit(lpBuddyMsg);
+                    }
+                }
+                lpMsgList->DelMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
+                ::PostMessage(m_hMainDlg, WM_DEL_MSG_SENDER, FMG_MSG_TYPE_BUDDY, nUTalkUin);
+            }
+        }
+    } else
+    {
+        CMessageList* lpMsgList = m_lpFMGClient->GetMessageList();
+        if (lpMsgList != NULL)
+        {
+            CMessageSender* lpMsgSender = lpMsgList->GetMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
+            if (lpMsgSender != NULL)
+            {
+                CBuddyMessage* lpBuddyMsg = lpMsgSender->GetBuddyMsgById(nMsgId);
+                if (lpBuddyMsg != NULL)
+                {
+                    AddMsgToRecvEdit(lpBuddyMsg);
+                    lpMsgSender->DelMsgById(nMsgId);
+                }
 
-				if (lpMsgSender->GetMsgCount() <= 0)
-				{
-					lpMsgList->DelMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
-					::PostMessage(m_hMainDlg, WM_DEL_MSG_SENDER, FMG_MSG_TYPE_BUDDY, nUTalkUin);
-				}
-			}
-		}
-	}
+                if (lpMsgSender->GetMsgCount() <= 0)
+                {
+                    lpMsgList->DelMsgSender(FMG_MSG_TYPE_BUDDY, nUTalkUin);
+                    ::PostMessage(m_hMainDlg, WM_DEL_MSG_SENDER, FMG_MSG_TYPE_BUDDY, nUTalkUin);
+                }
+            }
+        }
+    }
 }
 
-// ¸üĞÂºÃÓÑºÅÂëÍ¨Öª
+// æ›´æ–°å¥½å‹å·ç é€šçŸ¥
 void CBuddyChatDlg::OnUpdateBuddyNumber()
 {
-	UpdateData();
-	UpdateBuddyNameCtrl();
+    UpdateData();
+    UpdateBuddyNameCtrl();
 }
 
-// ¸üĞÂºÃÓÑÇ©ÃûÍ¨Öª
+// æ›´æ–°å¥½å‹ç­¾åé€šçŸ¥
 void CBuddyChatDlg::OnUpdateBuddySign()
 {
-	UpdateData();
-	UpdateBuddySignCtrl();
+    UpdateData();
+    UpdateBuddySignCtrl();
 }
 
-// ¸üĞÂºÃÓÑÍ·ÏñÍ¨Öª
+// æ›´æ–°å¥½å‹å¤´åƒé€šçŸ¥
 void CBuddyChatDlg::OnUpdateBuddyHeadPic()
 {
-	long nFaceID = 0;
-	BOOL bGray = FALSE;
-	BOOL bMobile = FALSE;
-	CString strThumbPath;
-	CBuddyInfo* pBuddyInfo = GetBuddyInfoPtr();
-	if(pBuddyInfo != NULL)
-	{
-		nFaceID = pBuddyInfo->m_nFace;
-		if(pBuddyInfo->m_nStatus==STATUS_INVISIBLE || pBuddyInfo->m_nStatus==STATUS_OFFLINE)
-			bGray = TRUE;
+    long nFaceID = 0;
+    BOOL bGray = FALSE;
+    BOOL bMobile = FALSE;
+    CString strThumbPath;
+    CBuddyInfo* pBuddyInfo = GetBuddyInfoPtr();
+    if (pBuddyInfo != NULL)
+    {
+        nFaceID = pBuddyInfo->m_nFace;
+        if (pBuddyInfo->m_nStatus == STATUS_INVISIBLE || pBuddyInfo->m_nStatus == STATUS_OFFLINE)
+            bGray = TRUE;
 
-		if(pBuddyInfo->m_nStatus == STATUS_MOBILE_ONLINE)
-			bMobile = TRUE;
-	}
-	
-	//if(lpBuddyInfo == NULL)
-	//{
-	//	::MessageBox(m_lpFMGClient->m_UserMgr.m_hCallBackWnd, _T("³ÌĞòÓöµ½Ò»¸öÑÏÖØµÄ´íÎóµ¼ÖÂ´ò¿ªÁÄÌì¶Ô»°¿òÊ§°Ü£¡"), g_strAppTitle.c_str(), MB_OK|MB_ICONERROR); 
-	//	return;
-	//}
-	if(pBuddyInfo!=NULL && pBuddyInfo->m_bUseCustomFace && pBuddyInfo->m_bCustomFaceAvailable)
-	{
-		strThumbPath.Format(_T("%s%d.png"), m_lpFMGClient->m_UserMgr.GetCustomUserThumbFolder().c_str(), pBuddyInfo->m_uUserID);
-		if(!Hootina::CPath::IsFileExist(strThumbPath))
-			strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, pBuddyInfo->m_nFace);
-	}
-	else
-		strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, pBuddyInfo->m_nFace);
-	
-	m_picHead.SetBitmap(strThumbPath, FALSE, bGray);
-	
-	CString strMobileImagePath;
-	strMobileImagePath.Format(_T("%sImage\\mobile_online.png"), g_szHomePath);
-	if(bMobile)
-	{
-		m_picHead.SetMobileBitmap(strMobileImagePath, TRUE);
-	}
-	else
-	{
-		m_picHead.SetMobileBitmap(strMobileImagePath, FALSE);
-	}
+        if (pBuddyInfo->m_nStatus == STATUS_MOBILE_ONLINE)
+            bMobile = TRUE;
+    }
 
-	m_hDlgIcon = ExtractIcon(strThumbPath, 64);
-	m_hDlgSmallIcon = m_hDlgIcon;
-	if(m_hDlgIcon == NULL)
-	{
-		m_hDlgIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_32, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
-		m_hDlgSmallIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_16, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
-	}
-	SetIcon(m_hDlgIcon, TRUE);
-	SetIcon(m_hDlgSmallIcon, FALSE);
+    //if(lpBuddyInfo == NULL)
+    //{
+    //	::MessageBox(m_lpFMGClient->m_UserMgr.m_hCallBackWnd, _T("ç¨‹åºé‡åˆ°ä¸€ä¸ªä¸¥é‡çš„é”™è¯¯å¯¼è‡´æ‰“å¼€èŠå¤©å¯¹è¯æ¡†å¤±è´¥ï¼"), g_strAppTitle.c_str(), MB_OK|MB_ICONERROR); 
+    //	return;
+    //}
+    if (pBuddyInfo != NULL && pBuddyInfo->m_bUseCustomFace && pBuddyInfo->m_bCustomFaceAvailable)
+    {
+        strThumbPath.Format(_T("%s%d.png"), m_lpFMGClient->m_UserMgr.GetCustomUserThumbFolder().c_str(), pBuddyInfo->m_uUserID);
+        if (!Hootina::CPath::IsFileExist(strThumbPath))
+            strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, pBuddyInfo->m_nFace);
+    } else
+        strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, pBuddyInfo->m_nFace);
+
+    m_picHead.SetBitmap(strThumbPath, FALSE, bGray);
+
+    CString strMobileImagePath;
+    strMobileImagePath.Format(_T("%sImage\\mobile_online.png"), g_szHomePath);
+    if (bMobile)
+    {
+        m_picHead.SetMobileBitmap(strMobileImagePath, TRUE);
+    } else
+    {
+        m_picHead.SetMobileBitmap(strMobileImagePath, FALSE);
+    }
+
+    m_hDlgIcon = ExtractIcon(strThumbPath, 64);
+    m_hDlgSmallIcon = m_hDlgIcon;
+    if (m_hDlgIcon == NULL)
+    {
+        m_hDlgIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_32, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
+        m_hDlgSmallIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_16, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
+    }
+    SetIcon(m_hDlgIcon, TRUE);
+    SetIcon(m_hDlgSmallIcon, FALSE);
 
 
-	if(m_picHead.IsWindow())
-		m_picHead.Invalidate(FALSE);
+    if (m_picHead.IsWindow())
+        m_picHead.Invalidate(FALSE);
 }
 
 BOOL CBuddyChatDlg::IsFilesTransferring()
 {
-	return m_FileTransferCtrl.GetItemCount() > 0;
+    return m_FileTransferCtrl.GetItemCount() > 0;
 }
 
 BOOL CBuddyChatDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
-	m_lpCascadeWinManager->Add(m_hWnd, CHATDLG_WIDTH, CHATDLG_HEIGHT);
+    m_lpCascadeWinManager->Add(m_hWnd, CHATDLG_WIDTH, CHATDLG_HEIGHT);
 
-	CString strThumbPath;
-	CBuddyInfo* lpBuddyInfo = m_lpFMGClient->m_UserMgr.m_BuddyList.GetBuddy(m_nUTalkUin);
-	if(lpBuddyInfo == NULL)
-	{
-		::MessageBox(m_lpFMGClient->m_UserMgr.m_hCallBackWnd, _T("³ÌĞòÓöµ½Ò»¸öÑÏÖØµÄ´íÎóµ¼ÖÂ´ò¿ªÁÄÌì¶Ô»°¿òÊ§°Ü£¡"), g_strAppTitle.c_str(), MB_OK|MB_ICONERROR); 
-		return FALSE;
-	}
-	if(lpBuddyInfo->m_bUseCustomFace && !lpBuddyInfo->m_strCustomFace.empty() && lpBuddyInfo->m_bCustomFaceAvailable)
-	{
-		strThumbPath.Format(_T("%s%s"), m_lpFMGClient->m_UserMgr.GetCustomUserThumbFolder().c_str(), lpBuddyInfo->m_strCustomFace.c_str());
-		if(!Hootina::CPath::IsFileExist(strThumbPath))
-			strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, lpBuddyInfo->m_nFace);
-	}
-	else
-		strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, lpBuddyInfo->m_nFace);
+    CString strThumbPath;
+    CBuddyInfo* lpBuddyInfo = m_lpFMGClient->m_UserMgr.m_BuddyList.GetBuddy(m_nUTalkUin);
+    if (lpBuddyInfo == NULL)
+    {
+        ::MessageBox(m_lpFMGClient->m_UserMgr.m_hCallBackWnd, _T("ç¨‹åºé‡åˆ°ä¸€ä¸ªä¸¥é‡çš„é”™è¯¯å¯¼è‡´æ‰“å¼€èŠå¤©å¯¹è¯æ¡†å¤±è´¥ï¼"), g_strAppTitle.c_str(), MB_OK | MB_ICONERROR);
+        return FALSE;
+    }
+    if (lpBuddyInfo->m_bUseCustomFace && !lpBuddyInfo->m_strCustomFace.empty() && lpBuddyInfo->m_bCustomFaceAvailable)
+    {
+        strThumbPath.Format(_T("%s%s"), m_lpFMGClient->m_UserMgr.GetCustomUserThumbFolder().c_str(), lpBuddyInfo->m_strCustomFace.c_str());
+        if (!Hootina::CPath::IsFileExist(strThumbPath))
+            strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, lpBuddyInfo->m_nFace);
+    } else
+        strThumbPath.Format(_T("%sImage\\UserThumbs\\%d.png"), g_szHomePath, lpBuddyInfo->m_nFace);
 
-	m_hDlgIcon = ExtractIcon(strThumbPath, 64);
-	m_hDlgSmallIcon = m_hDlgIcon;
-	if(m_hDlgIcon == NULL)
-	{
-		m_hDlgIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_32, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
-		m_hDlgSmallIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_16, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
-	}
-	SetIcon(m_hDlgIcon, TRUE);
-	SetIcon(m_hDlgSmallIcon, FALSE);
+    m_hDlgIcon = ExtractIcon(strThumbPath, 64);
+    m_hDlgSmallIcon = m_hDlgIcon;
+    if (m_hDlgIcon == NULL)
+    {
+        m_hDlgIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_32, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
+        m_hDlgSmallIcon = AtlLoadIconImage(IDI_BUDDYCHATDLG_16, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
+    }
+    SetIcon(m_hDlgIcon, TRUE);
+    SetIcon(m_hDlgSmallIcon, FALSE);
 
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
-	ATLASSERT(pLoop != NULL);
-	pLoop->AddMessageFilter(this);
+    CMessageLoop* pLoop = _Module.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->AddMessageFilter(this);
 
-	UpdateData();
+    UpdateData();
 
-	m_FontSelDlg.m_pFMGClient = m_lpFMGClient;
-	m_bPressEnterToSendMessage = m_lpFMGClient->m_UserConfig.IsEnablePressEnterToSend();
+    m_FontSelDlg.m_pFMGClient = m_lpFMGClient;
+    m_bPressEnterToSendMessage = m_lpFMGClient->m_UserConfig.IsEnablePressEnterToSend();
 
-	
-	//if (lpBuddyInfo != NULL)
-	//{
-	//	if (!lpBuddyInfo->IsHasUTalkNum())		// ¸üĞÂºÃÓÑºÅÂë
-	//	{
-	//		m_lpFMGClient->UpdateBuddyNum(m_nUTalkUin);
-	//	}
-	//	else								// ¸üĞÂºÃÓÑÍ·Ïñ
-	//	{
-	//		if (m_lpFMGClient->IsNeedUpdateBuddyHeadPic(m_nUTalkNumber))
-	//			m_lpFMGClient->UpdateBuddyHeadPic(m_nUTalkUin, m_nUTalkNumber);
-	//	}
 
-	//	if (!lpBuddyInfo->IsHasUTalkSign())	// ¸üĞÂ¸öĞÔÇ©Ãû
-	//		m_lpFMGClient->UpdateBuddySign(m_nUTalkUin);
-	//}
+    //if (lpBuddyInfo != NULL)
+    //{
+    //	if (!lpBuddyInfo->IsHasUTalkNum())		// æ›´æ–°å¥½å‹å·ç 
+    //	{
+    //		m_lpFMGClient->UpdateBuddyNum(m_nUTalkUin);
+    //	}
+    //	else								// æ›´æ–°å¥½å‹å¤´åƒ
+    //	{
+    //		if (m_lpFMGClient->IsNeedUpdateBuddyHeadPic(m_nUTalkNumber))
+    //			m_lpFMGClient->UpdateBuddyHeadPic(m_nUTalkUin, m_nUTalkNumber);
+    //	}
 
-	Init();		// ³õÊ¼»¯
+    //	if (!lpBuddyInfo->IsHasUTalkSign())	// æ›´æ–°ä¸ªæ€§ç­¾å
+    //		m_lpFMGClient->UpdateBuddySign(m_nUTalkUin);
+    //}
 
-	SetHotRgn();
+    Init();		// åˆå§‹åŒ–
+
+    SetHotRgn();
 
     //ModifyStyle(0, WS_CLIPCHILDREN);
 
-    //FIXME: win7ÓÃ¹ÜÀíÔ±È¨ÏŞÆô¶¯,·¢ËÍ¸»ÎÄ±¾»¹ÊÇÃ»·¨½ÓÊÕ´°¿ÚÍÏ×§,ÆäËû´°¿Ú¿ÉÒÔ
+    //FIXME: win7ç”¨ç®¡ç†å‘˜æƒé™å¯åŠ¨,å‘é€å¯Œæ–‡æœ¬è¿˜æ˜¯æ²¡æ³•æ¥æ”¶çª—å£æ‹–æ‹½,å…¶ä»–çª—å£å¯ä»¥
     if (IsWindowsVistaOrGreater())
     {
-        //win 7¹ÜÀíÔ±È¨ÏŞÆô¶¯ Ä¬ÈÏÊÇ´ÓUIPI¡¾ÓÃ»§½çÃæÌØÈ¨¸ôÀë¡¿ÒÆ³ıWM_DROPFILESÏûÏ¢µÄ,
-        //ÕâÀïÈ¥³ıÕâÖÖÏŞÖÆ
+        //win 7ç®¡ç†å‘˜æƒé™å¯åŠ¨ é»˜è®¤æ˜¯ä»UIPIã€ç”¨æˆ·ç•Œé¢ç‰¹æƒéš”ç¦»ã€‘ç§»é™¤WM_DROPFILESæ¶ˆæ¯çš„,
+        //è¿™é‡Œå»é™¤è¿™ç§é™åˆ¶
         //see: http://blog.csdn.net/whatday/article/details/44278605
         //see: https://msdn.microsoft.com/EN-US/library/windows/desktop/ms632675(v=vs.85).aspx
         typedef BOOL(WINAPI* ChangeWindowMessageFilterOkFn)(HWND, UINT, DWORD, PCHANGEFILTERSTRUCT);
 
         HMODULE hModUser32 = LoadLibrary(_T("user32.dll"));
-        if (hModUser32 != NULL) 
-        { 
+        if (hModUser32 != NULL)
+        {
             ChangeWindowMessageFilterOkFn pfnChangeWindowMessageFilter = (ChangeWindowMessageFilterOkFn)GetProcAddress(hModUser32, "ChangeWindowMessageFilterEx");
             if (pfnChangeWindowMessageFilter != NULL)
             {
@@ -691,484 +677,478 @@ BOOL CBuddyChatDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
                 //pfnChangeWindowMessageFilter(m_richSend.m_hWnd, WM_DROPFILES, MSGFLT_ALLOW, NULL);
                 //pfnChangeWindowMessageFilter(m_richSend.m_hWnd, 0x0049, MSGFLT_ALLOW, NULL);
             }
-            FreeLibrary(hModUser32);       
+            FreeLibrary(hModUser32);
         }
     }
 
-	//ÔÊĞíÍÏ×§ÎÄ¼ş½ø´°¿Ú
-	::DragAcceptFiles(m_hWnd, TRUE); 
+    //å…è®¸æ‹–æ‹½æ–‡ä»¶è¿›çª—å£
+    ::DragAcceptFiles(m_hWnd, TRUE);
     //::DragAcceptFiles(m_richSend.m_hWnd, TRUE);
-	//PostMessage(WM_SETDLGINITFOCUS, 0, 0);		// ÉèÖÃ¶Ô»°¿ò³õÊ¼½¹µã
-	SetTimer(1001, 300, NULL);
-	
-	CalculateMsgLogCountAndOffset();
+    //PostMessage(WM_SETDLGINITFOCUS, 0, 0);		// è®¾ç½®å¯¹è¯æ¡†åˆå§‹ç„¦ç‚¹
+    SetTimer(1001, 300, NULL);
 
-	if(m_lpFMGClient->m_UserConfig.IsEnableShowLastMsgInChatDlg())
-		ShowLastMsgInRecvRichEdit();
+    CalculateMsgLogCountAndOffset();
+
+    if (m_lpFMGClient->m_UserConfig.IsEnableShowLastMsgInChatDlg())
+        ShowLastMsgInRecvRichEdit();
 
 
-	return TRUE;
+    return TRUE;
 }
 
 void CBuddyChatDlg::CalculateMsgLogCountAndOffset()
 {
-	//¶ÁÈ¡ÏûÏ¢¼ÇÂ¼¸öÊı
-	CString strMsgFile = m_lpFMGClient->GetMsgLogFullName().c_str();
-	strMsgFile.Replace(_T("\\"), _T("/"));
-	m_MsgLogger.SetMsgLogFileName(strMsgFile);
-	long nTotal = m_MsgLogger.GetBuddyMsgLogCount(m_nUTalkUin);
-	
-	long nPageCount = nTotal/10;
-	if(nTotal%10 != 0)
-		++nPageCount;
+    //è¯»å–æ¶ˆæ¯è®°å½•ä¸ªæ•°
+    CString strMsgFile = m_lpFMGClient->GetMsgLogFullName().c_str();
+    strMsgFile.Replace(_T("\\"), _T("/"));
+    m_MsgLogger.SetMsgLogFileName(strMsgFile);
+    long nTotal = m_MsgLogger.GetBuddyMsgLogCount(m_nUTalkUin);
 
-	m_nMsgLogRecordOffset = 1;
-	m_nMsgLogCurrentPageIndex = 1;
-	while(TRUE)
-	{
-		m_nMsgLogRecordOffset += 10;
-		++m_nMsgLogCurrentPageIndex;
-		if(m_nMsgLogCurrentPageIndex > nPageCount)
-		{
-			m_nMsgLogRecordOffset -= 10;
-			--m_nMsgLogCurrentPageIndex;
-			break;
-		}
-	}
-	CString strInfo;
-	if(nPageCount > 0)
-		strInfo.Format(_T("%d/%d"), m_nMsgLogCurrentPageIndex, nPageCount);
-	else
-		strInfo = _T("0/0");
+    long nPageCount = nTotal / 10;
+    if (nTotal % 10 != 0)
+        ++nPageCount;
 
-	m_staMsgLogPage.SetWindowText(strInfo);
-	m_staMsgLogPage.Invalidate(FALSE);
+    m_nMsgLogRecordOffset = 1;
+    m_nMsgLogCurrentPageIndex = 1;
+    while (TRUE)
+    {
+        m_nMsgLogRecordOffset += 10;
+        ++m_nMsgLogCurrentPageIndex;
+        if (m_nMsgLogCurrentPageIndex > nPageCount)
+        {
+            m_nMsgLogRecordOffset -= 10;
+            --m_nMsgLogCurrentPageIndex;
+            break;
+        }
+    }
+    CString strInfo;
+    if (nPageCount > 0)
+        strInfo.Format(_T("%d/%d"), m_nMsgLogCurrentPageIndex, nPageCount);
+    else
+        strInfo = _T("0/0");
+
+    m_staMsgLogPage.SetWindowText(strInfo);
+    m_staMsgLogPage.Invalidate(FALSE);
 }
 
 BOOL CBuddyChatDlg::OnCopyData(CWindow wnd, PCOPYDATASTRUCT pCopyDataStruct)
 {
-	if (NULL == pCopyDataStruct)
-		return FALSE;
+    if (NULL == pCopyDataStruct)
+        return FALSE;
 
-	switch (pCopyDataStruct->dwData)
-	{
-	case IPC_CODE_MSGLOG_PASTE:			// ÏûÏ¢¼ÇÂ¼ä¯ÀÀ´°¿ÚÕ³ÌùÏûÏ¢
-		{
-			if (pCopyDataStruct->lpData != NULL && pCopyDataStruct->cbData > 0)
-				AddMsgToSendEdit((LPCTSTR)pCopyDataStruct->lpData);
-		}
-		break;
+    switch (pCopyDataStruct->dwData)
+    {
+    case IPC_CODE_MSGLOG_PASTE:			// æ¶ˆæ¯è®°å½•æµè§ˆçª—å£ç²˜è´´æ¶ˆæ¯
+    {
+        if (pCopyDataStruct->lpData != NULL && pCopyDataStruct->cbData > 0)
+            AddMsgToSendEdit((LPCTSTR)pCopyDataStruct->lpData);
+    }
+    break;
 
-	case IPC_CODE_MSGLOG_EXIT:			// ÏûÏ¢¼ÇÂ¼ä¯ÀÀ´°¿ÚÍË³öÏûÏ¢
-		{
-			m_tbMid.SetItemCheckState(13, FALSE);
-			m_tbMid.Invalidate();
-		}
-		break;
-	}
+    case IPC_CODE_MSGLOG_EXIT:			// æ¶ˆæ¯è®°å½•æµè§ˆçª—å£é€€å‡ºæ¶ˆæ¯
+    {
+        m_tbMid.SetItemCheckState(13, FALSE);
+        m_tbMid.Invalidate();
+    }
+    break;
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 void CBuddyChatDlg::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	m_SkinMenu.OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+    m_SkinMenu.OnMeasureItem(nIDCtl, lpMeasureItemStruct);
 }
 
 void CBuddyChatDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
-	m_SkinMenu.OnDrawItem(nIDCtl, lpDrawItemStruct);
+    m_SkinMenu.OnDrawItem(nIDCtl, lpDrawItemStruct);
 }
 
 void CBuddyChatDlg::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
 {
-	if (m_bMsgLogWindowVisible)
-	{
-		lpMMI->ptMinTrackSize.x = CHATDLG_EXPAND_WIDTH;
-		lpMMI->ptMinTrackSize.y = CHATDLG_HEIGHT;
-	}
-	else
-	{
-		lpMMI->ptMinTrackSize.x = CHATDLG_WIDTH;
-		lpMMI->ptMinTrackSize.y = CHATDLG_HEIGHT;
-	}
+    if (m_bMsgLogWindowVisible)
+    {
+        lpMMI->ptMinTrackSize.x = CHATDLG_EXPAND_WIDTH;
+        lpMMI->ptMinTrackSize.y = CHATDLG_HEIGHT;
+    } else
+    {
+        lpMMI->ptMinTrackSize.x = CHATDLG_WIDTH;
+        lpMMI->ptMinTrackSize.y = CHATDLG_HEIGHT;
+    }
 }
 
 void CBuddyChatDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (::GetCapture() == m_SplitterCtrl.m_hWnd)
-	{
-		ReCaculateCtrlPostion(point.y);
-	}
+    if (::GetCapture() == m_SplitterCtrl.m_hWnd)
+    {
+        ReCaculateCtrlPostion(point.y);
+    }
 }
 
 void CBuddyChatDlg::OnMove(CPoint ptPos)
 {
-	SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);
 
-	m_lpCascadeWinManager->SetPos(m_hWnd, ptPos.x, ptPos.y);
+    m_lpCascadeWinManager->SetPos(m_hWnd, ptPos.x, ptPos.y);
 }
 
 void CBuddyChatDlg::OnSize(UINT nType, CSize size)
 {
-	//Õâ¸öº¯ÊıÓĞµãÓ·Ö×£¬´óÌåË¼Â·ÊÇ£º
-	//Èç¹ûÓÃ»§Í¨¹ıÍÏ×§·¢ËÍ¿òµ÷ÕûÁË´°¿Ú³ß´ç£¬Ôò»Ö¸´ºóµÄ´°¿Ú¸÷¿Ø¼şµÄÎ»ÖÃÉèÖÃÎªµ÷ÕûºóµÄÎ»ÖÃ
-	//·´Ö®£¬¸÷¿Ø¼şÊ¹ÓÃÄ¬ÈÏÎ»ÖÃ
-	if (!m_bMsgLogWindowVisible && !m_bFileTransferVisible)
-	{
-		if (m_tbTop.IsWindow())
-			m_tbTop.MoveWindow(3, 70, size.cx-5, 32, TRUE);
+    //è¿™ä¸ªå‡½æ•°æœ‰ç‚¹è‡ƒè‚¿ï¼Œå¤§ä½“æ€è·¯æ˜¯ï¼š
+    //å¦‚æœç”¨æˆ·é€šè¿‡æ‹–æ‹½å‘é€æ¡†è°ƒæ•´äº†çª—å£å°ºå¯¸ï¼Œåˆ™æ¢å¤åçš„çª—å£å„æ§ä»¶çš„ä½ç½®è®¾ç½®ä¸ºè°ƒæ•´åçš„ä½ç½®
+    //åä¹‹ï¼Œå„æ§ä»¶ä½¿ç”¨é»˜è®¤ä½ç½®
+    if (!m_bMsgLogWindowVisible && !m_bFileTransferVisible)
+    {
+        if (m_tbTop.IsWindow())
+            m_tbTop.MoveWindow(3, 70, size.cx - 5, 32, TRUE);
 
-		if(m_staPicUploadProgress.IsWindow())
-			m_staPicUploadProgress.MoveWindow(10, size.cy-25, 380, 25, FALSE);
-		
-		if (m_btnClose.IsWindow())
-			m_btnClose.MoveWindow(size.cx-190, size.cy-30, 77, 25, TRUE);
+        if (m_staPicUploadProgress.IsWindow())
+            m_staPicUploadProgress.MoveWindow(10, size.cy - 25, 380, 25, FALSE);
 
-		if (m_btnSend.IsWindow())
-			m_btnSend.MoveWindow(size.cx-110, size.cy-30, 77, 25, TRUE);
+        if (m_btnClose.IsWindow())
+            m_btnClose.MoveWindow(size.cx - 190, size.cy - 30, 77, 25, TRUE);
 
-		if (m_btnArrow.IsWindow())
-			m_btnArrow.MoveWindow(size.cx-33, size.cy-30, 28, 25, TRUE);
+        if (m_btnSend.IsWindow())
+            m_btnSend.MoveWindow(size.cx - 110, size.cy - 30, 77, 25, TRUE);
 
-
-		if (m_richRecv.IsWindow())
-		{
-			if(m_bDraged)
-			{
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_richRecv.MoveWindow(6, 106, size.cx-8, m_rtRichRecv.bottom-m_rtRichRecv.top-32);
-				else if((m_FontSelDlg.IsWindow()&&!m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
-					m_richRecv.MoveWindow(6, 106, size.cx-8, m_rtRichRecv.bottom-m_rtRichRecv.top);
-
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_FontSelDlg.MoveWindow(2, m_rtRichRecv.bottom-32, size.cx-20, 32, TRUE);
-			}
-			else
-			{
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_richRecv.MoveWindow(6, 106, size.cx-8, size.cy-305, TRUE);
-				else if((m_FontSelDlg.IsWindow()&&!m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
-					m_richRecv.MoveWindow(6, 106, size.cx-8, size.cy-273, TRUE);
-
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_FontSelDlg.MoveWindow(2, size.cy-197, size.cx-20, 32, TRUE);
-			}
-		}
-
-		if (m_tbMid.IsWindow())
-		{
-			if(m_bDraged)
-				m_tbMid.MoveWindow(3, m_rtMidToolBar.top, size.cx-5, 31, TRUE);
-			else
-				m_tbMid.MoveWindow(3, size.cy-167, size.cx-5, 31, TRUE);
-			//ÏûÏ¢¼ÇÂ¼°´Å¥Ê¼ÖÕ¿¿±ß
-			m_tbMid.SetItemMargin(m_nMsgLogIndexInToolbar, size.cx-240, 0);
-		}
-		
-		if(m_SplitterCtrl.IsWindow())
-		{
-			if(m_bDraged)
-				m_SplitterCtrl.MoveWindow(6, m_rtSplitter.top, size.cx-8, 5, TRUE);
-			else
-				m_SplitterCtrl.MoveWindow(6, size.cy-135, size.cx-8, 5, TRUE);
-		}
+        if (m_btnArrow.IsWindow())
+            m_btnArrow.MoveWindow(size.cx - 33, size.cy - 30, 28, 25, TRUE);
 
 
-		if (m_richSend.IsWindow())
-		{
-			if(m_bDraged)
-				m_richSend.MoveWindow(6, m_rtRichSend.top, size.cx-8, size.cy-m_rtRichSend.top-35, FALSE);
-			else
-				m_richSend.MoveWindow(6, size.cy-130, size.cx-8, 95, FALSE);
-		}
+        if (m_richRecv.IsWindow())
+        {
+            if (m_bDraged)
+            {
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_richRecv.MoveWindow(6, 106, size.cx - 8, m_rtRichRecv.bottom - m_rtRichRecv.top - 32);
+                else if ((m_FontSelDlg.IsWindow() && !m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
+                    m_richRecv.MoveWindow(6, 106, size.cx - 8, m_rtRichRecv.bottom - m_rtRichRecv.top);
 
-	}
-	else
-	{	
-		if(m_staPicUploadProgress.IsWindow())
-			m_staPicUploadProgress.MoveWindow(10, size.cy-25, 380, 25, TRUE);
-		
-		if (m_btnClose.IsWindow())
-			m_btnClose.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH-190, size.cy-30, 77, 25, TRUE);
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_FontSelDlg.MoveWindow(2, m_rtRichRecv.bottom - 32, size.cx - 20, 32, TRUE);
+            } else
+            {
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_richRecv.MoveWindow(6, 106, size.cx - 8, size.cy - 305, TRUE);
+                else if ((m_FontSelDlg.IsWindow() && !m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
+                    m_richRecv.MoveWindow(6, 106, size.cx - 8, size.cy - 273, TRUE);
 
-		if (m_btnSend.IsWindow())
-			m_btnSend.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH-110, size.cy-30, 77, 25, TRUE);
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_FontSelDlg.MoveWindow(2, size.cy - 197, size.cx - 20, 32, TRUE);
+            }
+        }
 
-		if (m_btnArrow.IsWindow())
-			m_btnArrow.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH-33, size.cy-30, 28, 25, TRUE);
-		
-		//ÁÄÌì¼ÇÂ¼·­Ò³ËÄ¸ö°´Å¥
-		if (m_btnFirstMsgLog.IsWindow())
-			m_btnFirstMsgLog.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+110, size.cy-30, 28, 25, TRUE);
+        if (m_tbMid.IsWindow())
+        {
+            if (m_bDraged)
+                m_tbMid.MoveWindow(3, m_rtMidToolBar.top, size.cx - 5, 31, TRUE);
+            else
+                m_tbMid.MoveWindow(3, size.cy - 167, size.cx - 5, 31, TRUE);
+            //æ¶ˆæ¯è®°å½•æŒ‰é’®å§‹ç»ˆé è¾¹
+            m_tbMid.SetItemMargin(m_nMsgLogIndexInToolbar, size.cx - 240, 0);
+        }
 
-		if (m_btnPrevMsgLog.IsWindow())
-			m_btnPrevMsgLog.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+140, size.cy-30, 28, 25, TRUE);
-
-		if (m_staMsgLogPage.IsWindow())
-			m_staMsgLogPage.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+180, size.cy-24, 60, 25, TRUE);
-
-		if (m_btnNextMsgLog.IsWindow())
-			m_btnNextMsgLog.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+240, size.cy-30, 28, 25, TRUE);
-
-		if (m_btnLastMsgLog.IsWindow())
-			m_btnLastMsgLog.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+270, size.cy-30, 28, 25, TRUE);
-
-		if (m_tbTop.IsWindow())
-			m_tbTop.MoveWindow(3, 70, size.cx-RIGHT_CHAT_WINDOW_WIDTH-5, 32, TRUE);
-
-		if (m_richRecv.IsWindow())
-		{
-			if(m_bDraged)
-			{		
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_richRecv.MoveWindow(6, 106, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, m_rtRichRecv.bottom-m_rtRichRecv.top-32);	
-				else if((m_FontSelDlg.IsWindow()&&!m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
-					m_richRecv.MoveWindow(6, 106, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, m_rtRichRecv.bottom-m_rtRichRecv.top);
-
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_FontSelDlg.MoveWindow(2, m_rtRichRecv.bottom-32, size.cx-RIGHT_CHAT_WINDOW_WIDTH-20, 32);
-	
-			}
-			else
-			{	
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_richRecv.MoveWindow(6, 106, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, size.cy-305);	
-				else if((m_FontSelDlg.IsWindow()&&!m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
-					m_richRecv.MoveWindow(6, 106, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, size.cy-273);
-
-				if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-					m_FontSelDlg.MoveWindow(2, size.cy-RIGHT_CHAT_WINDOW_WIDTH-197, size.cx-20, 32, TRUE);
-			}
-		}
-
-		if (m_tbMid.IsWindow())
-		{
-			if(m_bDraged)
-				m_tbMid.MoveWindow(3, m_rtMidToolBar.top, size.cx-RIGHT_CHAT_WINDOW_WIDTH-5, 31, TRUE);
-			else
-				m_tbMid.MoveWindow(3, size.cy-167, size.cx-RIGHT_CHAT_WINDOW_WIDTH-5, 31, TRUE);
-			//ÏûÏ¢¼ÇÂ¼°´Å¥Ê¼ÖÕ¿¿±ß
-			m_tbMid.SetItemMargin(m_nMsgLogIndexInToolbar, size.cx-RIGHT_CHAT_WINDOW_WIDTH-240, 0);
-		}
-
-		if(m_SplitterCtrl.IsWindow())
-		{
-			if(m_bDraged)
-				m_SplitterCtrl.MoveWindow(6, m_rtSplitter.top, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, 5, TRUE);
-			else
-				m_SplitterCtrl.MoveWindow(6, size.cy-135, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, 5, TRUE);
-		}
-
-		if (m_richSend.IsWindow()) 
-		{
-			if(m_bDraged)
-				m_richSend.MoveWindow(6, m_rtRichSend.top, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, size.cy-m_rtRichSend.top-35, TRUE);
-			else
-				m_richSend.MoveWindow(6, size.cy-130, size.cx-RIGHT_CHAT_WINDOW_WIDTH-8, 95, TRUE);
-		}
-
-		if(m_TabMgr.IsWindow())
-		{
-			//CRect rcTabMgr(CHATDLG_WIDTH-1, 69, CHATDLG_WIDTH+RIGHT_CHAT_WINDOW_WIDTH-2, 101);
-			m_TabMgr.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH, 69, RIGHT_CHAT_WINDOW_WIDTH-2, 32);
-		}
-		
-		if (m_richMsgLog.IsWindow())
-		{
-			m_richMsgLog.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+4, 106, RIGHT_CHAT_WINDOW_WIDTH-6, size.cy-140);	
-		}
-
-		if(m_bFileTransferVisible)
-		{
-			if (m_FileTransferCtrl.IsWindow())
-			{
-				m_FileTransferCtrl.MoveWindow(size.cx-RIGHT_CHAT_WINDOW_WIDTH+4, 106, RIGHT_CHAT_WINDOW_WIDTH-6, size.cy-140);	
-			}
-		}
-		
-	}
-	
-	ResizeImageInRecvRichEdit();
+        if (m_SplitterCtrl.IsWindow())
+        {
+            if (m_bDraged)
+                m_SplitterCtrl.MoveWindow(6, m_rtSplitter.top, size.cx - 8, 5, TRUE);
+            else
+                m_SplitterCtrl.MoveWindow(6, size.cy - 135, size.cx - 8, 5, TRUE);
+        }
 
 
-	SetMsgHandled(TRUE);
+        if (m_richSend.IsWindow())
+        {
+            if (m_bDraged)
+                m_richSend.MoveWindow(6, m_rtRichSend.top, size.cx - 8, size.cy - m_rtRichSend.top - 35, FALSE);
+            else
+                m_richSend.MoveWindow(6, size.cy - 130, size.cx - 8, 95, FALSE);
+        }
+
+    } else
+    {
+        if (m_staPicUploadProgress.IsWindow())
+            m_staPicUploadProgress.MoveWindow(10, size.cy - 25, 380, 25, TRUE);
+
+        if (m_btnClose.IsWindow())
+            m_btnClose.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH - 190, size.cy - 30, 77, 25, TRUE);
+
+        if (m_btnSend.IsWindow())
+            m_btnSend.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH - 110, size.cy - 30, 77, 25, TRUE);
+
+        if (m_btnArrow.IsWindow())
+            m_btnArrow.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH - 33, size.cy - 30, 28, 25, TRUE);
+
+        //èŠå¤©è®°å½•ç¿»é¡µå››ä¸ªæŒ‰é’®
+        if (m_btnFirstMsgLog.IsWindow())
+            m_btnFirstMsgLog.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 110, size.cy - 30, 28, 25, TRUE);
+
+        if (m_btnPrevMsgLog.IsWindow())
+            m_btnPrevMsgLog.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 140, size.cy - 30, 28, 25, TRUE);
+
+        if (m_staMsgLogPage.IsWindow())
+            m_staMsgLogPage.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 180, size.cy - 24, 60, 25, TRUE);
+
+        if (m_btnNextMsgLog.IsWindow())
+            m_btnNextMsgLog.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 240, size.cy - 30, 28, 25, TRUE);
+
+        if (m_btnLastMsgLog.IsWindow())
+            m_btnLastMsgLog.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 270, size.cy - 30, 28, 25, TRUE);
+
+        if (m_tbTop.IsWindow())
+            m_tbTop.MoveWindow(3, 70, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 5, 32, TRUE);
+
+        if (m_richRecv.IsWindow())
+        {
+            if (m_bDraged)
+            {
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_richRecv.MoveWindow(6, 106, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, m_rtRichRecv.bottom - m_rtRichRecv.top - 32);
+                else if ((m_FontSelDlg.IsWindow() && !m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
+                    m_richRecv.MoveWindow(6, 106, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, m_rtRichRecv.bottom - m_rtRichRecv.top);
+
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_FontSelDlg.MoveWindow(2, m_rtRichRecv.bottom - 32, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 20, 32);
+
+            } else
+            {
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_richRecv.MoveWindow(6, 106, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, size.cy - 305);
+                else if ((m_FontSelDlg.IsWindow() && !m_FontSelDlg.IsWindowVisible()) || !m_FontSelDlg.IsWindow())
+                    m_richRecv.MoveWindow(6, 106, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, size.cy - 273);
+
+                if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
+                    m_FontSelDlg.MoveWindow(2, size.cy - RIGHT_CHAT_WINDOW_WIDTH - 197, size.cx - 20, 32, TRUE);
+            }
+        }
+
+        if (m_tbMid.IsWindow())
+        {
+            if (m_bDraged)
+                m_tbMid.MoveWindow(3, m_rtMidToolBar.top, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 5, 31, TRUE);
+            else
+                m_tbMid.MoveWindow(3, size.cy - 167, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 5, 31, TRUE);
+            //æ¶ˆæ¯è®°å½•æŒ‰é’®å§‹ç»ˆé è¾¹
+            m_tbMid.SetItemMargin(m_nMsgLogIndexInToolbar, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 240, 0);
+        }
+
+        if (m_SplitterCtrl.IsWindow())
+        {
+            if (m_bDraged)
+                m_SplitterCtrl.MoveWindow(6, m_rtSplitter.top, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, 5, TRUE);
+            else
+                m_SplitterCtrl.MoveWindow(6, size.cy - 135, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, 5, TRUE);
+        }
+
+        if (m_richSend.IsWindow())
+        {
+            if (m_bDraged)
+                m_richSend.MoveWindow(6, m_rtRichSend.top, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, size.cy - m_rtRichSend.top - 35, TRUE);
+            else
+                m_richSend.MoveWindow(6, size.cy - 130, size.cx - RIGHT_CHAT_WINDOW_WIDTH - 8, 95, TRUE);
+        }
+
+        if (m_TabMgr.IsWindow())
+        {
+            //CRect rcTabMgr(CHATDLG_WIDTH-1, 69, CHATDLG_WIDTH+RIGHT_CHAT_WINDOW_WIDTH-2, 101);
+            m_TabMgr.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH, 69, RIGHT_CHAT_WINDOW_WIDTH - 2, 32);
+        }
+
+        if (m_richMsgLog.IsWindow())
+        {
+            m_richMsgLog.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 4, 106, RIGHT_CHAT_WINDOW_WIDTH - 6, size.cy - 140);
+        }
+
+        if (m_bFileTransferVisible)
+        {
+            if (m_FileTransferCtrl.IsWindow())
+            {
+                m_FileTransferCtrl.MoveWindow(size.cx - RIGHT_CHAT_WINDOW_WIDTH + 4, 106, RIGHT_CHAT_WINDOW_WIDTH - 6, size.cy - 140);
+            }
+        }
+
+    }
+
+    ResizeImageInRecvRichEdit();
+
+
+    SetMsgHandled(TRUE);
 }
 
 void CBuddyChatDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	if (1001 == nIDEvent)
-	{
-		OnRecvMsg(m_nUTalkUin, NULL);	// ÏÔÊ¾ÏûÏ¢
-		KillTimer(nIDEvent);
-		SetTimer(1002, 300, NULL);
-	}
-	else if (nIDEvent == 1002)
-	{
-		if (!m_FontSelDlg.IsWindow())
-			m_FontSelDlg.Create(m_hWnd);
-		KillTimer(nIDEvent);
-	}
+    if (1001 == nIDEvent)
+    {
+        OnRecvMsg(m_nUTalkUin, NULL);	// æ˜¾ç¤ºæ¶ˆæ¯
+        KillTimer(nIDEvent);
+        SetTimer(1002, 300, NULL);
+    } else if (nIDEvent == 1002)
+    {
+        if (!m_FontSelDlg.IsWindow())
+            m_FontSelDlg.Create(m_hWnd);
+        KillTimer(nIDEvent);
+    }
 }
 
 void CBuddyChatDlg::OnDropFiles(HDROP hDropInfo)
-{ 
-	UINT nFileNum = ::DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0); // ÍÏ×§ÎÄ¼ş¸öÊı  
-    TCHAR szFileName[MAX_PATH];  
-    for (UINT i=0; i<nFileNum; ++i)    
-    {  
-		::DragQueryFile(hDropInfo, i, szFileName, MAX_PATH);//»ñµÃÍÏÒ·µÄÎÄ¼şÃû  
-        HandleFileDragResult(szFileName);    
-    }  
-    DragFinish(hDropInfo);      //ÊÍ·ÅhDropInfo  
+{
+    UINT nFileNum = ::DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0); // æ‹–æ‹½æ–‡ä»¶ä¸ªæ•°  
+    TCHAR szFileName[MAX_PATH];
+    for (UINT i = 0; i < nFileNum; ++i)
+    {
+        ::DragQueryFile(hDropInfo, i, szFileName, MAX_PATH);//è·å¾—æ‹–æ›³çš„æ–‡ä»¶å  
+        HandleFileDragResult(szFileName);
+    }
+    DragFinish(hDropInfo);      //é‡Šæ”¾hDropInfo  
 
     //InvalidateRect(hwnd, NULL, TRUE); 
 }
 
 BOOL CBuddyChatDlg::HandleFileDragResult(PCTSTR lpszFileName)
 {
-	if(lpszFileName == NULL) 
-		return FALSE;
-	
-	//Èç¹ûÊÇÎÄ¼ş¼Ğ£¬Ôò·¢ËÍÎÄ¼ş¼Ğ
-	if(Hootina::CPath::IsDirectory(lpszFileName))
-	{
-		//TODO: ·¢ËÍÎÄ¼ş¼Ğ
-		return TRUE;
-	}
+    if (lpszFileName == NULL)
+        return FALSE;
 
-	CString strFileExtension(Hootina::CPath::GetExtension(lpszFileName).c_str());
-	strFileExtension.MakeLower();
+    //å¦‚æœæ˜¯æ–‡ä»¶å¤¹ï¼Œåˆ™å‘é€æ–‡ä»¶å¤¹
+    if (Hootina::CPath::IsDirectory(lpszFileName))
+    {
+        //TODO: å‘é€æ–‡ä»¶å¤¹
+        return TRUE;
+    }
 
-	//Èç¹ûÊÇÍ¼Æ¬¸ñÊ½£¬Ôò²åÈëÍ¼Æ¬
-	if( strFileExtension==_T("jpg")  ||
-		strFileExtension==_T("jpeg") ||
-	    strFileExtension==_T("png")  ||
-	    strFileExtension==_T("bmp")  ||
-		strFileExtension==_T("gif") )
-	{
-		//UINT64 nFileSize = IUGetFileSize2(lpszFileName);
-		//if(nFileSize > MAX_CHAT_IMAGE_SIZE)
-		//{
-		//	::MessageBox(m_hWnd, _T("Í¼Æ¬´óĞ¡³¬¹ı10M£¬ÇëÊ¹ÓÃÎÄ¼ş·¢ËÍ¡£"), g_strAppTitle.c_str(), MB_OK|MB_ICONINFORMATION);
-		//	return FALSE;
-		//}
-		
-		_RichEdit_InsertFace(m_richSend.m_hWnd, lpszFileName, -1, -1);
-		m_richSend.SetFocus();
-		return TRUE;
-	}
-	else
-	{
-		return SendOfflineFile(lpszFileName);
-	}
+    CString strFileExtension(Hootina::CPath::GetExtension(lpszFileName).c_str());
+    strFileExtension.MakeLower();
+
+    //å¦‚æœæ˜¯å›¾ç‰‡æ ¼å¼ï¼Œåˆ™æ’å…¥å›¾ç‰‡
+    if (strFileExtension == _T("jpg") ||
+        strFileExtension == _T("jpeg") ||
+        strFileExtension == _T("png") ||
+        strFileExtension == _T("bmp") ||
+        strFileExtension == _T("gif"))
+    {
+        //UINT64 nFileSize = IUGetFileSize2(lpszFileName);
+        //if(nFileSize > MAX_CHAT_IMAGE_SIZE)
+        //{
+        //	::MessageBox(m_hWnd, _T("å›¾ç‰‡å¤§å°è¶…è¿‡10Mï¼Œè¯·ä½¿ç”¨æ–‡ä»¶å‘é€ã€‚"), g_strAppTitle.c_str(), MB_OK|MB_ICONINFORMATION);
+        //	return FALSE;
+        //}
+
+        _RichEdit_InsertFace(m_richSend.m_hWnd, lpszFileName, -1, -1);
+        m_richSend.SetFocus();
+        return TRUE;
+    } else
+    {
+        return SendOfflineFile(lpszFileName);
+    }
 
 
-	return FALSE;
+    return FALSE;
 }
 
 void CBuddyChatDlg::OnClose()
 {
-	long nFileItemCount = m_FileTransferCtrl.GetItemCount();
-	if(nFileItemCount > 0)
-	{
-		//TODO: ÏµÍ³¶Ô»°¿òÌ«³ó£¬×Ô¼º×öÒ»¸ö¶Ô»°¿ò£¡
-		ShowWindow(SW_RESTORE);
-        if (IDNO == ::MessageBox(m_hWnd, _T("ÓĞÎÄ¼şÕıÔÚ´«Êä£¬¹Ø±Õ´°¿Ú½«ÖÕÖ¹´«Êä£¬È·ÊµÒª¹Ø±ÕÂğ£¿"), g_strAppTitle.c_str(), MB_YESNO | MB_ICONQUESTION))
-			return;
+    long nFileItemCount = m_FileTransferCtrl.GetItemCount();
+    if (nFileItemCount > 0)
+    {
+        //TODO: ç³»ç»Ÿå¯¹è¯æ¡†å¤ªä¸‘ï¼Œè‡ªå·±åšä¸€ä¸ªå¯¹è¯æ¡†ï¼
+        ShowWindow(SW_RESTORE);
+        if (IDNO == ::MessageBox(m_hWnd, _T("æœ‰æ–‡ä»¶æ­£åœ¨ä¼ è¾“ï¼Œå…³é—­çª—å£å°†ç»ˆæ­¢ä¼ è¾“ï¼Œç¡®å®è¦å…³é—­å—ï¼Ÿ"), g_strAppTitle.c_str(), MB_YESNO | MB_ICONQUESTION))
+            return;
 
-		//Í£Ö¹ÕıÔÚ´«ÊäµÄÎÄ¼ş
-		CFileItemRequest* pFileItemRequest = NULL;
-		FILE_TARGET_TYPE nTargetType = SEND_TYPE;
-		CString strRecvFileResultMsgText;
-		for(long i=0; i<nFileItemCount; ++i)
-		{
-			//×¢Òâ£ºÈç¹ûÎÄ¼ş»¹Ã»ÓĞ½øĞĞ´«Êä£¬ÄÇÃ´pFileItemRequest·µ»ØÖµÎªNULL£¬ÕâÑùÒ²²»Ó°ÏìÊ¹ÓÃ¡£
-			pFileItemRequest = m_FileTransferCtrl.GetFileItemRequestByIndex((size_t)i);
-			nTargetType = m_FileTransferCtrl.GetItemTargetTypeByIndex((size_t)i);
-			if(pFileItemRequest != NULL)
-			{
-				//m_lpFMGClient->m_FileTask.RemoveItem(pFileItemRequest);
-			}
-			
-			//ÌáÊ¾¶Ô·½ÄúÈ¡ÏûÁËÎÄ¼şµÄ½ÓÊÕ
-			if(nTargetType == RECV_TYPE)
-			{
-				strRecvFileResultMsgText.Format(_T("%sÈ¡ÏûÁË½ÓÊÕÎÄ¼ş[%s]¡£"), m_lpFMGClient->m_UserMgr.m_UserInfo.m_strNickName.c_str(), m_FileTransferCtrl.GetItemFileNameByIndex((size_t)i));
-				m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), time(NULL), strRecvFileResultMsgText.GetString(), m_hWnd);
-			}		
-		}
-	}
-	
+        //åœæ­¢æ­£åœ¨ä¼ è¾“çš„æ–‡ä»¶
+        CFileItemRequest* pFileItemRequest = NULL;
+        FILE_TARGET_TYPE nTargetType = SEND_TYPE;
+        CString strRecvFileResultMsgText;
+        for (long i = 0; i < nFileItemCount; ++i)
+        {
+            //æ³¨æ„ï¼šå¦‚æœæ–‡ä»¶è¿˜æ²¡æœ‰è¿›è¡Œä¼ è¾“ï¼Œé‚£ä¹ˆpFileItemRequestè¿”å›å€¼ä¸ºNULLï¼Œè¿™æ ·ä¹Ÿä¸å½±å“ä½¿ç”¨ã€‚
+            pFileItemRequest = m_FileTransferCtrl.GetFileItemRequestByIndex((size_t)i);
+            nTargetType = m_FileTransferCtrl.GetItemTargetTypeByIndex((size_t)i);
+            if (pFileItemRequest != NULL)
+            {
+                //m_lpFMGClient->m_FileTask.RemoveItem(pFileItemRequest);
+            }
 
-	//Ä£Äâ¹Ø±ÕÏûÏ¢¼ÇÂ¼´°¿Ú¶¯×÷£¬ÒÔÊ¹ÔÙ´Î´ò¿ª¸Ã´°¿ÚÊ±³ß´çÕı³£
-	//m_bMsgLogWindowVisible = FALSE;
-	//PostMessage(WM_COMMAND, IDC_BTN_MSGLOG, 0);
+            //æç¤ºå¯¹æ–¹æ‚¨å–æ¶ˆäº†æ–‡ä»¶çš„æ¥æ”¶
+            if (nTargetType == RECV_TYPE)
+            {
+                strRecvFileResultMsgText.Format(_T("%så–æ¶ˆäº†æ¥æ”¶æ–‡ä»¶[%s]ã€‚"), m_lpFMGClient->m_UserMgr.m_UserInfo.m_strNickName.c_str(), m_FileTransferCtrl.GetItemFileNameByIndex((size_t)i));
+                m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), time(NULL), strRecvFileResultMsgText.GetString(), m_hWnd);
+            }
+        }
+    }
 
-	RecordWindowSize();
 
-	//Í¨ÖªÖ÷´°¿Ú¹Ø±Õµ±Ç°ÁÄÌì¶Ô»°¿ò
-	::PostMessage(m_lpFMGClient->m_UserMgr.m_hCallBackWnd, WM_CLOSE_BUDDYCHATDLG, 0, (LPARAM)m_nUTalkUin);
+    //æ¨¡æ‹Ÿå…³é—­æ¶ˆæ¯è®°å½•çª—å£åŠ¨ä½œï¼Œä»¥ä½¿å†æ¬¡æ‰“å¼€è¯¥çª—å£æ—¶å°ºå¯¸æ­£å¸¸
+    //m_bMsgLogWindowVisible = FALSE;
+    //PostMessage(WM_COMMAND, IDC_BTN_MSGLOG, 0);
+
+    RecordWindowSize();
+
+    //é€šçŸ¥ä¸»çª—å£å…³é—­å½“å‰èŠå¤©å¯¹è¯æ¡†
+    ::PostMessage(m_lpFMGClient->m_UserMgr.m_hCallBackWnd, WM_CLOSE_BUDDYCHATDLG, 0, (LPARAM)m_nUTalkUin);
 }
 
 void CBuddyChatDlg::OnDestroy()
 {
-	SetMsgHandled(FALSE);
-	
-	CloseMsgLogBrowser();
+    SetMsgHandled(FALSE);
 
-	m_lpCascadeWinManager->Del(m_hWnd);
+    CloseMsgLogBrowser();
 
-	UnInit();	// ·´³õÊ¼»¯¿Ø¼ş
+    m_lpCascadeWinManager->Del(m_hWnd);
 
-	if (m_hDlgIcon != NULL)
-	{
-		::DestroyIcon(m_hDlgIcon);
-		m_hDlgIcon = NULL;
-	}
+    UnInit();	// ååˆå§‹åŒ–æ§ä»¶
 
-	if (m_hDlgSmallIcon != NULL)
-	{
-		::DestroyIcon(m_hDlgSmallIcon);
-		m_hDlgSmallIcon = NULL;
-	}
+    if (m_hDlgIcon != NULL)
+    {
+        ::DestroyIcon(m_hDlgIcon);
+        m_hDlgIcon = NULL;
+    }
 
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
-	ATLASSERT(pLoop != NULL);
-	pLoop->RemoveMessageFilter(this);
+    if (m_hDlgSmallIcon != NULL)
+    {
+        ::DestroyIcon(m_hDlgSmallIcon);
+        m_hDlgSmallIcon = NULL;
+    }
+
+    CMessageLoop* pLoop = _Module.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->RemoveMessageFilter(this);
 }
 
-// ¡°ºÃÓÑÃû³Æ¡±³¬Á´½Ó¿Ø¼ş
+// â€œå¥½å‹åç§°â€è¶…é“¾æ¥æ§ä»¶
 void CBuddyChatDlg::OnLnk_BuddyName(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	::PostMessage(m_hMainDlg, WM_SHOW_BUDDYINFODLG, NULL, m_nUTalkUin);
+    ::PostMessage(m_hMainDlg, WM_SHOW_BUDDYINFODLG, NULL, m_nUTalkUin);
 }
 
 void CBuddyChatDlg::OnBtn_RemoteDesktop(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-    //TODO: Ô¶³Ì×ÀÃæµÄ´úÂëÔİÇÒ×¢ÊÍµô 
+    //TODO: è¿œç¨‹æ¡Œé¢çš„ä»£ç æš‚ä¸”æ³¨é‡Šæ‰ 
     if (m_lpFMGClient->IsOffline())
     {
-        MessageBox(_T("ÄúÒÑ¾­´¦ÓÚÀëÏß×´Ì¬£¬ÎŞ·¨·¢ÆğÔ¶³Ì×ÀÃæ£¬ÇëÉÏÏßºóÔÙ´Î³¢ÊÔ¡£"), g_strAppTitle.c_str());
+        MessageBox(_T("æ‚¨å·²ç»å¤„äºç¦»çº¿çŠ¶æ€ï¼Œæ— æ³•å‘èµ·è¿œç¨‹æ¡Œé¢ï¼Œè¯·ä¸Šçº¿åå†æ¬¡å°è¯•ã€‚"), g_strAppTitle.c_str());
         return;
     }
 
-    CString strInfo(_T("                                            ¡îÄú·¢ÆğÔ¶³Ì×ÀÃæ¡î\r\n"));
+    CString strInfo(_T("                                            â˜†æ‚¨å‘èµ·è¿œç¨‹æ¡Œé¢â˜†\r\n"));
     time_t nNow = time(NULL);
-    //TODO: Èç¹ûÒÑ¾­·¢ÆğÔ¶³Ì×ÀÃæ£¬ÔòÌáÊ¾ÏÂ
+    //TODO: å¦‚æœå·²ç»å‘èµ·è¿œç¨‹æ¡Œé¢ï¼Œåˆ™æç¤ºä¸‹
     //if (nNow - m_nLastSendShakeWindowTime <= 5)
     //{
-     //   strInfo = _T("                                        ¡îÄú·¢ËÍµÄ´°¿Ú¶¶¶¯¹ıÓÚÆµ·±£¬ÇëÉÔºóÔÙ·¢¡£¡î\r\n");
+     //   strInfo = _T("                                        â˜†æ‚¨å‘é€çš„çª—å£æŠ–åŠ¨è¿‡äºé¢‘ç¹ï¼Œè¯·ç¨åå†å‘ã€‚â˜†\r\n");
     //}
    // else
     //{
         //m_nLastSendShakeWindowTime = nNow;
         //ShakeWindow(m_hWnd, 1);
-        m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nNow, _T("/r[\"1\"]"), m_hWnd);
+    m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nNow, _T("/r[\"1\"]"), m_hWnd);
     //}
 
     RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
     m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
 
     ::PostMessage(m_hMainDlg, FMG_MSG_SCREENSHOT, 0, 0);
@@ -1177,885 +1157,871 @@ void CBuddyChatDlg::OnBtn_RemoteDesktop(UINT uNotifyCode, int nID, CWindow wndCt
     //::CloseHandle(hRemoteDesktopThread);
 }
 
-// ¡°×ÖÌåÑ¡Ôñ¹¤¾ßÀ¸¡±°´Å¥
+// â€œå­—ä½“é€‰æ‹©å·¥å…·æ â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_Font(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	RECT rtRichRecv;
-	::GetWindowRect(m_richRecv, &rtRichRecv);
-	::ScreenToClient(m_hWnd, rtRichRecv);	
-	
-	if (BN_PUSHED == uNotifyCode)
-	{
-		m_FontSelDlg.ShowWindow(SW_SHOW);
-		m_richRecv.MoveWindow(6, 106, rtRichRecv.right-rtRichRecv.left, rtRichRecv.bottom-rtRichRecv.top-32, TRUE);
-		m_FontSelDlg.MoveWindow(6, rtRichRecv.bottom-32, rtRichRecv.right-rtRichRecv.left, 32, TRUE);	
-	}
-	else if (BN_UNPUSHED == uNotifyCode)
-	{
-		m_richRecv.MoveWindow(6, 106, rtRichRecv.right-rtRichRecv.left, rtRichRecv.bottom-rtRichRecv.top+32);
-		m_FontSelDlg.ShowWindow(SW_HIDE);
-	}
+    RECT rtRichRecv;
+    ::GetWindowRect(m_richRecv, &rtRichRecv);
+    ::ScreenToClient(m_hWnd, rtRichRecv);
+
+    if (BN_PUSHED == uNotifyCode)
+    {
+        m_FontSelDlg.ShowWindow(SW_SHOW);
+        m_richRecv.MoveWindow(6, 106, rtRichRecv.right - rtRichRecv.left, rtRichRecv.bottom - rtRichRecv.top - 32, TRUE);
+        m_FontSelDlg.MoveWindow(6, rtRichRecv.bottom - 32, rtRichRecv.right - rtRichRecv.left, 32, TRUE);
+    } else if (BN_UNPUSHED == uNotifyCode)
+    {
+        m_richRecv.MoveWindow(6, 106, rtRichRecv.right - rtRichRecv.left, rtRichRecv.bottom - rtRichRecv.top + 32);
+        m_FontSelDlg.ShowWindow(SW_HIDE);
+    }
 }
 
-// ¡°±íÇé¡±°´Å¥
+// â€œè¡¨æƒ…â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_Face(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	if (BN_PUSHED == uNotifyCode)
-	{
-		m_FaceSelDlg.SetFaceList(m_lpFaceList);
-		if (!m_FaceSelDlg.IsWindow())
-		{
-			m_FaceSelDlg.Create(m_hWnd);
+    if (BN_PUSHED == uNotifyCode)
+    {
+        m_FaceSelDlg.SetFaceList(m_lpFaceList);
+        if (!m_FaceSelDlg.IsWindow())
+        {
+            m_FaceSelDlg.Create(m_hWnd);
 
-			CRect rcBtn;
-			m_tbMid.GetItemRectByIndex(1, rcBtn);
-			m_tbMid.ClientToScreen(&rcBtn);
+            CRect rcBtn;
+            m_tbMid.GetItemRectByIndex(1, rcBtn);
+            m_tbMid.ClientToScreen(&rcBtn);
 
-			int cx = 432;
-			//int cy = 236;
+            int cx = 432;
+            //int cy = 236;
             int cy = 306;
-			int x = rcBtn.left - cx / 2;
-			int y = rcBtn.top - cy;
+            int x = rcBtn.left - cx / 2;
+            int y = rcBtn.top - cy;
 
-			m_FaceSelDlg.SetWindowPos(NULL, x, y, cx, cy, NULL);
-			m_FaceSelDlg.ShowWindow(SW_SHOW);
-		}
-	}
-	else if (BN_UNPUSHED == uNotifyCode)
-	{
+            m_FaceSelDlg.SetWindowPos(NULL, x, y, cx, cy, NULL);
+            m_FaceSelDlg.ShowWindow(SW_SHOW);
+        }
+    } else if (BN_UNPUSHED == uNotifyCode)
+    {
 
-	}
+    }
 }
 
-//²Î¿¼£ºhttp://www.rupeng.com/forum/thread-6423-1-1.html
+//å‚è€ƒï¼šhttp://www.rupeng.com/forum/thread-6423-1-1.html
 void CBuddyChatDlg::OnShakeWindow(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	if (m_lpFMGClient->IsOffline())
-	{
-        MessageBox(_T("ÄúÒÑ¾­´¦ÓÚÀëÏß×´Ì¬£¬ÎŞ·¨·¢ËÍ´°¿Ú¶¶¶¯£¬ÇëÉÏÏßºóÔÙ´Î³¢ÊÔ¡£"), g_strAppTitle.c_str());
-		return;
-	}
-	
-    CString strInfo(_T("                                            ¡îÄú·¢ËÍÁËÒ»¸ö´°¿Ú¶¶¶¯¡î\r\n"));
+    if (m_lpFMGClient->IsOffline())
+    {
+        MessageBox(_T("æ‚¨å·²ç»å¤„äºç¦»çº¿çŠ¶æ€ï¼Œæ— æ³•å‘é€çª—å£æŠ–åŠ¨ï¼Œè¯·ä¸Šçº¿åå†æ¬¡å°è¯•ã€‚"), g_strAppTitle.c_str());
+        return;
+    }
+
+    CString strInfo(_T("                                            â˜†æ‚¨å‘é€äº†ä¸€ä¸ªçª—å£æŠ–åŠ¨â˜†\r\n"));
     time_t nNow = time(NULL);
-    //·¢Éú´°¿Ú¶¶¶¯µÄ×îĞ¡Ê±¼ä¼ä¸ôÊÇ5Ãë
+    //å‘ç”Ÿçª—å£æŠ–åŠ¨çš„æœ€å°æ—¶é—´é—´éš”æ˜¯5ç§’
     if (nNow - m_nLastSendShakeWindowTime <= 5)
     {
-        strInfo = _T("                                        ¡îÄú·¢ËÍµÄ´°¿Ú¶¶¶¯¹ıÓÚÆµ·±£¬ÇëÉÔºóÔÙ·¢¡£¡î\r\n");
-    }
-    else
+        strInfo = _T("                                        â˜†æ‚¨å‘é€çš„çª—å£æŠ–åŠ¨è¿‡äºé¢‘ç¹ï¼Œè¯·ç¨åå†å‘ã€‚â˜†\r\n");
+    } else
     {
         m_nLastSendShakeWindowTime = nNow;
         ShakeWindow(m_hWnd, 1);
         m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nNow, _T("/s[\"1\"]"), m_hWnd);
     }
 
-	RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-	m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	
+    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+    m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+
 }
 
-// ¡°·¢ËÍÍ¼Æ¬¡±°´Å¥
+// â€œå‘é€å›¾ç‰‡â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_Image(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	BOOL bOpenFileDialog = TRUE;
-	LPCTSTR lpszDefExt = NULL;
-	LPCTSTR lpszFileName = NULL;
-	DWORD dwFlags = OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR|OFN_EXTENSIONDIFFERENT;
-	LPCTSTR lpszFilter = _T("Í¼ÏñÎÄ¼ş(*.bmp;*.jpg;*.jpeg;*.gif;*.png)\0*.bmp;*.jpg;*.jpeg;*.gif;*.png\0\0");
-	HWND hWndParent = m_hWnd;
+    BOOL bOpenFileDialog = TRUE;
+    LPCTSTR lpszDefExt = NULL;
+    LPCTSTR lpszFileName = NULL;
+    DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
+    LPCTSTR lpszFilter = _T("å›¾åƒæ–‡ä»¶(*.bmp;*.jpg;*.jpeg;*.gif;*.png)\0*.bmp;*.jpg;*.jpeg;*.gif;*.png\0\0");
+    HWND hWndParent = m_hWnd;
 
-	CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
-	fileDlg.m_ofn.lpstrTitle = _T("´ò¿ªÍ¼Æ¬");
-	if (fileDlg.DoModal() == IDOK)
-	{
-		UINT64 nFileSize = IUGetFileSize2(fileDlg.m_ofn.lpstrFile);
-		if(nFileSize > MAX_CHAT_IMAGE_SIZE)
-		{
-            ::MessageBox(m_hWnd, _T("Í¼Æ¬´óĞ¡³¬¹ı10M£¬ÇëÊ¹ÓÃÎÄ¼ş·½Ê½·¢ËÍ»òÊ¹ÓÃ½ØÍ¼¹¤¾ß¡£"), g_strAppTitle.c_str(), MB_OK | MB_ICONINFORMATION);
-			return;
-		}
-		
-		_RichEdit_InsertFace(m_richSend.m_hWnd, fileDlg.m_ofn.lpstrFile, -1, -1);
-		m_richSend.SetFocus();
-	}
+    CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
+    fileDlg.m_ofn.lpstrTitle = _T("æ‰“å¼€å›¾ç‰‡");
+    if (fileDlg.DoModal() == IDOK)
+    {
+        UINT64 nFileSize = IUGetFileSize2(fileDlg.m_ofn.lpstrFile);
+        if (nFileSize > MAX_CHAT_IMAGE_SIZE)
+        {
+            ::MessageBox(m_hWnd, _T("å›¾ç‰‡å¤§å°è¶…è¿‡10Mï¼Œè¯·ä½¿ç”¨æ–‡ä»¶æ–¹å¼å‘é€æˆ–ä½¿ç”¨æˆªå›¾å·¥å…·ã€‚"), g_strAppTitle.c_str(), MB_OK | MB_ICONINFORMATION);
+            return;
+        }
+
+        _RichEdit_InsertFace(m_richSend.m_hWnd, fileDlg.m_ofn.lpstrFile, -1, -1);
+        m_richSend.SetFocus();
+    }
 }
 
 void CBuddyChatDlg::OnBtn_ScreenShot(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	DWORD dwSucceedExitCode = 2;
-	CString strCatchScreen;
-	strCatchScreen.Format(_T("%sCatchScreen.exe %u"), g_szHomePath, dwSucceedExitCode);
-	STARTUPINFO si = {0};
-	PROCESS_INFORMATION pi = {0};
-	if(!CreateProcess(NULL, strCatchScreen.GetBuffer(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
-	{
-        ::MessageBox(m_hWnd, _T("Æô¶¯½ØÍ¼¹¤¾ßÊ§°Ü£¡"), g_strAppTitle.c_str(), MB_OK | MB_ICONERROR);
-	}
-	if(pi.hProcess != NULL)
-	{
-		::WaitForSingleObject(pi.hProcess, INFINITE);
-		
-		dwSucceedExitCode = 0;
+    DWORD dwSucceedExitCode = 2;
+    CString strCatchScreen;
+    strCatchScreen.Format(_T("%sCatchScreen.exe %u"), g_szHomePath, dwSucceedExitCode);
+    STARTUPINFO si = { 0 };
+    PROCESS_INFORMATION pi = { 0 };
+    if (!CreateProcess(NULL, strCatchScreen.GetBuffer(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+    {
+        ::MessageBox(m_hWnd, _T("å¯åŠ¨æˆªå›¾å·¥å…·å¤±è´¥ï¼"), g_strAppTitle.c_str(), MB_OK | MB_ICONERROR);
+    }
+    if (pi.hProcess != NULL)
+    {
+        ::WaitForSingleObject(pi.hProcess, INFINITE);
 
-		if(::GetExitCodeProcess(pi.hProcess, &dwSucceedExitCode) && dwSucceedExitCode==2)
-			m_richSend.PasteSpecial(CF_TEXT);
-	}
+        dwSucceedExitCode = 0;
+
+        if (::GetExitCodeProcess(pi.hProcess, &dwSucceedExitCode) && dwSucceedExitCode == 2)
+            m_richSend.PasteSpecial(CF_TEXT);
+    }
 }
 
-// ¡°ÏûÏ¢¼ÇÂ¼¡±°´Å¥
+// â€œæ¶ˆæ¯è®°å½•â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_MsgLog(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_bMsgLogWindowVisible = !m_bMsgLogWindowVisible;
+    m_bMsgLogWindowVisible = !m_bMsgLogWindowVisible;
 
-	CRect rtWindow;
-	GetWindowRect(&rtWindow);
+    CRect rtWindow;
+    GetWindowRect(&rtWindow);
 
-	//»ñÈ¡µ±Ç°´°¿ÚÔÚÆÁÄ»µÄÎ»ÖÃ	
-	if(m_bMsgLogWindowVisible)
-	{
-		if(m_TabMgr.GetItemCount() == 0)
-		{
-			m_SkinDlg.SetBgPic(CHAT_EXPAND_BG_IMAGE_NAME, CRect(4, 100, 445, 32));
-			::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width()+RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE|SWP_NOZORDER);
-		}
-		
-		m_TabMgr.AddItem(_T("ÏûÏ¢¼ÇÂ¼"), m_richMsgLog.m_hWnd);
-		OpenMsgLogBrowser();
+    //è·å–å½“å‰çª—å£åœ¨å±å¹•çš„ä½ç½®	
+    if (m_bMsgLogWindowVisible)
+    {
+        if (m_TabMgr.GetItemCount() == 0)
+        {
+            m_SkinDlg.SetBgPic(CHAT_EXPAND_BG_IMAGE_NAME, CRect(4, 100, 445, 32));
+            ::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width() + RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE | SWP_NOZORDER);
+        }
 
-		m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T("<<"));
-		
-	}
-	else
-	{
-		CloseMsgLogBrowser();
+        m_TabMgr.AddItem(_T("æ¶ˆæ¯è®°å½•"), m_richMsgLog.m_hWnd);
+        OpenMsgLogBrowser();
 
-		m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T(">>"));
-		m_TabMgr.RemoveItem(m_richMsgLog.m_hWnd);
-		
-		//TabMgrµÄÏî¸öÊıÎª0²ÅÈ¥ÊÕÆğÓÒ²à´°¿Ú
-		if(m_TabMgr.GetItemCount() == 0)
-		{
-			m_SkinDlg.SetBgPic(CHAT_BG_IMAGE_NAME, CRect(4, 100, 4, 32));
-			::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE|SWP_NOZORDER);
-		}			
-	}
+        m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T("<<"));
+
+    } else
+    {
+        CloseMsgLogBrowser();
+
+        m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T(">>"));
+        m_TabMgr.RemoveItem(m_richMsgLog.m_hWnd);
+
+        //TabMgrçš„é¡¹ä¸ªæ•°ä¸º0æ‰å»æ”¶èµ·å³ä¾§çª—å£
+        if (m_TabMgr.GetItemCount() == 0)
+        {
+            m_SkinDlg.SetBgPic(CHAT_BG_IMAGE_NAME, CRect(4, 100, 4, 32));
+            ::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width() - RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE | SWP_NOZORDER);
+        }
+    }
 }
 
-//ÏÔÊ¾ÎÄ¼ş´«Êä¿Ø¼ş
+//æ˜¾ç¤ºæ–‡ä»¶ä¼ è¾“æ§ä»¶
 void CBuddyChatDlg::DisplayFileTransfer(BOOL bShow)
 {
-	if(bShow)
-		m_TabMgr.Active(m_FileTransferCtrl.m_hWnd);
-	//ÎÄ¼ş´«Êä½çÃæÒÑ¾­´æÔÚÁË£¬Ôò¼¤»îÎÄ¼ş´«Êä´°¿Ú
-	if(bShow && m_bFileTransferVisible)	
-		return;
+    if (bShow)
+        m_TabMgr.Active(m_FileTransferCtrl.m_hWnd);
+    //æ–‡ä»¶ä¼ è¾“ç•Œé¢å·²ç»å­˜åœ¨äº†ï¼Œåˆ™æ¿€æ´»æ–‡ä»¶ä¼ è¾“çª—å£
+    if (bShow && m_bFileTransferVisible)
+        return;
 
-	m_bFileTransferVisible = bShow;
+    m_bFileTransferVisible = bShow;
 
-	//»ñÈ¡µ±Ç°´°¿ÚÔÚÆÁÄ»µÄÎ»ÖÃ	
-	CRect rtWindow;
-	GetWindowRect(&rtWindow);
+    //è·å–å½“å‰çª—å£åœ¨å±å¹•çš„ä½ç½®	
+    CRect rtWindow;
+    GetWindowRect(&rtWindow);
 
-	if(m_bFileTransferVisible)
-	{
-		m_SkinDlg.SetBgPic(CHAT_EXPAND_BG_IMAGE_NAME, CRect(4, 100, 445, 32));
-		
-		if(m_TabMgr.GetItemCount() <= 0)
-			::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width()+RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE|SWP_NOZORDER);
-		
-		//m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T("<<"));
-		m_TabMgr.AddItem(_T("´«ËÍÎÄ¼ş"), m_FileTransferCtrl.m_hWnd, FALSE);
-		//m_TabMgr.ShowWindow(SW_SHOW);
-		ShowFileTransferCtrl(TRUE);
-	}
-	else
-	{
-		//m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T(">>"));
-		//Èç¹ûÎÄ¼ş¶ÓÁĞÖĞÒÑ¾­Ã»ÓĞÎÄ¼şÔÚ´«ÊäÁË£¬ÔòÒş²ØÎÄ¼ş´«Êä¿Ø¼ş
-		if(m_FileTransferCtrl.GetItemCount() == 0)
-		{
-			m_TabMgr.RemoveItem(m_FileTransferCtrl.m_hWnd);
-			ShowFileTransferCtrl(FALSE);
-		}
+    if (m_bFileTransferVisible)
+    {
+        m_SkinDlg.SetBgPic(CHAT_EXPAND_BG_IMAGE_NAME, CRect(4, 100, 445, 32));
 
-		m_SkinDlg.SetBgPic(CHAT_BG_IMAGE_NAME, CRect(4, 100, 4, 32));
-		//AtlTrace(_T("rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH=%d\n"), rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH);
-		if(m_TabMgr.GetItemCount() <= 0)
-		{
-			m_bMsgLogWindowVisible = TRUE;	
-			SendMessage(WM_COMMAND, 214, 0);
-			//::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE|SWP_NOZORDER);
-			m_bMsgLogWindowVisible = FALSE;
-		}
+        if (m_TabMgr.GetItemCount() <= 0)
+            ::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width() + RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE | SWP_NOZORDER);
 
-	}
+        //m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T("<<"));
+        m_TabMgr.AddItem(_T("ä¼ é€æ–‡ä»¶"), m_FileTransferCtrl.m_hWnd, FALSE);
+        //m_TabMgr.ShowWindow(SW_SHOW);
+        ShowFileTransferCtrl(TRUE);
+    } else
+    {
+        //m_tbMid.SetItemText(m_nMsgLogIndexInToolbar, _T(">>"));
+        //å¦‚æœæ–‡ä»¶é˜Ÿåˆ—ä¸­å·²ç»æ²¡æœ‰æ–‡ä»¶åœ¨ä¼ è¾“äº†ï¼Œåˆ™éšè—æ–‡ä»¶ä¼ è¾“æ§ä»¶
+        if (m_FileTransferCtrl.GetItemCount() == 0)
+        {
+            m_TabMgr.RemoveItem(m_FileTransferCtrl.m_hWnd);
+            ShowFileTransferCtrl(FALSE);
+        }
+
+        m_SkinDlg.SetBgPic(CHAT_BG_IMAGE_NAME, CRect(4, 100, 4, 32));
+        //AtlTrace(_T("rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH=%d\n"), rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH);
+        if (m_TabMgr.GetItemCount() <= 0)
+        {
+            m_bMsgLogWindowVisible = TRUE;
+            SendMessage(WM_COMMAND, 214, 0);
+            //::SetWindowPos(m_SkinDlg.m_hWnd, NULL, 0, 0, rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH, rtWindow.Height(), SWP_NOMOVE|SWP_NOZORDER);
+            m_bMsgLogWindowVisible = FALSE;
+        }
+
+    }
 }
 
-// ¡°µã»÷Áí´æÎª¡±°´Å¥
+// â€œç‚¹å‡»å¦å­˜ä¸ºâ€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_SaveAs(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	OnMenu_SaveAs(uNotifyCode, nID, wndCtl);
+    OnMenu_SaveAs(uNotifyCode, nID, wndCtl);
 }
 
 void CBuddyChatDlg::OnMsgLogPage(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	long nTotalCount = m_MsgLogger.GetBuddyMsgLogCount(m_nUTalkUin);
-	long nPageCount = nTotalCount/10;
-	if(nTotalCount%10 != 0)
-		++nPageCount;
+    long nTotalCount = m_MsgLogger.GetBuddyMsgLogCount(m_nUTalkUin);
+    long nPageCount = nTotalCount / 10;
+    if (nTotalCount % 10 != 0)
+        ++nPageCount;
 
-	if(nPageCount == 0)
-		return;
-	
-	switch(nID)
-	{
-	case IDC_FIRSTMSGLOG:
-		if(m_nMsgLogCurrentPageIndex == 1)
-			return;
-		m_nMsgLogRecordOffset = 1;
-		m_nMsgLogCurrentPageIndex = 1;
-		break;
+    if (nPageCount == 0)
+        return;
 
-	case IDC_PREVMSGLOG:
-		if(m_nMsgLogCurrentPageIndex == 1)
-			return;
-		m_nMsgLogRecordOffset -= 10;
-		--m_nMsgLogCurrentPageIndex;
-		if(m_nMsgLogRecordOffset <= 0)
-		{
-			m_nMsgLogRecordOffset = 1;
-			m_nMsgLogCurrentPageIndex = 1;
-		}
-		break;
+    switch (nID)
+    {
+    case IDC_FIRSTMSGLOG:
+        if (m_nMsgLogCurrentPageIndex == 1)
+            return;
+        m_nMsgLogRecordOffset = 1;
+        m_nMsgLogCurrentPageIndex = 1;
+        break;
 
-	case IDC_NEXTMSGLOG:
-		if(m_nMsgLogCurrentPageIndex == nPageCount)
-			return;
-		m_nMsgLogRecordOffset += 10;
-		++m_nMsgLogCurrentPageIndex;
-		if(m_nMsgLogCurrentPageIndex > nPageCount)
-		{
-			m_nMsgLogRecordOffset -= 10;
-			--m_nMsgLogCurrentPageIndex;
-		}
-		break;
+    case IDC_PREVMSGLOG:
+        if (m_nMsgLogCurrentPageIndex == 1)
+            return;
+        m_nMsgLogRecordOffset -= 10;
+        --m_nMsgLogCurrentPageIndex;
+        if (m_nMsgLogRecordOffset <= 0)
+        {
+            m_nMsgLogRecordOffset = 1;
+            m_nMsgLogCurrentPageIndex = 1;
+        }
+        break;
 
-	case IDC_LASTMSGLOG:
-		{
-			if(m_nMsgLogCurrentPageIndex == nPageCount)
-				return;
-			while(TRUE)
-			{
-				m_nMsgLogRecordOffset += 10;
-				++m_nMsgLogCurrentPageIndex;
-				if(m_nMsgLogCurrentPageIndex > nPageCount)
-				{
-					m_nMsgLogRecordOffset -= 10;
-					--m_nMsgLogCurrentPageIndex;
-					break;
-				}
-			}
-		}
-		break;
-	}
-	
-	//AtlTrace(_T("Offset: %d, PageIndex: %d, TotalPage: %d\n"), m_nMsgLogRecordOffset, m_nMsgLogCurrentPageIndex, nPageCount);
-	CString strPageInfo;
-	strPageInfo.Format(_T("%d/%d"), m_nMsgLogCurrentPageIndex, nPageCount);
-	m_staMsgLogPage.SetWindowText(strPageInfo);
-	m_staMsgLogPage.Invalidate(FALSE);
+    case IDC_NEXTMSGLOG:
+        if (m_nMsgLogCurrentPageIndex == nPageCount)
+            return;
+        m_nMsgLogRecordOffset += 10;
+        ++m_nMsgLogCurrentPageIndex;
+        if (m_nMsgLogCurrentPageIndex > nPageCount)
+        {
+            m_nMsgLogRecordOffset -= 10;
+            --m_nMsgLogCurrentPageIndex;
+        }
+        break;
 
-	OpenMsgLogBrowser();
+    case IDC_LASTMSGLOG:
+    {
+        if (m_nMsgLogCurrentPageIndex == nPageCount)
+            return;
+        while (TRUE)
+        {
+            m_nMsgLogRecordOffset += 10;
+            ++m_nMsgLogCurrentPageIndex;
+            if (m_nMsgLogCurrentPageIndex > nPageCount)
+            {
+                m_nMsgLogRecordOffset -= 10;
+                --m_nMsgLogCurrentPageIndex;
+                break;
+            }
+        }
+    }
+    break;
+    }
+
+    //AtlTrace(_T("Offset: %d, PageIndex: %d, TotalPage: %d\n"), m_nMsgLogRecordOffset, m_nMsgLogCurrentPageIndex, nPageCount);
+    CString strPageInfo;
+    strPageInfo.Format(_T("%d/%d"), m_nMsgLogCurrentPageIndex, nPageCount);
+    m_staMsgLogPage.SetWindowText(strPageInfo);
+    m_staMsgLogPage.Invalidate(FALSE);
+
+    OpenMsgLogBrowser();
 }
 
-//»Ø³µ¼ü·¢ËÍÏûÏ¢
+//å›è½¦é”®å‘é€æ¶ˆæ¯
 void CBuddyChatDlg::OnPressEnterMenuItem(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_bPressEnterToSendMessage = TRUE;
-	m_lpFMGClient->m_UserConfig.EnablePressEnterToSend(m_bPressEnterToSendMessage);
+    m_bPressEnterToSendMessage = TRUE;
+    m_lpFMGClient->m_UserConfig.EnablePressEnterToSend(m_bPressEnterToSendMessage);
 }
 
-//ctrl+»Ø³µ¼ü·¢ËÍÏûÏ¢
+//ctrl+å›è½¦é”®å‘é€æ¶ˆæ¯
 void CBuddyChatDlg::OnPressCtrlEnterMenuItem(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_bPressEnterToSendMessage = FALSE;
-	m_lpFMGClient->m_UserConfig.EnablePressEnterToSend(m_bPressEnterToSendMessage);
+    m_bPressEnterToSendMessage = FALSE;
+    m_lpFMGClient->m_UserConfig.EnablePressEnterToSend(m_bPressEnterToSendMessage);
 }
 
 void CBuddyChatDlg::OnAutoReply(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_bEnableAutoReply = !m_bEnableAutoReply;
+    m_bEnableAutoReply = !m_bEnableAutoReply;
 }
 
-// ¡°¹Ø±Õ¡±°´Å¥
+// â€œå…³é—­â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_Close(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	PostMessage(WM_CLOSE);
+    PostMessage(WM_CLOSE);
 }
 
-// ¡°·¢ËÍ¡±°´Å¥
+// â€œå‘é€â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_Send(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
     if (m_lpFMGClient->IsOffline())
-	{
-        MessageBox(_T("ÄúÒÑ¾­´¦ÓÚÀëÏß×´Ì¬£¬ÎŞ·¨·¢ËÍÏûÏ¢£¬ÇëÉÏÏßºóÔÙ´Î³¢ÊÔ¡£"), g_strAppTitle.c_str());
-		return;
-	}
+    {
+        MessageBox(_T("æ‚¨å·²ç»å¤„äºç¦»çº¿çŠ¶æ€ï¼Œæ— æ³•å‘é€æ¶ˆæ¯ï¼Œè¯·ä¸Šçº¿åå†æ¬¡å°è¯•ã€‚"), g_strAppTitle.c_str());
+        return;
+    }
 
-	int nCustomPicCnt = RichEdit_GetCustomPicCount(m_richSend.m_hWnd);
-	if (nCustomPicCnt > 1)
-	{
-        MessageBox(_T("Ã¿ÌõÏûÏ¢×î¶à°üº¬1ÕÅÍ¼Æ¬£¬¶àÕÅÍ¼Æ¬Çë·ÖÌõ·¢ËÍ¡£"), g_strAppTitle.c_str());
-		return;
-	}
+    int nCustomPicCnt = RichEdit_GetCustomPicCount(m_richSend.m_hWnd);
+    if (nCustomPicCnt > 1)
+    {
+        MessageBox(_T("æ¯æ¡æ¶ˆæ¯æœ€å¤šåŒ…å«1å¼ å›¾ç‰‡ï¼Œå¤šå¼ å›¾ç‰‡è¯·åˆ†æ¡å‘é€ã€‚"), g_strAppTitle.c_str());
+        return;
+    }
 
-	tstring strText;
-	RichEdit_GetText(m_richSend.m_hWnd, strText);
-	if (strText.empty())
-	{
-		::MessageBox(m_hWnd, _T("·¢ËÍÄÚÈİ²»ÄÜÎª¿Õ£¡"), g_strAppTitle.c_str(), MB_OK|MB_ICONINFORMATION);
-		return;
-	}
+    tstring strText;
+    RichEdit_GetText(m_richSend.m_hWnd, strText);
+    if (strText.empty())
+    {
+        ::MessageBox(m_hWnd, _T("å‘é€å†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), g_strAppTitle.c_str(), MB_OK | MB_ICONINFORMATION);
+        return;
+    }
 
-	if(strText.length() > 1800)
-	{
-		::MessageBox(m_hWnd, _T("Äú·¢ËÍµÄÄÚÈİÌ«³¤£¬Çë·ÖÌõ·¢ËÍ£¡"), g_strAppTitle.c_str(), MB_OK|MB_ICONINFORMATION);
-		return;
-	}
+    if (strText.length() > 1800)
+    {
+        ::MessageBox(m_hWnd, _T("æ‚¨å‘é€çš„å†…å®¹å¤ªé•¿ï¼Œè¯·åˆ†æ¡å‘é€ï¼"), g_strAppTitle.c_str(), MB_OK | MB_ICONINFORMATION);
+        return;
+    }
 
     time_t nMsgTime = time(NULL);
     AddMsgToRecvEdit(nMsgTime, strText.c_str());
 
-	CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
+    CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
 
-	TCHAR szColor[32] = {0};
-	RGBToHexStr(fontInfo.m_clrText, szColor, sizeof(szColor)/sizeof(TCHAR));
+    TCHAR szColor[32] = { 0 };
+    RGBToHexStr(fontInfo.m_clrText, szColor, sizeof(szColor) / sizeof(TCHAR));
 
-	//×ÖÌåĞÅÏ¢¸ñÊ½ÊÇ£º/0["×ÖÌåÃû,×ÖºÅ,ÑÕÉ«,´ÖÌå,Ğ±Ìå,ÏÂ»®Ïß"]
-	TCHAR szFontInfo[1024] = {0};
-	LPCTSTR lpFontFmt = _T("/o[\"%s,%d,%s,%d,%d,%d\"]");
-	wsprintf(szFontInfo, lpFontFmt, fontInfo.m_strName.c_str(), fontInfo.m_nSize, szColor, fontInfo.m_bBold, fontInfo.m_bItalic, fontInfo.m_bUnderLine);
-	strText += szFontInfo;
-	
-	//½«windows»»ĞĞ·û\r\n»»³É\n
-	//\r 0x0A \n 0x0D
+    //å­—ä½“ä¿¡æ¯æ ¼å¼æ˜¯ï¼š/0["å­—ä½“å,å­—å·,é¢œè‰²,ç²—ä½“,æ–œä½“,ä¸‹åˆ’çº¿"]
+    TCHAR szFontInfo[1024] = { 0 };
+    LPCTSTR lpFontFmt = _T("/o[\"%s,%d,%s,%d,%d,%d\"]");
+    wsprintf(szFontInfo, lpFontFmt, fontInfo.m_strName.c_str(), fontInfo.m_nSize, szColor, fontInfo.m_bBold, fontInfo.m_bItalic, fontInfo.m_bUnderLine);
+    strText += szFontInfo;
+
+    //å°†windowsæ¢è¡Œç¬¦\r\næ¢æˆ\n
+    //\r 0x0A \n 0x0D
     m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nMsgTime, strText.c_str(), m_hWnd);
 
-	m_richSend.SetWindowText(_T(""));
-	m_richSend.SetFocus();
+    m_richSend.SetWindowText(_T(""));
+    m_richSend.SetFocus();
 
 }
 
-// ¡°¼ıÍ·¡±°´Å¥
+// â€œç®­å¤´â€æŒ‰é’®
 void CBuddyChatDlg::OnBtn_Arrow(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	CSkinMenu PopupMenu = m_SkinMenu.GetSubMenu(8);
-	if (PopupMenu.IsMenu())
-	{
-		CRect rc;
-		m_btnArrow.GetClientRect(&rc);
-		m_btnArrow.ClientToScreen(&rc);
-		m_bPressEnterToSendMessage = m_lpFMGClient->m_UserConfig.IsEnablePressEnterToSend();
-		if(m_bPressEnterToSendMessage)
-		{
-			PopupMenu.CheckMenuItem(ID_32852, MF_CHECKED);
-			PopupMenu.CheckMenuItem(ID_32853, MF_UNCHECKED);
-		}
-		else
-		{
-			PopupMenu.CheckMenuItem(ID_32852, MF_UNCHECKED);
-			PopupMenu.CheckMenuItem(ID_32853, MF_CHECKED);
-		}
+    CSkinMenu PopupMenu = m_SkinMenu.GetSubMenu(8);
+    if (PopupMenu.IsMenu())
+    {
+        CRect rc;
+        m_btnArrow.GetClientRect(&rc);
+        m_btnArrow.ClientToScreen(&rc);
+        m_bPressEnterToSendMessage = m_lpFMGClient->m_UserConfig.IsEnablePressEnterToSend();
+        if (m_bPressEnterToSendMessage)
+        {
+            PopupMenu.CheckMenuItem(ID_32852, MF_CHECKED);
+            PopupMenu.CheckMenuItem(ID_32853, MF_UNCHECKED);
+        } else
+        {
+            PopupMenu.CheckMenuItem(ID_32852, MF_UNCHECKED);
+            PopupMenu.CheckMenuItem(ID_32853, MF_CHECKED);
+        }
 
-		
-		PopupMenu.CheckMenuItem(IDM_AUTOREPLY, m_bEnableAutoReply ? MF_CHECKED : MF_UNCHECKED);
-		
 
-		PopupMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, 
-			rc.left, rc.bottom + 4, m_hWnd, &rc);
-	}
+        PopupMenu.CheckMenuItem(IDM_AUTOREPLY, m_bEnableAutoReply ? MF_CHECKED : MF_UNCHECKED);
+
+
+        PopupMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+            rc.left, rc.bottom + 4, m_hWnd, &rc);
+    }
 }
 
 void CBuddyChatDlg::OnOpenTransferFileItem(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	if(m_strLinkUrl.IsEmpty())
-		return;
+    if (m_strLinkUrl.IsEmpty())
+        return;
 
-	if(nID == IDM_OPENFILE)
-		::ShellExecute(NULL, _T("open"), m_strLinkUrl, NULL, NULL, SW_SHOWNORMAL);
-	else if(nID == IDM_OPENDIRECTORY)
-	{
-		//²Î¿¼£ºhttp://zhidao.baidu.com/link?url=uEc51-5yf52fP2PHVl7mvAx2CpA8s1R5j8cyCWhYR8AaNE7KQaswGoguJtCI-ZlXMtiD02Iq6K_hBrbCvXoHfGy8ez3t3KtdHeIydox8wDu
-		CString strCmdLine;
-		strCmdLine.Format(_T("/n,/select,%s"), m_strLinkUrl);
-		::ShellExecute(NULL, _T("open"), _T("explorer.exe"), strCmdLine, NULL, SW_SHOWNORMAL);
-	}
+    if (nID == IDM_OPENFILE)
+        ::ShellExecute(NULL, _T("open"), m_strLinkUrl, NULL, NULL, SW_SHOWNORMAL);
+    else if (nID == IDM_OPENDIRECTORY)
+    {
+        //å‚è€ƒï¼šhttp://zhidao.baidu.com/link?url=uEc51-5yf52fP2PHVl7mvAx2CpA8s1R5j8cyCWhYR8AaNE7KQaswGoguJtCI-ZlXMtiD02Iq6K_hBrbCvXoHfGy8ez3t3KtdHeIydox8wDu
+        CString strCmdLine;
+        strCmdLine.Format(_T("/n,/select,%s"), m_strLinkUrl);
+        ::ShellExecute(NULL, _T("open"), _T("explorer.exe"), strCmdLine, NULL, SW_SHOWNORMAL);
+    }
 }
 
 
 LRESULT CBuddyChatDlg::OnToolbarDropDown(LPNMHDR pnmh)
 {
-	NMTOOLBAR* pnmtb = (NMTOOLBAR*)pnmh;
-	CSkinMenu PopupMenu;
-	int nIndex = -1;
-	CRect rc(pnmtb->rcButton);
+    NMTOOLBAR* pnmtb = (NMTOOLBAR*)pnmh;
+    CSkinMenu PopupMenu;
+    int nIndex = -1;
+    CRect rc(pnmtb->rcButton);
 
-	switch (pnmtb->iItem)
-	{
-	case 101:
-		nIndex = 0;
-		m_tbTop.ClientToScreen(&rc);
-		break;
+    switch (pnmtb->iItem)
+    {
+    case 101:
+        nIndex = 0;
+        m_tbTop.ClientToScreen(&rc);
+        break;
 
-	case 102:
-		nIndex = 1;
-		m_tbTop.ClientToScreen(&rc);
-		break;
+    case 102:
+        nIndex = 1;
+        m_tbTop.ClientToScreen(&rc);
+        break;
 
-	case 103:
-		nIndex = 2;
-		m_tbTop.ClientToScreen(&rc);
-		break;
+    case 103:
+        nIndex = 2;
+        m_tbTop.ClientToScreen(&rc);
+        break;
 
-	case 106:
-		nIndex = 3;
-		m_tbTop.ClientToScreen(&rc);
-		break;
+    case 106:
+        nIndex = 3;
+        m_tbTop.ClientToScreen(&rc);
+        break;
 
-	case 107:
-		nIndex = 4;
-		m_tbTop.ClientToScreen(&rc);
-		break;
+    case 107:
+        nIndex = 4;
+        m_tbTop.ClientToScreen(&rc);
+        break;
 
-	case 211:
-		nIndex = 5;
-		m_tbMid.ClientToScreen(&rc);
-		break;
+    case 211:
+        nIndex = 5;
+        m_tbMid.ClientToScreen(&rc);
+        break;
 
-	case 212:
-		nIndex = 6;
-		m_tbMid.ClientToScreen(&rc);
-		break;
+    case 212:
+        nIndex = 6;
+        m_tbMid.ClientToScreen(&rc);
+        break;
 
-	case 214:
-		nIndex = 7;
-		m_tbMid.ClientToScreen(&rc);
-		break;
+    case 214:
+        nIndex = 7;
+        m_tbMid.ClientToScreen(&rc);
+        break;
 
-	default:
-		return 0;
-	}
+    default:
+        return 0;
+    }
 
-	PopupMenu = m_SkinMenu.GetSubMenu(nIndex);
-	if (PopupMenu.IsMenu())
-	{
-		PopupMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, 
-			rc.left, rc.bottom + 4, m_hWnd, &rc);
-	}
+    PopupMenu = m_SkinMenu.GetSubMenu(nIndex);
+    if (PopupMenu.IsMenu())
+    {
+        PopupMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+            rc.left, rc.bottom + 4, m_hWnd, &rc);
+    }
 
-	return 0;
+    return 0;
 }
 
-// ¸üĞÂ×ÖÌåĞÅÏ¢
+// æ›´æ–°å­—ä½“ä¿¡æ¯
 LRESULT CBuddyChatDlg::OnUpdateFontInfo(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
-	RichEdit_SetDefFont(m_richSend.m_hWnd, fontInfo.m_strName.c_str(),
-		fontInfo.m_nSize, fontInfo.m_clrText, fontInfo.m_bBold,
-		fontInfo.m_bItalic, fontInfo.m_bUnderLine, FALSE);
-	return 0;
+    CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
+    RichEdit_SetDefFont(m_richSend.m_hWnd, fontInfo.m_strName.c_str(),
+        fontInfo.m_nSize, fontInfo.m_clrText, fontInfo.m_bBold,
+        fontInfo.m_bItalic, fontInfo.m_bUnderLine, FALSE);
+    return 0;
 }
 
-// ¡°±íÇé¡±¿Ø¼şÑ¡È¡ÏûÏ¢
+// â€œè¡¨æƒ…â€æ§ä»¶é€‰å–æ¶ˆæ¯
 LRESULT CBuddyChatDlg::OnFaceCtrlSel(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	int nFaceId = m_FaceSelDlg.GetSelFaceId();
-	int nFaceIndex = m_FaceSelDlg.GetSelFaceIndex();
-	CString strFileName = m_FaceSelDlg.GetSelFaceFileName();
-	if (!strFileName.IsEmpty())
-	{
-		_RichEdit_InsertFace(m_richSend.m_hWnd, strFileName, nFaceId, nFaceIndex);
-		m_richSend.SetFocus();
-	}
+    int nFaceId = m_FaceSelDlg.GetSelFaceId();
+    int nFaceIndex = m_FaceSelDlg.GetSelFaceIndex();
+    CString strFileName = m_FaceSelDlg.GetSelFaceFileName();
+    if (!strFileName.IsEmpty())
+    {
+        _RichEdit_InsertFace(m_richSend.m_hWnd, strFileName, nFaceId, nFaceIndex);
+        m_richSend.SetFocus();
+    }
 
-	m_tbMid.SetItemCheckState(1, FALSE);
-	m_tbMid.Invalidate();
+    m_tbMid.SetItemCheckState(1, FALSE);
+    m_tbMid.Invalidate();
 
-	return 0;
+    return 0;
 }
 
-// ÉèÖÃ¶Ô»°¿ò³õÊ¼½¹µã
+// è®¾ç½®å¯¹è¯æ¡†åˆå§‹ç„¦ç‚¹
 LRESULT CBuddyChatDlg::OnSetDlgInitFocus(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	m_richSend.SetFocus();
-	return 0;
+    m_richSend.SetFocus();
+    return 0;
 }
 
-//	¡°½ÓÊÕÏûÏ¢¡±¸»ÎÄ±¾¿òÁ´½Óµã»÷ÏûÏ¢
+//	â€œæ¥æ”¶æ¶ˆæ¯â€å¯Œæ–‡æœ¬æ¡†é“¾æ¥ç‚¹å‡»æ¶ˆæ¯
 LRESULT CBuddyChatDlg::OnRichEdit_Recv_Link(LPNMHDR pnmh)
 {
-	//CString strUrl;
+    //CString strUrl;
 
-	if (pnmh->code == EN_LINK)
-	{
-		ENLINK*pLink = (ENLINK*)pnmh;
-		if (pLink->msg == WM_LBUTTONUP)
-		{
-			m_richRecv.SetSel(pLink->chrg);
-			m_richRecv.GetSelText(m_strLinkUrl);
+    if (pnmh->code == EN_LINK)
+    {
+        ENLINK* pLink = (ENLINK*)pnmh;
+        if (pLink->msg == WM_LBUTTONUP)
+        {
+            m_richRecv.SetSel(pLink->chrg);
+            m_richRecv.GetSelText(m_strLinkUrl);
 
-			if (m_strLinkUrl.Left(7).MakeLower()==_T("http://") || m_strLinkUrl.Left(8).MakeLower()==_T("https://") ||
-				(m_strLinkUrl.GetLength() >= 7 && m_strLinkUrl.Left(4).MakeLower()==_T("www.")))
-			{
-				::ShellExecute(NULL, _T("open"), m_strLinkUrl, NULL, NULL, SW_SHOWNORMAL);
-			}
-			else if(::PathFileExists(m_strLinkUrl))
-			{
-				DWORD dwPos = GetMessagePos();
-				CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
+            if (m_strLinkUrl.Left(7).MakeLower() == _T("http://") || m_strLinkUrl.Left(8).MakeLower() == _T("https://") ||
+                (m_strLinkUrl.GetLength() >= 7 && m_strLinkUrl.Left(4).MakeLower() == _T("www.")))
+            {
+                ::ShellExecute(NULL, _T("open"), m_strLinkUrl, NULL, NULL, SW_SHOWNORMAL);
+            } else if (::PathFileExists(m_strLinkUrl))
+            {
+                DWORD dwPos = GetMessagePos();
+                CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 
-				CSkinMenu PopupMenu = m_SkinMenu.GetSubMenu(12);
-				PopupMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, m_hWnd);
-			}
-		}
-	}
-	return 0;
+                CSkinMenu PopupMenu = m_SkinMenu.GetSubMenu(12);
+                PopupMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, m_hWnd);
+            }
+        }
+    }
+    return 0;
 }
 
 LRESULT CBuddyChatDlg::OnRichEdit_Send_Paste(LPNMHDR pnmh)
 {
-	NMRICHEDITOLECALLBACK* lpOleNotify = (NMRICHEDITOLECALLBACK*)pnmh;
-	if (lpOleNotify != NULL && lpOleNotify->hdr.code == EN_PASTE
-		&& lpOleNotify->hdr.hwndFrom == m_richSend.m_hWnd)
-	{
-		AddMsgToSendEdit(lpOleNotify->lpszText);
-	}
-	return 0;
+    NMRICHEDITOLECALLBACK* lpOleNotify = (NMRICHEDITOLECALLBACK*)pnmh;
+    if (lpOleNotify != NULL && lpOleNotify->hdr.code == EN_PASTE
+        && lpOleNotify->hdr.hwndFrom == m_richSend.m_hWnd)
+    {
+        AddMsgToSendEdit(lpOleNotify->lpszText);
+    }
+    return 0;
 }
 
-// ¡°¼ôÇĞ¡±²Ëµ¥
+// â€œå‰ªåˆ‡â€èœå•
 void CBuddyChatDlg::OnMenu_Cut(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_richSend.Cut();
+    m_richSend.Cut();
 }
 
-// ¡°¸´ÖÆ¡±²Ëµ¥
+// â€œå¤åˆ¶â€èœå•
 void CBuddyChatDlg::OnMenu_Copy(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	HWND hWnd = GetFocus();
-	if (hWnd == m_richSend.m_hWnd)
-	{
-		m_richSend.Copy();
-	}
-	else if (hWnd == m_richRecv.m_hWnd)
-	{
-		m_richRecv.Copy();
-	}
-	else if(hWnd == m_richMsgLog.m_hWnd)
-	{
-		m_richMsgLog.Copy();
-	}
+    HWND hWnd = GetFocus();
+    if (hWnd == m_richSend.m_hWnd)
+    {
+        m_richSend.Copy();
+    } else if (hWnd == m_richRecv.m_hWnd)
+    {
+        m_richRecv.Copy();
+    } else if (hWnd == m_richMsgLog.m_hWnd)
+    {
+        m_richMsgLog.Copy();
+    }
 }
 
-// ¡°Õ³Ìù¡±²Ëµ¥
+// â€œç²˜è´´â€èœå•
 void CBuddyChatDlg::OnMenu_Paste(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_richSend.PasteSpecial(CF_TEXT);
+    m_richSend.PasteSpecial(CF_TEXT);
 }
 
-// ¡°È«²¿Ñ¡Ôñ¡±²Ëµ¥
+// â€œå…¨éƒ¨é€‰æ‹©â€èœå•
 void CBuddyChatDlg::OnMenu_SelAll(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	HWND hWnd = GetFocus();
-	if (hWnd == m_richSend.m_hWnd)
-	{
-		m_richSend.SetSel(0, -1);
-	}
-	else if (hWnd == m_richRecv.m_hWnd)
-	{
-		m_richRecv.SetSel(0, -1);
-	}
+    HWND hWnd = GetFocus();
+    if (hWnd == m_richSend.m_hWnd)
+    {
+        m_richSend.SetSel(0, -1);
+    } else if (hWnd == m_richRecv.m_hWnd)
+    {
+        m_richRecv.SetSel(0, -1);
+    }
 }
 
-// ¡°ÇåÆÁ¡±²Ëµ¥
+// â€œæ¸…å±â€èœå•
 void CBuddyChatDlg::OnMenu_Clear(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_richRecv.SetWindowText(_T(""));
+    m_richRecv.SetWindowText(_T(""));
 }
 
-// ¡°ÏÔÊ¾±ÈÀı¡±²Ëµ¥
+// â€œæ˜¾ç¤ºæ¯”ä¾‹â€èœå•
 void CBuddyChatDlg::OnMenu_ZoomRatio(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	switch (nID)
-	{
-	case ID_MENU_ZOOMRATIO_400:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 16, 4);
-		break;
-	case ID_MENU_ZOOMRATIO_200:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 8, 4);
-		break;
-	case ID_MENU_ZOOMRATIO_150:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 6, 4);
-		break;
-	case ID_MENU_ZOOMRATIO_125:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 5, 4);
-		break;
-	case ID_MENU_ZOOMRATIO_100:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 0, 0);
-		break;
-	case ID_MENU_ZOOMRATIO_75:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 3, 4);
-		break;
-	case ID_MENU_ZOOMRATIO_50:
-		::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 1, 2);
-		break;
-	default:
-		return;
-	}
+    switch (nID)
+    {
+    case ID_MENU_ZOOMRATIO_400:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 16, 4);
+        break;
+    case ID_MENU_ZOOMRATIO_200:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 8, 4);
+        break;
+    case ID_MENU_ZOOMRATIO_150:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 6, 4);
+        break;
+    case ID_MENU_ZOOMRATIO_125:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 5, 4);
+        break;
+    case ID_MENU_ZOOMRATIO_100:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 0, 0);
+        break;
+    case ID_MENU_ZOOMRATIO_75:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 3, 4);
+        break;
+    case ID_MENU_ZOOMRATIO_50:
+        ::SendMessage(m_richRecv.m_hWnd, EM_SETZOOM, 1, 2);
+        break;
+    default:
+        return;
+    }
 
-	CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(10);
-	for (int i = ID_MENU_ZOOMRATIO_400; i <= ID_MENU_ZOOMRATIO_50; i++)
-	{
-		if (i != nID)
-			menuPopup.CheckMenuItem(i, MF_BYCOMMAND|MF_UNCHECKED);
-		else
-			menuPopup.CheckMenuItem(i, MF_BYCOMMAND|MF_CHECKED);
-	}	
+    CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(10);
+    for (int i = ID_MENU_ZOOMRATIO_400; i <= ID_MENU_ZOOMRATIO_50; i++)
+    {
+        if (i != nID)
+            menuPopup.CheckMenuItem(i, MF_BYCOMMAND | MF_UNCHECKED);
+        else
+            menuPopup.CheckMenuItem(i, MF_BYCOMMAND | MF_CHECKED);
+    }
 }
 
-// ¡°Áí´æÎª¡±²Ëµ¥
+// â€œå¦å­˜ä¸ºâ€èœå•
 void CBuddyChatDlg::OnMenu_SaveAs(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	IImageOle* pImageOle = NULL;
-	BOOL bRet = RichEdit_GetImageOle(m_hRBtnDownWnd, m_ptRBtnDown, &pImageOle);
-	if (!bRet || NULL == pImageOle)
-		return;
+    IImageOle* pImageOle = NULL;
+    BOOL bRet = RichEdit_GetImageOle(m_hRBtnDownWnd, m_ptRBtnDown, &pImageOle);
+    if (!bRet || NULL == pImageOle)
+        return;
 
-	CString strFileName;
+    CString strFileName;
 
-	BSTR bstrFileName = NULL;
-	HRESULT hr = pImageOle->GetFileName(&bstrFileName);
-	if (SUCCEEDED(hr))
-		strFileName = bstrFileName;
-	if (bstrFileName != NULL)
-		::SysFreeString(bstrFileName);
+    BSTR bstrFileName = NULL;
+    HRESULT hr = pImageOle->GetFileName(&bstrFileName);
+    if (SUCCEEDED(hr))
+        strFileName = bstrFileName;
+    if (bstrFileName != NULL)
+        ::SysFreeString(bstrFileName);
 
-	TCHAR cFileName[MAX_PATH] = {0};
-	BOOL bOpenFileDialog = FALSE;
-	LPCTSTR lpszDefExt;
-	CString strFileNamePrefix;
-	GenerateChatImageSavedName(strFileNamePrefix);
-	DWORD dwFlags = OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR|OFN_EXTENSIONDIFFERENT;
-	LPCTSTR lpszFilter;
-	HWND hWndParent = m_hWnd;
+    TCHAR cFileName[MAX_PATH] = { 0 };
+    BOOL bOpenFileDialog = FALSE;
+    LPCTSTR lpszDefExt;
+    CString strFileNamePrefix;
+    GenerateChatImageSavedName(strFileNamePrefix);
+    DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
+    LPCTSTR lpszFilter;
+    HWND hWndParent = m_hWnd;
 
-	GUID guid = {0};
-	hr = pImageOle->GetRawFormat(&guid);
+    GUID guid = { 0 };
+    hr = pImageOle->GetRawFormat(&guid);
 
-	if (InlineIsEqualGUID(guid, Gdiplus::ImageFormatJPEG))
-	{
-		lpszDefExt = _T(".jpg");
-		lpszFilter = _T("Í¼ÏñÎÄ¼ş(*.jpg)\0*.jpg\0Í¼ÏñÎÄ¼ş(*.bmp)\0*.bmp\0\0");
-	}
-	else if (InlineIsEqualGUID(guid, Gdiplus::ImageFormatPNG))
-	{
-		lpszDefExt = _T(".png");
-		lpszFilter = _T("Í¼ÏñÎÄ¼ş(*.png)\0*.png\0\0");
-	}
-	else if (InlineIsEqualGUID(guid, Gdiplus::ImageFormatGIF))
-	{
-		lpszDefExt = _T(".gif");
-		lpszFilter = _T("Í¼ÏñÎÄ¼ş(*.gif)\0*.gif\0Í¼ÏñÎÄ¼ş(*.jpg)\0*.jpg\0Í¼ÏñÎÄ¼ş(*.bmp)\0*.bmp\0\0");
-	}
-	else
-	{
-		lpszDefExt = _T(".jpg");
-		lpszFilter = _T("Í¼ÏñÎÄ¼ş(*.jpg)\0*.jpg\0Í¼ÏñÎÄ¼ş(*.bmp)\0*.bmp\0\0");
-	}
+    if (InlineIsEqualGUID(guid, Gdiplus::ImageFormatJPEG))
+    {
+        lpszDefExt = _T(".jpg");
+        lpszFilter = _T("å›¾åƒæ–‡ä»¶(*.jpg)\0*.jpg\0å›¾åƒæ–‡ä»¶(*.bmp)\0*.bmp\0\0");
+    } else if (InlineIsEqualGUID(guid, Gdiplus::ImageFormatPNG))
+    {
+        lpszDefExt = _T(".png");
+        lpszFilter = _T("å›¾åƒæ–‡ä»¶(*.png)\0*.png\0\0");
+    } else if (InlineIsEqualGUID(guid, Gdiplus::ImageFormatGIF))
+    {
+        lpszDefExt = _T(".gif");
+        lpszFilter = _T("å›¾åƒæ–‡ä»¶(*.gif)\0*.gif\0å›¾åƒæ–‡ä»¶(*.jpg)\0*.jpg\0å›¾åƒæ–‡ä»¶(*.bmp)\0*.bmp\0\0");
+    } else
+    {
+        lpszDefExt = _T(".jpg");
+        lpszFilter = _T("å›¾åƒæ–‡ä»¶(*.jpg)\0*.jpg\0å›¾åƒæ–‡ä»¶(*.bmp)\0*.bmp\0\0");
+    }
 
-	CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, strFileNamePrefix, dwFlags, lpszFilter, hWndParent);
-	fileDlg.m_ofn.lpstrTitle = _T("±£´æÍ¼Æ¬");
-	if (fileDlg.DoModal() == IDOK)
-	{
-		CString strSavePath = fileDlg.m_ofn.lpstrFile;
-		CString strExtName = (_T(".") + Hootina::CPath::GetExtension(strSavePath)).c_str();
-		GUID guid2 = GetFileTypeGuidByExtension(strExtName);
+    CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, strFileNamePrefix, dwFlags, lpszFilter, hWndParent);
+    fileDlg.m_ofn.lpstrTitle = _T("ä¿å­˜å›¾ç‰‡");
+    if (fileDlg.DoModal() == IDOK)
+    {
+        CString strSavePath = fileDlg.m_ofn.lpstrFile;
+        CString strExtName = (_T(".") + Hootina::CPath::GetExtension(strSavePath)).c_str();
+        GUID guid2 = GetFileTypeGuidByExtension(strExtName);
 
-		if (InlineIsEqualGUID(guid, guid2))
-		{
-			CopyFile(strFileName, strSavePath, FALSE);
-		}
-		else
-		{
-			BSTR bstrSavePath = ::SysAllocString(strSavePath);
-			if (bstrSavePath != NULL)
-			{
-				pImageOle->SaveAsFile(bstrSavePath);
-				::SysFreeString(bstrSavePath);
-			}
-		}
-	}
+        if (InlineIsEqualGUID(guid, guid2))
+        {
+            CopyFile(strFileName, strSavePath, FALSE);
+        } else
+        {
+            BSTR bstrSavePath = ::SysAllocString(strSavePath);
+            if (bstrSavePath != NULL)
+            {
+                pImageOle->SaveAsFile(bstrSavePath);
+                ::SysFreeString(bstrSavePath);
+            }
+        }
+    }
 
-	if (pImageOle != NULL)
-		pImageOle->Release();
+    if (pImageOle != NULL)
+        pImageOle->Release();
 }
 
 void CBuddyChatDlg::OnMenu_ExportMsgLog(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	//µ¼³öÏûÏ¢¼ÇÂ¼£¬µ¼³öÎªword¡¢txtÎÄ¼ş
-	//µ¼³öÎªwordÓÃÓÚºóÆÚ×ÖÌåÍ¼Æ¬±íÇéµ¼³ö
-	tstring strText;
-	RichEdit_GetText(m_richMsgLog.m_hWnd, strText);
-	TCHAR	cFileName[MAX_PATH] = {0};
-	BOOL	bOpenFileDialog = FALSE;
-	LPCTSTR lpszDefExt = NULL;
-	LPCTSTR lpszFileName = _T("Î´ÃüÃû");
-	LPCTSTR lpszFilter = _T("Microsoft Office(*.doc)\0*.doc\0Microsoft Office(*.docx)\0*.docx\0½ğÉ½WPS(*.wps)\0*.wps\0\0");
-	DWORD	dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
-	HWND	hWndParent = m_hWnd;
+    //å¯¼å‡ºæ¶ˆæ¯è®°å½•ï¼Œå¯¼å‡ºä¸ºwordã€txtæ–‡ä»¶
+    //å¯¼å‡ºä¸ºwordç”¨äºåæœŸå­—ä½“å›¾ç‰‡è¡¨æƒ…å¯¼å‡º
+    tstring strText;
+    RichEdit_GetText(m_richMsgLog.m_hWnd, strText);
+    TCHAR	cFileName[MAX_PATH] = { 0 };
+    BOOL	bOpenFileDialog = FALSE;
+    LPCTSTR lpszDefExt = NULL;
+    LPCTSTR lpszFileName = _T("æœªå‘½å");
+    LPCTSTR lpszFilter = _T("Microsoft Office(*.doc)\0*.doc\0Microsoft Office(*.docx)\0*.docx\0é‡‘å±±WPS(*.wps)\0*.wps\0\0");
+    DWORD	dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
+    HWND	hWndParent = m_hWnd;
 
-	CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
-	fileDlg.m_ofn.lpstrTitle = _T("±£´æÎÄ¼ş");
-	if (fileDlg.DoModal() == IDOK)
-	{
-		CString strSavePath = fileDlg.m_ofn.lpstrFile;
-		CString strExtName = (_T(".") + Hootina::CPath::GetExtension(strSavePath)).c_str();
-		CFile file;
-		if(!file.Open(strSavePath, TRUE))
-			return;
+    CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
+    fileDlg.m_ofn.lpstrTitle = _T("ä¿å­˜æ–‡ä»¶");
+    if (fileDlg.DoModal() == IDOK)
+    {
+        CString strSavePath = fileDlg.m_ofn.lpstrFile;
+        CString strExtName = (_T(".") + Hootina::CPath::GetExtension(strSavePath)).c_str();
+        CFile file;
+        if (!file.Open(strSavePath, TRUE))
+            return;
 
-		char* pBuffer = new char[strText.size() / 2 + 1];
+        char* pBuffer = new char[strText.size() / 2 + 1];
         EncodeUtil::UnicodeToAnsi(strText.c_str(), pBuffer, strlen(pBuffer) * 2);
-		file.Write(pBuffer, strlen(pBuffer));
-	}
+        file.Write(pBuffer, strlen(pBuffer));
+    }
 }
 
 void CBuddyChatDlg::OnMenu_FindInMsgLog(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	//²éÕÒÏûÏ¢¼ÇÂ¼
+    //æŸ¥æ‰¾æ¶ˆæ¯è®°å½•
 }
 
-// É¾³ıÑ¡ÖĞÏûÏ¢¼ÇÂ¼
+// åˆ é™¤é€‰ä¸­æ¶ˆæ¯è®°å½•
 void CBuddyChatDlg::OnMenu_DeleteSelectMsgLog(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	if(IDYES != ::MessageBox(m_hWnd, _T("É¾³ıµÄÏûÏ¢¼ÇÂ¼ÎŞ·¨»Ö¸´£¬È·ÊµÒªÉ¾³ıÑ¡ÖĞµÄÏûÏ¢¼ÇÂ¼Âğ£¿"), _T("É¾³ıÈ·ÈÏ"), MB_YESNO|MB_ICONWARNING))
-		return;
-	
-	m_richMsgLog.SetReadOnly(FALSE);
-	m_richMsgLog.Cut();
-	INPUT Input={0};
-	// Backspace down
-	//Input.type = INPUT_KEYBOARD;
-	//Input.mi.dwFlags = KEYBDINPUT;
-	//SendInput(1,&Input,sizeof(INPUT));
-	::SendMessage(m_richMsgLog.m_hWnd, WM_KEYDOWN, VK_BACK, 0);
-	m_richMsgLog.SetReadOnly(TRUE);
-	//m_richSend.PasteSpecial(CF_TEXT);
+    if (IDYES != ::MessageBox(m_hWnd, _T("åˆ é™¤çš„æ¶ˆæ¯è®°å½•æ— æ³•æ¢å¤ï¼Œç¡®å®è¦åˆ é™¤é€‰ä¸­çš„æ¶ˆæ¯è®°å½•å—ï¼Ÿ"), _T("åˆ é™¤ç¡®è®¤"), MB_YESNO | MB_ICONWARNING))
+        return;
 
-	//ÅĞ¶Ï¼ôÌù°åµÄÊı¾İ¸ñÊ½ÊÇ·ñ¿ÉÒÔ´¦Àí¡£
-	if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
-	{
-		return;
-	} 
-	// Open the clipboard.  
-	if (!::OpenClipboard(m_richMsgLog.m_hWnd))  
-		return;  
+    m_richMsgLog.SetReadOnly(FALSE);
+    m_richMsgLog.Cut();
+    INPUT Input = { 0 };
+    // Backspace down
+    //Input.type = INPUT_KEYBOARD;
+    //Input.mi.dwFlags = KEYBDINPUT;
+    //SendInput(1,&Input,sizeof(INPUT));
+    ::SendMessage(m_richMsgLog.m_hWnd, WM_KEYDOWN, VK_BACK, 0);
+    m_richMsgLog.SetReadOnly(TRUE);
+    //m_richSend.PasteSpecial(CF_TEXT);
 
-	HGLOBAL hMem = ::GetClipboardData(CF_UNICODETEXT);;
-	LPCTSTR lpStr = NULL;
-	if(hMem != NULL)  
-	{
-		lpStr = (LPCTSTR)::GlobalLock(hMem);
-		if (lpStr != NULL)
-		{
-			//ÏÔÊ¾Êä³ö¡£
-			::OutputDebugString(lpStr);
-			//ÊÍ·ÅËøÄÚ´æ¡£
-			::GlobalUnlock(hMem);
-		}
-	}
-	::CloseClipboard();
-	//ÓÃsqlÓï¾äÈ¥É¾³ıSQLiteÊı¾İ¿âÖĞ¶ÔÓ¦µÄÏûÏ¢¼ÇÂ¼
+    //åˆ¤æ–­å‰ªè´´æ¿çš„æ•°æ®æ ¼å¼æ˜¯å¦å¯ä»¥å¤„ç†ã€‚
+    if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
+    {
+        return;
+    }
+    // Open the clipboard.  
+    if (!::OpenClipboard(m_richMsgLog.m_hWnd))
+        return;
 
-	//UINT nMsgLogID = m_MsgLogger.DelBuddyMsgLogByText(lpStr);
+    HGLOBAL hMem = ::GetClipboardData(CF_UNICODETEXT);;
+    LPCTSTR lpStr = NULL;
+    if (hMem != NULL)
+    {
+        lpStr = (LPCTSTR)::GlobalLock(hMem);
+        if (lpStr != NULL)
+        {
+            //æ˜¾ç¤ºè¾“å‡ºã€‚
+            ::OutputDebugString(lpStr);
+            //é‡Šæ”¾é”å†…å­˜ã€‚
+            ::GlobalUnlock(hMem);
+        }
+    }
+    ::CloseClipboard();
+    //ç”¨sqlè¯­å¥å»åˆ é™¤SQLiteæ•°æ®åº“ä¸­å¯¹åº”çš„æ¶ˆæ¯è®°å½•
+
+    //UINT nMsgLogID = m_MsgLogger.DelBuddyMsgLogByText(lpStr);
 }
 
 void CBuddyChatDlg::OnMenu_ClearMsgLog(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	if(IDYES != ::MessageBox(m_hWnd, _T("É¾³ıµÄÏûÏ¢¼ÇÂ¼ÎŞ·¨»Ö¸´£¬È·ÊµÒªÉ¾³ıÓë¸ÃºÃÓÑµÄËùÓĞÏûÏ¢¼ÇÂ¼Âğ£¿"), _T("É¾³ıÈ·ÈÏ"), MB_YESNO|MB_ICONWARNING))
-		return;
-	
-	m_richMsgLog.SetWindowText(_T(""));
-	m_richRecv.SetWindowText(_T(""));
-	m_staMsgLogPage.SetWindowText(_T("0/0"));
-	//tstring strChatMsgDBPath = m_lpFMGClient->GetMsgLogFullName();
-	//::DeleteFile(strChatMsgDBPath.c_str());
-	//UINT nUTalkNum = m_lpFMGClient;
-	m_MsgLogger.DelBuddyMsgLog(m_nUTalkUin);
+    if (IDYES != ::MessageBox(m_hWnd, _T("åˆ é™¤çš„æ¶ˆæ¯è®°å½•æ— æ³•æ¢å¤ï¼Œç¡®å®è¦åˆ é™¤ä¸è¯¥å¥½å‹çš„æ‰€æœ‰æ¶ˆæ¯è®°å½•å—ï¼Ÿ"), _T("åˆ é™¤ç¡®è®¤"), MB_YESNO | MB_ICONWARNING))
+        return;
+
+    m_richMsgLog.SetWindowText(_T(""));
+    m_richRecv.SetWindowText(_T(""));
+    m_staMsgLogPage.SetWindowText(_T("0/0"));
+    //tstring strChatMsgDBPath = m_lpFMGClient->GetMsgLogFullName();
+    //::DeleteFile(strChatMsgDBPath.c_str());
+    //UINT nUTalkNum = m_lpFMGClient;
+    m_MsgLogger.DelBuddyMsgLog(m_nUTalkUin);
 }
 
-//·¢ËÍÎÄ¼ş
+//å‘é€æ–‡ä»¶
 void CBuddyChatDlg::OnMenu_SendFile(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	TCHAR	cFileName[MAX_PATH] = {0};
-	BOOL	bOpenFileDialog = TRUE;
-	LPCTSTR lpszDefExt = NULL;
-	LPCTSTR lpszFileName = _T("Ñ¡ÔñÎÄ¼ş");
-	LPCTSTR lpszFilter = _T("ËùÓĞÎÄ¼ş(*.)\0\0");
-	DWORD	dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
-	HWND	hWndParent = m_hWnd;
+    TCHAR	cFileName[MAX_PATH] = { 0 };
+    BOOL	bOpenFileDialog = TRUE;
+    LPCTSTR lpszDefExt = NULL;
+    LPCTSTR lpszFileName = _T("é€‰æ‹©æ–‡ä»¶");
+    LPCTSTR lpszFilter = _T("æ‰€æœ‰æ–‡ä»¶(*.)\0\0");
+    DWORD	dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
+    HWND	hWndParent = m_hWnd;
 
-	CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
-	if (fileDlg.DoModal() == IDOK)
-	{
-		CString strSavePath = fileDlg.m_ofn.lpstrFile;
-		CString strExtName = (Hootina::CPath::GetExtension(strSavePath)).c_str();
-		
-		CString strFileTypeThumbs = Hootina::CPath::GetAppPath().c_str();
-		strFileTypeThumbs += _T("\\Skins\\Skin0\\fileTypeThumbs\\");
-		strFileTypeThumbs += strExtName;
-		strFileTypeThumbs += _T(".png");
-		m_SendFileThumbPicture.SetBitmap(strFileTypeThumbs);
-		if (!m_bMsgLogWindowVisible)
-		{
-			::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-			m_bMsgLogWindowVisible = TRUE;
-		}
-		//::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-		m_RightTabCtrl.SetCurSel(1);
-		m_richMsgLog.ShowWindow(SW_HIDE);
-		ShowFileTransferCtrl(TRUE);
-		m_staSendFileDesc.SetWindowText(Hootina::CPath::GetFileName(strSavePath).c_str());
-	}
+    CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
+    if (fileDlg.DoModal() == IDOK)
+    {
+        CString strSavePath = fileDlg.m_ofn.lpstrFile;
+        CString strExtName = (Hootina::CPath::GetExtension(strSavePath)).c_str();
+
+        CString strFileTypeThumbs = Hootina::CPath::GetAppPath().c_str();
+        strFileTypeThumbs += _T("\\Skins\\Skin0\\fileTypeThumbs\\");
+        strFileTypeThumbs += strExtName;
+        strFileTypeThumbs += _T(".png");
+        m_SendFileThumbPicture.SetBitmap(strFileTypeThumbs);
+        if (!m_bMsgLogWindowVisible)
+        {
+            ::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+            m_bMsgLogWindowVisible = TRUE;
+        }
+        //::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+        m_RightTabCtrl.SetCurSel(1);
+        m_richMsgLog.ShowWindow(SW_HIDE);
+        ShowFileTransferCtrl(TRUE);
+        m_staSendFileDesc.SetWindowText(Hootina::CPath::GetFileName(strSavePath).c_str());
+    }
 }
 
-//¡°·¢ËÍÀëÏßÎÄ¼ş¡±²Ëµ¥
+//â€œå‘é€ç¦»çº¿æ–‡ä»¶â€èœå•
 void CBuddyChatDlg::OnMenu_SendOfflineFile(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	TCHAR	cFileName[MAX_PATH] = {0};
-	BOOL	bOpenFileDialog = TRUE;
-	LPCTSTR lpszDefExt = NULL;
-	LPCTSTR lpszFileName = _T("Ñ¡ÔñÎÄ¼ş");
-	LPCTSTR lpszFilter = _T("ËùÓĞÎÄ¼ş(*.)\0\0");
-	DWORD	dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
-	HWND	hWndParent = m_hWnd;
+    TCHAR	cFileName[MAX_PATH] = { 0 };
+    BOOL	bOpenFileDialog = TRUE;
+    LPCTSTR lpszDefExt = NULL;
+    LPCTSTR lpszFileName = _T("é€‰æ‹©æ–‡ä»¶");
+    LPCTSTR lpszFilter = _T("æ‰€æœ‰æ–‡ä»¶(*.)\0\0");
+    DWORD	dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
+    HWND	hWndParent = m_hWnd;
 
-	CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
-	if (fileDlg.DoModal() != IDOK)
-		return;
+    CFileDialog fileDlg(bOpenFileDialog, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent);
+    if (fileDlg.DoModal() != IDOK)
+        return;
 
-	SendOfflineFile(fileDlg.m_szFileName);
+    SendOfflineFile(fileDlg.m_szFileName);
 }
 
-//¡°·¢ËÍÎÄ¼ş¼Ğ¡±²Ëµ¥
+//â€œå‘é€æ–‡ä»¶å¤¹â€èœå•
 void CBuddyChatDlg::OnMenu_SendDirectory(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
 
 }
 
-//¡°·¢ËÍÎÄ¼şÉèÖÃ¡±²Ëµ¥
+//â€œå‘é€æ–‡ä»¶è®¾ç½®â€èœå•
 void CBuddyChatDlg::OnMenu_SendFileSettings(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
 
@@ -2063,1154 +2029,1146 @@ void CBuddyChatDlg::OnMenu_SendFileSettings(UINT uNotifyCode, int nID, CWindow w
 
 BOOL CBuddyChatDlg::SendOfflineFile(PCTSTR pszFileName)
 {
-	if(pszFileName==NULL)
-		return FALSE;
+    if (pszFileName == NULL)
+        return FALSE;
 
-	UINT64 nFileSize = IUGetFileSize2(pszFileName);
-	//if(nFileSize > (UINT64)MAX_OFFLINE_FILE_SIZE)
-	//{
-	//	::MessageBox(m_hWnd, _T("ÀëÏßÎÄ¼şÔİÇÒ²»Ö§³Ö´óĞ¡³¬¹ı2GµÄÎÄ¼ş¡£"), g_strAppTitle.c_str(), MB_OK|MB_ICONINFORMATION);
-	//	return FALSE;
-	//}
+    UINT64 nFileSize = IUGetFileSize2(pszFileName);
+    //if(nFileSize > (UINT64)MAX_OFFLINE_FILE_SIZE)
+    //{
+    //	::MessageBox(m_hWnd, _T("ç¦»çº¿æ–‡ä»¶æš‚ä¸”ä¸æ”¯æŒå¤§å°è¶…è¿‡2Gçš„æ–‡ä»¶ã€‚"), g_strAppTitle.c_str(), MB_OK|MB_ICONINFORMATION);
+    //	return FALSE;
+    //}
 
-	CString strSavePath(pszFileName);
-	CString strExtName(Hootina::CPath::GetExtension(strSavePath).c_str());
+    CString strSavePath(pszFileName);
+    CString strExtName(Hootina::CPath::GetExtension(strSavePath).c_str());
 
-	CString strFileTypeThumbs(Hootina::CPath::GetAppPath().c_str());
-	strFileTypeThumbs += _T("\\Skins\\Skin0\\fileTypeThumbs\\");
-	strFileTypeThumbs += strExtName;
-	strFileTypeThumbs += _T(".png");
-	//m_SendFileThumbPicture.SetBitmap(strFileTypeThumbs);
+    CString strFileTypeThumbs(Hootina::CPath::GetAppPath().c_str());
+    strFileTypeThumbs += _T("\\Skins\\Skin0\\fileTypeThumbs\\");
+    strFileTypeThumbs += strExtName;
+    strFileTypeThumbs += _T(".png");
+    //m_SendFileThumbPicture.SetBitmap(strFileTypeThumbs);
 
-	////¸ù¾İµ±Ç°ÊÇ·ñ´ò¿ªÅĞ¶ÏÊÇ·ñ·¢ËÍÏûÏ¢
-	//if (!m_bMsgLogWindowVisible)
-	//{
-	//	::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-	//	m_bMsgLogWindowVisible = TRUE;
-	//}
-	//::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-	//TODO: Ææ¹ÖÎªÊ²Ã´¶ÔÓÚ´óÎÄ¼ş£¬×ÜÊÇ²»ÄÜ¼¤»îÎÄ¼şÊä³öTab£¬Òò¶øµ¼ÖÂÎÄ¼ş´«Êä°´Å¥ÎŞ·¨ÏìÓ¦µã»÷¡£
-	//if(m_bMsgLogWindowVisible)
-		m_richMsgLog.ShowWindow(SW_HIDE);
-	DisplayFileTransfer(TRUE);
-	
-	CString strImage;
-	long nItemID = m_FileTransferCtrl.AddItem();
-	tstring strFileName(Hootina::CPath::GetFileName(strSavePath));
-	m_FileTransferCtrl.SetItemFileFullNameByID(nItemID, strSavePath);
-	m_FileTransferCtrl.SetItemFileNameByID(nItemID, strFileName.c_str());
-	if(!Hootina::CPath::IsFileExist(strFileTypeThumbs))
-		strFileTypeThumbs.Format(_T("%sSkins\\Skin0\\fileTypeThumbs\\unknown.png"), g_szHomePath);
-	m_FileTransferCtrl.SetItemFileTypePicByID(nItemID, strFileTypeThumbs);
-	m_FileTransferCtrl.SetItemFileSizeByID(nItemID, Hootina::CPath::GetFileSize(pszFileName));
-	m_FileTransferCtrl.SetItemTargetTypeByID(nItemID, SEND_TYPE);
+    ////æ ¹æ®å½“å‰æ˜¯å¦æ‰“å¼€åˆ¤æ–­æ˜¯å¦å‘é€æ¶ˆæ¯
+    //if (!m_bMsgLogWindowVisible)
+    //{
+    //	::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+    //	m_bMsgLogWindowVisible = TRUE;
+    //}
+    //::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+    //TODO: å¥‡æ€ªä¸ºä»€ä¹ˆå¯¹äºå¤§æ–‡ä»¶ï¼Œæ€»æ˜¯ä¸èƒ½æ¿€æ´»æ–‡ä»¶è¾“å‡ºTabï¼Œå› è€Œå¯¼è‡´æ–‡ä»¶ä¼ è¾“æŒ‰é’®æ— æ³•å“åº”ç‚¹å‡»ã€‚
+    //if(m_bMsgLogWindowVisible)
+    m_richMsgLog.ShowWindow(SW_HIDE);
+    DisplayFileTransfer(TRUE);
 
-	m_FileTransferCtrl.Invalidate(FALSE);
+    CString strImage;
+    long nItemID = m_FileTransferCtrl.AddItem();
+    tstring strFileName(Hootina::CPath::GetFileName(strSavePath));
+    m_FileTransferCtrl.SetItemFileFullNameByID(nItemID, strSavePath);
+    m_FileTransferCtrl.SetItemFileNameByID(nItemID, strFileName.c_str());
+    if (!Hootina::CPath::IsFileExist(strFileTypeThumbs))
+        strFileTypeThumbs.Format(_T("%sSkins\\Skin0\\fileTypeThumbs\\unknown.png"), g_szHomePath);
+    m_FileTransferCtrl.SetItemFileTypePicByID(nItemID, strFileTypeThumbs);
+    m_FileTransferCtrl.SetItemFileSizeByID(nItemID, Hootina::CPath::GetFileSize(pszFileName));
+    m_FileTransferCtrl.SetItemTargetTypeByID(nItemID, SEND_TYPE);
 
-	m_mapSendFileInfo.insert(std::pair<CString, long>(pszFileName, -1));
+    m_FileTransferCtrl.Invalidate(FALSE);
 
-	CFileItemRequest* pFileItemRequest = new CFileItemRequest();
-	pFileItemRequest->m_nID = nItemID;
-	_tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), strSavePath);
-	pFileItemRequest->m_hwndReflection = m_hWnd;
-	pFileItemRequest->m_nFileType = FILE_ITEM_UPLOAD_CHAT_OFFLINE_FILE;
-	//CreateEventÊ§°Ü»á·µ»ØNULL£¬²»ÊÇINVALID_HANDLE_VALUE£¬ËùÒÔ¿ÉÒÔÕâÃ´Ğ´
-	pFileItemRequest->m_hCancelEvent = ::CreateEvent(NULL, TRUE, FALSE, NULL);
+    m_mapSendFileInfo.insert(std::pair<CString, long>(pszFileName, -1));
 
-	m_FileTransferCtrl.SetFileItemRequestByID(nItemID, pFileItemRequest);
+    CFileItemRequest* pFileItemRequest = new CFileItemRequest();
+    pFileItemRequest->m_nID = nItemID;
+    _tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), strSavePath);
+    pFileItemRequest->m_hwndReflection = m_hWnd;
+    pFileItemRequest->m_nFileType = FILE_ITEM_UPLOAD_CHAT_OFFLINE_FILE;
+    //CreateEventå¤±è´¥ä¼šè¿”å›NULLï¼Œä¸æ˜¯INVALID_HANDLE_VALUEï¼Œæ‰€ä»¥å¯ä»¥è¿™ä¹ˆå†™
+    pFileItemRequest->m_hCancelEvent = ::CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	m_lpFMGClient->m_FileTask.AddItem(pFileItemRequest);
+    m_FileTransferCtrl.SetFileItemRequestByID(nItemID, pFileItemRequest);
 
-	return TRUE;
+    m_lpFMGClient->m_FileTask.AddItem(pFileItemRequest);
+
+    return TRUE;
 }
 
 BOOL CBuddyChatDlg::RecvOfflineFile(PCTSTR lpszDownloadName, PCTSTR pszFileName, long nFileSize)
 {
-	if(pszFileName==NULL || nFileSize==NULL)
-		return FALSE;
+    if (pszFileName == NULL || nFileSize == NULL)
+        return FALSE;
 
-	CString strExtName(Hootina::CPath::GetExtension(pszFileName).c_str());
-	CString strFileTypeThumbs(Hootina::CPath::GetAppPath().c_str());
-	strFileTypeThumbs += _T("\\Skins\\Skin0\\fileTypeThumbs\\");
-	strFileTypeThumbs += strExtName;
-	strFileTypeThumbs += _T(".png");
-	if(!Hootina::CPath::IsFileExist(strFileTypeThumbs))
-		strFileTypeThumbs.Format(_T("%sSkins\\Skin0\\fileTypeThumbs\\unknown.png"), g_szHomePath);
+    CString strExtName(Hootina::CPath::GetExtension(pszFileName).c_str());
+    CString strFileTypeThumbs(Hootina::CPath::GetAppPath().c_str());
+    strFileTypeThumbs += _T("\\Skins\\Skin0\\fileTypeThumbs\\");
+    strFileTypeThumbs += strExtName;
+    strFileTypeThumbs += _T(".png");
+    if (!Hootina::CPath::IsFileExist(strFileTypeThumbs))
+        strFileTypeThumbs.Format(_T("%sSkins\\Skin0\\fileTypeThumbs\\unknown.png"), g_szHomePath);
 
-	//¸ù¾İµ±Ç°ÊÇ·ñ´ò¿ªÅĞ¶ÏÊÇ·ñ·¢ËÍÏûÏ¢
-	//if (!m_bMsgLogWindowVisible)
-	//{
-	//	::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-	//	m_bMsgLogWindowVisible = TRUE;
-	//}
-	//::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-	if(!m_bMsgLogWindowVisible)
-		m_richMsgLog.ShowWindow(SW_HIDE);
-	DisplayFileTransfer(TRUE);
-	
-	CString strImage;
-	long nItemID = m_FileTransferCtrl.AddItem();
-	m_FileTransferCtrl.SetItemFileNameByID(nItemID, pszFileName);
-	
-	m_FileTransferCtrl.SetItemFileTypePicByID(nItemID, strFileTypeThumbs);
-	m_FileTransferCtrl.SetItemFileSizeByID(nItemID, nFileSize);
-	m_FileTransferCtrl.SetItemTargetTypeByID(nItemID, RECV_TYPE);
-	char szDownloadName[MAX_PATH] = {0};
+    //æ ¹æ®å½“å‰æ˜¯å¦æ‰“å¼€åˆ¤æ–­æ˜¯å¦å‘é€æ¶ˆæ¯
+    //if (!m_bMsgLogWindowVisible)
+    //{
+    //	::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+    //	m_bMsgLogWindowVisible = TRUE;
+    //}
+    //::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+    if (!m_bMsgLogWindowVisible)
+        m_richMsgLog.ShowWindow(SW_HIDE);
+    DisplayFileTransfer(TRUE);
+
+    CString strImage;
+    long nItemID = m_FileTransferCtrl.AddItem();
+    m_FileTransferCtrl.SetItemFileNameByID(nItemID, pszFileName);
+
+    m_FileTransferCtrl.SetItemFileTypePicByID(nItemID, strFileTypeThumbs);
+    m_FileTransferCtrl.SetItemFileSizeByID(nItemID, nFileSize);
+    m_FileTransferCtrl.SetItemTargetTypeByID(nItemID, RECV_TYPE);
+    char szDownloadName[MAX_PATH] = { 0 };
     EncodeUtil::UnicodeToUtf8(lpszDownloadName, szDownloadName, ARRAYSIZE(szDownloadName));
-	m_FileTransferCtrl.SetItemDownloadNameByID(nItemID, szDownloadName);
+    m_FileTransferCtrl.SetItemDownloadNameByID(nItemID, szDownloadName);
 
-	m_FileTransferCtrl.Invalidate(FALSE);
+    m_FileTransferCtrl.Invalidate(FALSE);
 
-	return TRUE;
+    return TRUE;
 }
 
-// ·¢ËÍ/½ÓÊÕÎÄ±¾¿òµÄÊó±êÒÆ¶¯ÏûÏ¢
+// å‘é€/æ¥æ”¶æ–‡æœ¬æ¡†çš„é¼ æ ‡ç§»åŠ¨æ¶ˆæ¯
 BOOL CBuddyChatDlg::OnRichEdit_MouseMove(MSG* pMsg)
 {
-	IImageOle* pNewImageOle = NULL;
-	RECT rc = {0};
+    IImageOle* pNewImageOle = NULL;
+    RECT rc = { 0 };
 
-	POINT pt = {LOWORD(pMsg->lParam), HIWORD(pMsg->lParam)};
-	IImageOle* pImageOle = NULL;
-	BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, pt, &pImageOle);
-	if (bRet && pImageOle != NULL)
-	{
-		pNewImageOle = pImageOle;
-		pImageOle->GetObjectRect(&rc);
-	}
-	if (pImageOle != NULL)
-		pImageOle->Release();
+    POINT pt = { LOWORD(pMsg->lParam), HIWORD(pMsg->lParam) };
+    IImageOle* pImageOle = NULL;
+    BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, pt, &pImageOle);
+    if (bRet && pImageOle != NULL)
+    {
+        pNewImageOle = pImageOle;
+        pImageOle->GetObjectRect(&rc);
+    }
+    if (pImageOle != NULL)
+        pImageOle->Release();
 
-	if (m_pLastImageOle != pNewImageOle)
-	{
-		m_pLastImageOle = pNewImageOle;
-		if (m_pLastImageOle != NULL)
-		{
-			m_hRBtnDownWnd = pMsg->hwnd;
-			m_ptRBtnDown = pt;
+    if (m_pLastImageOle != pNewImageOle)
+    {
+        m_pLastImageOle = pNewImageOle;
+        if (m_pLastImageOle != NULL)
+        {
+            m_hRBtnDownWnd = pMsg->hwnd;
+            m_ptRBtnDown = pt;
 
-			if (!m_PicBarDlg.IsWindow())
-				m_PicBarDlg.Create(m_hWnd);
+            if (!m_PicBarDlg.IsWindow())
+                m_PicBarDlg.Create(m_hWnd);
 
-			RECT rc2 = {0};
-			::GetClientRect(pMsg->hwnd, &rc2);
-			POINT pt = {rc.right, rc.bottom-m_cyPicBarDlg};
-			if (pt.x < rc2.left)
-				pt.x = rc2.left;
-			if (pt.x > rc2.right)
-				pt.x = rc2.right;
-			if (pt.y > rc2.bottom-m_cyPicBarDlg)
-				pt.y = rc2.bottom-m_cyPicBarDlg;
-			::ClientToScreen(pMsg->hwnd, &pt);
+            RECT rc2 = { 0 };
+            ::GetClientRect(pMsg->hwnd, &rc2);
+            POINT pt = { rc.right, rc.bottom - m_cyPicBarDlg };
+            if (pt.x < rc2.left)
+                pt.x = rc2.left;
+            if (pt.x > rc2.right)
+                pt.x = rc2.right;
+            if (pt.y > rc2.bottom - m_cyPicBarDlg)
+                pt.y = rc2.bottom - m_cyPicBarDlg;
+            ::ClientToScreen(pMsg->hwnd, &pt);
 
-			::SetWindowPos(m_PicBarDlg.m_hWnd, NULL, pt.x, pt.y, m_cxPicBarDlg, m_cyPicBarDlg, SWP_NOACTIVATE|SWP_SHOWWINDOW);
-		}
-		else
-		{
-			::ShowWindow(m_PicBarDlg.m_hWnd, SW_HIDE);
-		}
-	}
-	return FALSE;
+            ::SetWindowPos(m_PicBarDlg.m_hWnd, NULL, pt.x, pt.y, m_cxPicBarDlg, m_cyPicBarDlg, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        } else
+        {
+            ::ShowWindow(m_PicBarDlg.m_hWnd, SW_HIDE);
+        }
+    }
+    return FALSE;
 }
 
-// ·¢ËÍ/½ÓÊÕÎÄ±¾¿òµÄÊó±êË«»÷ÏûÏ¢
+// å‘é€/æ¥æ”¶æ–‡æœ¬æ¡†çš„é¼ æ ‡åŒå‡»æ¶ˆæ¯
 BOOL CBuddyChatDlg::OnRichEdit_LBtnDblClk(MSG* pMsg)
 {
-	POINT pt = {GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)};
+    POINT pt = { GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam) };
 
-	IImageOle* pImageOle = NULL;
-	BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, pt, &pImageOle);
-	if (bRet && pImageOle != NULL)					// Ë«»÷µÄÊÇÍ¼Æ¬
-	{
-		LONG nFaceId = -1, nFaceIndex = -1;
-		pImageOle->GetFaceId(&nFaceId);
-		pImageOle->GetFaceIndex(&nFaceIndex);
-		if (-1 == nFaceId && -1 == nFaceIndex)		// ·ÇÏµÍ³±íÇé
-		{
-			BSTR bstrFileName = NULL;				// »ñÈ¡Í¼Æ¬ÎÄ¼şÃû
-			HRESULT hr = pImageOle->GetFileName(&bstrFileName);
-			if (SUCCEEDED(hr))						// µ÷ÓÃÍ¼Æ¬ä¯ÀÀÆ÷³ÌĞò´ò¿ªÍ¼Æ¬
-			{
-				CString strExeName = Hootina::CPath::GetAppPath().c_str();
-				strExeName += _T("picView.exe");
+    IImageOle* pImageOle = NULL;
+    BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, pt, &pImageOle);
+    if (bRet && pImageOle != NULL)					// åŒå‡»çš„æ˜¯å›¾ç‰‡
+    {
+        LONG nFaceId = -1, nFaceIndex = -1;
+        pImageOle->GetFaceId(&nFaceId);
+        pImageOle->GetFaceIndex(&nFaceIndex);
+        if (-1 == nFaceId && -1 == nFaceIndex)		// éç³»ç»Ÿè¡¨æƒ…
+        {
+            BSTR bstrFileName = NULL;				// è·å–å›¾ç‰‡æ–‡ä»¶å
+            HRESULT hr = pImageOle->GetFileName(&bstrFileName);
+            if (SUCCEEDED(hr))						// è°ƒç”¨å›¾ç‰‡æµè§ˆå™¨ç¨‹åºæ‰“å¼€å›¾ç‰‡
+            {
+                CString strExeName = Hootina::CPath::GetAppPath().c_str();
+                strExeName += _T("picView.exe");
 
-				CString strArg = _T("\"");
-				strArg += bstrFileName;
-				strArg += _T("\"");
+                CString strArg = _T("\"");
+                strArg += bstrFileName;
+                strArg += _T("\"");
 
-				if (Hootina::CPath::IsFileExist(strExeName))
-				{
-					HWND hWnd = ::FindWindow(_T("DUI_WINDOW"), _T("ImageView"));
-					if (::IsWindow(hWnd))
-						::SendMessage(hWnd, WM_CLOSE, 0, 0);
-					::ShellExecute(NULL, NULL, strExeName, strArg, NULL, SW_SHOWNORMAL);
-				}
-				else
-					::ShellExecute(NULL, _T("open"), bstrFileName, NULL, NULL, SW_SHOWNORMAL);
-			}
-			if (bstrFileName != NULL)
-				::SysFreeString(bstrFileName);
-		}
-	}
-	if (pImageOle != NULL)
-		pImageOle->Release();
+                if (Hootina::CPath::IsFileExist(strExeName))
+                {
+                    HWND hWnd = ::FindWindow(_T("DUI_WINDOW"), _T("ImageView"));
+                    if (::IsWindow(hWnd))
+                        ::SendMessage(hWnd, WM_CLOSE, 0, 0);
+                    ::ShellExecute(NULL, NULL, strExeName, strArg, NULL, SW_SHOWNORMAL);
+                } else
+                    ::ShellExecute(NULL, _T("open"), bstrFileName, NULL, NULL, SW_SHOWNORMAL);
+            }
+            if (bstrFileName != NULL)
+                ::SysFreeString(bstrFileName);
+        }
+    }
+    if (pImageOle != NULL)
+        pImageOle->Release();
 
-	return bRet;
+    return bRet;
 }
 
-// ·¢ËÍ/½ÓÊÕÎÄ±¾¿òµÄÊó±êÓÒ¼ü°´ÏÂÏûÏ¢
+// å‘é€/æ¥æ”¶æ–‡æœ¬æ¡†çš„é¼ æ ‡å³é”®æŒ‰ä¸‹æ¶ˆæ¯
 BOOL CBuddyChatDlg::OnRichEdit_RBtnDown(MSG* pMsg)
 {
-	if (pMsg->hwnd == m_richSend.m_hWnd)
-	{
-		m_hRBtnDownWnd = pMsg->hwnd;
-		m_ptRBtnDown.x = GET_X_LPARAM(pMsg->lParam);
-		m_ptRBtnDown.y = GET_Y_LPARAM(pMsg->lParam);
+    if (pMsg->hwnd == m_richSend.m_hWnd)
+    {
+        m_hRBtnDownWnd = pMsg->hwnd;
+        m_ptRBtnDown.x = GET_X_LPARAM(pMsg->lParam);
+        m_ptRBtnDown.y = GET_Y_LPARAM(pMsg->lParam);
 
-		CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(9);
+        CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(9);
 
-		UINT nSel = ((m_richSend.GetSelectionType() != SEL_EMPTY) ? 0 : MF_GRAYED);
-		menuPopup.EnableMenuItem(ID_MENU_CUT, MF_BYCOMMAND|nSel);
-		menuPopup.EnableMenuItem(ID_MENU_COPY, MF_BYCOMMAND|nSel);
+        UINT nSel = ((m_richSend.GetSelectionType() != SEL_EMPTY) ? 0 : MF_GRAYED);
+        menuPopup.EnableMenuItem(ID_MENU_CUT, MF_BYCOMMAND | nSel);
+        menuPopup.EnableMenuItem(ID_MENU_COPY, MF_BYCOMMAND | nSel);
 
-		UINT nPaste = (m_richSend.CanPaste() ? 0 : MF_GRAYED) ;
-		menuPopup.EnableMenuItem(ID_MENU_PASTE, MF_BYCOMMAND|nPaste);
+        UINT nPaste = (m_richSend.CanPaste() ? 0 : MF_GRAYED);
+        menuPopup.EnableMenuItem(ID_MENU_PASTE, MF_BYCOMMAND | nPaste);
 
-		IImageOle* pImageOle = NULL;
-		BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, m_ptRBtnDown, &pImageOle);
-		UINT nSaveAs = ((bRet && pImageOle != NULL) ? 0 : MF_GRAYED) ;
-		menuPopup.EnableMenuItem(ID_MENU_SAVEAS, MF_BYCOMMAND|nSaveAs);
-		if (pImageOle != NULL)
-			pImageOle->Release();
+        IImageOle* pImageOle = NULL;
+        BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, m_ptRBtnDown, &pImageOle);
+        UINT nSaveAs = ((bRet && pImageOle != NULL) ? 0 : MF_GRAYED);
+        menuPopup.EnableMenuItem(ID_MENU_SAVEAS, MF_BYCOMMAND | nSaveAs);
+        if (pImageOle != NULL)
+            pImageOle->Release();
 
-		menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-			pMsg->pt.x, pMsg->pt.y, m_hWnd, NULL);
-	}
-	else if (pMsg->hwnd == m_richRecv.m_hWnd)
-	{
-		m_hRBtnDownWnd = pMsg->hwnd;
-		m_ptRBtnDown.x = GET_X_LPARAM(pMsg->lParam);
-		m_ptRBtnDown.y = GET_Y_LPARAM(pMsg->lParam);
+        menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
+            pMsg->pt.x, pMsg->pt.y, m_hWnd, NULL);
+    } else if (pMsg->hwnd == m_richRecv.m_hWnd)
+    {
+        m_hRBtnDownWnd = pMsg->hwnd;
+        m_ptRBtnDown.x = GET_X_LPARAM(pMsg->lParam);
+        m_ptRBtnDown.y = GET_Y_LPARAM(pMsg->lParam);
 
-		CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(10);
+        CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(10);
 
-		UINT nSel = ((m_richRecv.GetSelectionType() != SEL_EMPTY) ? 0 : MF_GRAYED);
-		menuPopup.EnableMenuItem(ID_MENU_COPY, MF_BYCOMMAND|nSel);
-		//menuPopup.EnableMenuItem(ID_MENU_CLEAR, MF_BYCOMMAND|nSel);
+        UINT nSel = ((m_richRecv.GetSelectionType() != SEL_EMPTY) ? 0 : MF_GRAYED);
+        menuPopup.EnableMenuItem(ID_MENU_COPY, MF_BYCOMMAND | nSel);
+        //menuPopup.EnableMenuItem(ID_MENU_CLEAR, MF_BYCOMMAND|nSel);
 
-		IImageOle* pImageOle = NULL;
-		BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, m_ptRBtnDown, &pImageOle);
-		UINT nSaveAs = ((bRet && pImageOle != NULL) ? 0 : MF_GRAYED) ;
-		menuPopup.EnableMenuItem(ID_MENU_SAVEAS, MF_BYCOMMAND|nSaveAs);
-		if (pImageOle != NULL)
-			pImageOle->Release();
+        IImageOle* pImageOle = NULL;
+        BOOL bRet = RichEdit_GetImageOle(pMsg->hwnd, m_ptRBtnDown, &pImageOle);
+        UINT nSaveAs = ((bRet && pImageOle != NULL) ? 0 : MF_GRAYED);
+        menuPopup.EnableMenuItem(ID_MENU_SAVEAS, MF_BYCOMMAND | nSaveAs);
+        if (pImageOle != NULL)
+            pImageOle->Release();
 
-		menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-			pMsg->pt.x, pMsg->pt.y, m_hWnd, NULL);
-	}
-	else if(pMsg->hwnd == m_richMsgLog.m_hWnd)
-	{
-		CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(11);
-		menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pMsg->pt.x, pMsg->pt.y, m_hWnd, NULL);
-	}
+        menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
+            pMsg->pt.x, pMsg->pt.y, m_hWnd, NULL);
+    } else if (pMsg->hwnd == m_richMsgLog.m_hWnd)
+    {
+        CSkinMenu menuPopup = m_SkinMenu.GetSubMenu(11);
+        menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pMsg->pt.x, pMsg->pt.y, m_hWnd, NULL);
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
-// »ñÈ¡ºÃÓÑĞÅÏ¢Ö¸Õë
+// è·å–å¥½å‹ä¿¡æ¯æŒ‡é’ˆ
 CBuddyInfo* CBuddyChatDlg::GetBuddyInfoPtr()
 {
-	if (m_lpFMGClient != NULL)
-	{
-		CBuddyList* lpBuddyList = m_lpFMGClient->GetBuddyList();
-		if (lpBuddyList != NULL)
-			return lpBuddyList->GetBuddy(m_nUTalkUin);
-	}
-	return NULL;
+    if (m_lpFMGClient != NULL)
+    {
+        CBuddyList* lpBuddyList = m_lpFMGClient->GetBuddyList();
+        if (lpBuddyList != NULL)
+            return lpBuddyList->GetBuddy(m_nUTalkUin);
+    }
+    return NULL;
 }
 
-// »ñÈ¡ÓÃ»§ĞÅÏ¢Ö¸Õë
+// è·å–ç”¨æˆ·ä¿¡æ¯æŒ‡é’ˆ
 CBuddyInfo* CBuddyChatDlg::GetUserInfoPtr()
 {
-	if (m_lpFMGClient != NULL)
-		return m_lpFMGClient->GetUserInfo();
-	else
-		return NULL;
+    if (m_lpFMGClient != NULL)
+        return m_lpFMGClient->GetUserInfo();
+    else
+        return NULL;
 }
 
-// ¸üĞÂÊı¾İ
+// æ›´æ–°æ•°æ®
 void CBuddyChatDlg::UpdateData()
 {
-	CBuddyInfo* lpBuddyInfo = GetBuddyInfoPtr();
-	if (lpBuddyInfo != NULL)
-	{
-		m_nUTalkNumber = lpBuddyInfo->m_uUserID;
-		m_strBuddyName = lpBuddyInfo->m_strNickName.c_str();
-		
-		m_strBuddySign = lpBuddyInfo->m_strSign.c_str();
-		
-	}
+    CBuddyInfo* lpBuddyInfo = GetBuddyInfoPtr();
+    if (lpBuddyInfo != NULL)
+    {
+        m_nUTalkNumber = lpBuddyInfo->m_uUserID;
+        m_strBuddyName = lpBuddyInfo->m_strNickName.c_str();
 
-	CBuddyInfo* lpUserInfo = GetUserInfoPtr();
-	if (lpUserInfo != NULL)
-	{
-		/*m_nUserNumber = lpUserInfo->m_nUTalkNum;*/
-		m_strUserName = lpUserInfo->m_strNickName.c_str();
-	}
+        m_strBuddySign = lpBuddyInfo->m_strSign.c_str();
+
+    }
+
+    CBuddyInfo* lpUserInfo = GetUserInfoPtr();
+    if (lpUserInfo != NULL)
+    {
+        /*m_nUserNumber = lpUserInfo->m_nUTalkNum;*/
+        m_strUserName = lpUserInfo->m_strNickName.c_str();
+    }
 }
 
-// ¸üĞÂ¶Ô»°¿ò±êÌâÀ¸
+// æ›´æ–°å¯¹è¯æ¡†æ ‡é¢˜æ 
 void CBuddyChatDlg::UpdateDlgTitle()
 {
-	SetWindowText(m_strBuddyName);
+    SetWindowText(m_strBuddyName);
 }
 
-// ¸üĞÂºÃÓÑÃû³Æ¿Ø¼ş
+// æ›´æ–°å¥½å‹åç§°æ§ä»¶
 void CBuddyChatDlg::UpdateBuddyNameCtrl()
 {
-	CString strText;
-	strText.Format(_T("%s(%s)"), m_strBuddyName, m_lpFMGClient->m_UserMgr.GetAccountName(m_nUTalkUin).c_str());
-	m_lnkBuddyName.SetLabel(strText);
+    CString strText;
+    strText.Format(_T("%s(%s)"), m_strBuddyName, m_lpFMGClient->m_UserMgr.GetAccountName(m_nUTalkUin).c_str());
+    m_lnkBuddyName.SetLabel(strText);
 }
 
-// ¸üĞÂºÃÓÑÇ©Ãû¿Ø¼ş
+// æ›´æ–°å¥½å‹ç­¾åæ§ä»¶
 void CBuddyChatDlg::UpdateBuddySignCtrl()
 {
-	m_staBuddySign.SetWindowText(m_strBuddySign);
-	//TODO: ¼ÓÒ»¸ötooltip
-	//m_staBuddySign.SetTooltipText(m_strBuddySign);
+    m_staBuddySign.SetWindowText(m_strBuddySign);
+    //TODO: åŠ ä¸€ä¸ªtooltip
+    //m_staBuddySign.SetTooltipText(m_strBuddySign);
 }
 
-// ³õÊ¼»¯Top¹¤¾ßÀ¸
+// åˆå§‹åŒ–Topå·¥å…·æ 
 BOOL CBuddyChatDlg::InitTopToolBar()
 {
-	int nIndex = 0;
-	//int nIndex = m_tbTop.AddItem(101, STBI_STYLE_DROPDOWN);
-	//m_tbTop.SetItemSize(nIndex, 52, 40, 42, 10);
-	//m_tbTop.SetItemPadding(nIndex, 1);
-	//m_tbTop.SetItemToolTipText(nIndex, _T("¿ªÊ¼ÊÓÆµ»á»°"));
-	//m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbTop.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
-	//	_T("aio_toolbar_leftdown.png"), CRect(0,0,0,0));
-	//m_tbTop.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
-	//	_T("aio_toolbar_rightdown.png"), CRect(0,0,0,0));
-	//m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	//m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\video.png"));
+    int nIndex = 0;
+    //int nIndex = m_tbTop.AddItem(101, STBI_STYLE_DROPDOWN);
+    //m_tbTop.SetItemSize(nIndex, 52, 40, 42, 10);
+    //m_tbTop.SetItemPadding(nIndex, 1);
+    //m_tbTop.SetItemToolTipText(nIndex, _T("å¼€å§‹è§†é¢‘ä¼šè¯"));
+    //m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbTop.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
+    //	_T("aio_toolbar_leftdown.png"), CRect(0,0,0,0));
+    //m_tbTop.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
+    //	_T("aio_toolbar_rightdown.png"), CRect(0,0,0,0));
+    //m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    //m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\video.png"));
 
-	//nIndex = m_tbTop.AddItem(102, STBI_STYLE_DROPDOWN);
-	//m_tbTop.SetItemSize(nIndex, 52, 40, 42, 10);
-	//m_tbTop.SetItemPadding(nIndex, 1);
-	//m_tbTop.SetItemToolTipText(nIndex, _T("¿ªÊ¼ÓïÒô»á»°"));
-	//m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbTop.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
-	//	_T("aio_toolbar_leftdown.png"), CRect(0,0,0,0));
-	//m_tbTop.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
-	//	_T("aio_toolbar_rightdown.png"), CRect(0,0,0,0));
-	//m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	//m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\audio.png"));
+    //nIndex = m_tbTop.AddItem(102, STBI_STYLE_DROPDOWN);
+    //m_tbTop.SetItemSize(nIndex, 52, 40, 42, 10);
+    //m_tbTop.SetItemPadding(nIndex, 1);
+    //m_tbTop.SetItemToolTipText(nIndex, _T("å¼€å§‹è¯­éŸ³ä¼šè¯"));
+    //m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbTop.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
+    //	_T("aio_toolbar_leftdown.png"), CRect(0,0,0,0));
+    //m_tbTop.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
+    //	_T("aio_toolbar_rightdown.png"), CRect(0,0,0,0));
+    //m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    //m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\audio.png"));
 
-	nIndex = m_tbTop.AddItem(103, STBI_STYLE_DROPDOWN);
-	m_tbTop.SetItemSize(nIndex, 38, 28, 28, 10);
-	m_tbTop.SetItemPadding(nIndex, 1);
-	m_tbTop.SetItemToolTipText(nIndex, _T("´«ËÍÎÄ¼ş"));
-	m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	m_tbTop.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
-		_T("aio_toolbar_leftdown.png"), CRect(0,0,0,0));
-	m_tbTop.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
-		_T("aio_toolbar_rightdown.png"), CRect(0,0,0,0));
-	m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\sendfile.png"));
-
-	nIndex = m_tbTop.AddItem(104, STBI_STYLE_BUTTON);
+    nIndex = m_tbTop.AddItem(103, STBI_STYLE_DROPDOWN);
     m_tbTop.SetItemSize(nIndex, 38, 28, 28, 10);
-	m_tbTop.SetItemPadding(nIndex, 2);
-	m_tbTop.SetItemToolTipText(nIndex, _T("Ô¶³Ì×ÀÃæ"));
-	m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\remote_desktop.png"));
+    m_tbTop.SetItemPadding(nIndex, 1);
+    m_tbTop.SetItemToolTipText(nIndex, _T("ä¼ é€æ–‡ä»¶"));
+    m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    m_tbTop.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"),
+        _T("aio_toolbar_leftdown.png"), CRect(0, 0, 0, 0));
+    m_tbTop.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"),
+        _T("aio_toolbar_rightdown.png"), CRect(0, 0, 0, 0));
+    m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\sendfile.png"));
 
-	//nIndex = m_tbTop.AddItem(105, STBI_STYLE_BUTTON);
-	//m_tbTop.SetItemSize(nIndex, 36, 40);
-	//m_tbTop.SetItemPadding(nIndex, 2);
-	//m_tbTop.SetItemToolTipText(nIndex, _T("´´½¨ÌÖÂÛ×é"));
-	//m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\create_disc_group.png"));
+    nIndex = m_tbTop.AddItem(104, STBI_STYLE_BUTTON);
+    m_tbTop.SetItemSize(nIndex, 38, 28, 28, 10);
+    m_tbTop.SetItemPadding(nIndex, 2);
+    m_tbTop.SetItemToolTipText(nIndex, _T("è¿œç¨‹æ¡Œé¢"));
+    m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\remote_desktop.png"));
 
-	//nIndex = m_tbTop.AddItem(106, STBI_STYLE_WHOLEDROPDOWN);
-	//m_tbTop.SetItemSize(nIndex, 44, 40, 34, 10);
-	//m_tbTop.SetItemPadding(nIndex, 2);
-	//m_tbTop.SetItemToolTipText(nIndex, _T("¾Ù±¨"));
-	//m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	//m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\report.png"));
+    //nIndex = m_tbTop.AddItem(105, STBI_STYLE_BUTTON);
+    //m_tbTop.SetItemSize(nIndex, 36, 40);
+    //m_tbTop.SetItemPadding(nIndex, 2);
+    //m_tbTop.SetItemToolTipText(nIndex, _T("åˆ›å»ºè®¨è®ºç»„"));
+    //m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\create_disc_group.png"));
 
-	//nIndex = m_tbTop.AddItem(107, STBI_STYLE_WHOLEDROPDOWN);
-	//m_tbTop.SetItemSize(nIndex, 44, 40, 34, 10);
-	//m_tbTop.SetItemPadding(nIndex, 2);
-	//m_tbTop.SetItemToolTipText(nIndex, _T("Ó¦ÓÃ"));
-	//m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	//m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\app.png"));
+    //nIndex = m_tbTop.AddItem(106, STBI_STYLE_WHOLEDROPDOWN);
+    //m_tbTop.SetItemSize(nIndex, 44, 40, 34, 10);
+    //m_tbTop.SetItemPadding(nIndex, 2);
+    //m_tbTop.SetItemToolTipText(nIndex, _T("ä¸¾æŠ¥"));
+    //m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    //m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\report.png"));
 
-	//nIndex = m_tbTop.AddItem(108, STBI_STYLE_BUTTON);
-	//m_tbTop.SetItemSize(nIndex, 36, 40);
-	//m_tbTop.SetItemPadding(nIndex, 2);
-	//m_tbTop.SetItemToolTipText(nIndex, _T("Ô¶³ÌĞ­Öú"));
-	//m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\remote_assistance.png"));
+    //nIndex = m_tbTop.AddItem(107, STBI_STYLE_WHOLEDROPDOWN);
+    //m_tbTop.SetItemSize(nIndex, 44, 40, 34, 10);
+    //m_tbTop.SetItemPadding(nIndex, 2);
+    //m_tbTop.SetItemToolTipText(nIndex, _T("åº”ç”¨"));
+    //m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbTop.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    //m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\app.png"));
 
-	m_tbTop.SetLeftTop(2, 2);
-	m_tbTop.SetTransparent(TRUE, m_SkinDlg.GetBgDC());
-	//m_tbTop.SetBgPic(_T("BuddyTopToolBar\\buddyChatDlg_tbTopBg.png"), CRect(0, 0, 0, 0));
+    //nIndex = m_tbTop.AddItem(108, STBI_STYLE_BUTTON);
+    //m_tbTop.SetItemSize(nIndex, 36, 40);
+    //m_tbTop.SetItemPadding(nIndex, 2);
+    //m_tbTop.SetItemToolTipText(nIndex, _T("è¿œç¨‹ååŠ©"));
+    //m_tbTop.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbTop.SetItemIconPic(nIndex, _T("BuddyTopToolBar\\remote_assistance.png"));
 
-	CRect rcTopToolBar(3, 70, CHATDLG_WIDTH-3, 102);
-	m_tbTop.Create(m_hWnd, rcTopToolBar, NULL, WS_CHILD|WS_VISIBLE, NULL, ID_TOOLBAR_TOP);
-	
-	return TRUE;
+    m_tbTop.SetLeftTop(2, 2);
+    m_tbTop.SetTransparent(TRUE, m_SkinDlg.GetBgDC());
+    //m_tbTop.SetBgPic(_T("BuddyTopToolBar\\buddyChatDlg_tbTopBg.png"), CRect(0, 0, 0, 0));
+
+    CRect rcTopToolBar(3, 70, CHATDLG_WIDTH - 3, 102);
+    m_tbTop.Create(m_hWnd, rcTopToolBar, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_TOOLBAR_TOP);
+
+    return TRUE;
 }
 
-// ³õÊ¼»¯Middle¹¤¾ßÀ¸
+// åˆå§‹åŒ–Middleå·¥å…·æ 
 BOOL CBuddyChatDlg::InitMidToolBar()
 {
-	int nIndex = m_tbMid.AddItem(201, STBI_STYLE_BUTTON|STBI_STYLE_CHECK);
-	m_tbMid.SetItemSize(nIndex, 30, 27);
-	m_tbMid.SetItemPadding(nIndex, 1);
-	m_tbMid.SetItemToolTipText(nIndex, _T("×ÖÌåÑ¡Ôñ¹¤¾ßÀ¸"));
-	m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_font.png"));
+    int nIndex = m_tbMid.AddItem(201, STBI_STYLE_BUTTON | STBI_STYLE_CHECK);
+    m_tbMid.SetItemSize(nIndex, 30, 27);
+    m_tbMid.SetItemPadding(nIndex, 1);
+    m_tbMid.SetItemToolTipText(nIndex, _T("å­—ä½“é€‰æ‹©å·¥å…·æ "));
+    m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_font.png"));
 
-	nIndex = m_tbMid.AddItem(202, STBI_STYLE_BUTTON|STBI_STYLE_CHECK);
-	m_tbMid.SetItemSize(nIndex, 30, 27);
-	m_tbMid.SetItemPadding(nIndex, 1);
-	m_tbMid.SetItemToolTipText(nIndex, _T("Ñ¡Ôñ±íÇé"));
-	m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_face.png"));
+    nIndex = m_tbMid.AddItem(202, STBI_STYLE_BUTTON | STBI_STYLE_CHECK);
+    m_tbMid.SetItemSize(nIndex, 30, 27);
+    m_tbMid.SetItemPadding(nIndex, 1);
+    m_tbMid.SetItemToolTipText(nIndex, _T("é€‰æ‹©è¡¨æƒ…"));
+    m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_face.png"));
 
-	//nIndex = m_tbMid.AddItem(203, STBI_STYLE_BUTTON);
-	//m_tbMid.SetItemSize(nIndex, 24, 20);
-	//m_tbMid.SetItemPadding(nIndex, 1);
-	//m_tbMid.SetItemToolTipText(nIndex, _T("»áÔ±Ä§·¨±íÇé/³¬¼¶±íÇé/Í¿Ñ»±íÇé/³èÎïìÅ"));
-	//m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_richface.png"));
+    //nIndex = m_tbMid.AddItem(203, STBI_STYLE_BUTTON);
+    //m_tbMid.SetItemSize(nIndex, 24, 20);
+    //m_tbMid.SetItemPadding(nIndex, 1);
+    //m_tbMid.SetItemToolTipText(nIndex, _T("ä¼šå‘˜é­”æ³•è¡¨æƒ…/è¶…çº§è¡¨æƒ…/æ¶‚é¸¦è¡¨æƒ…/å® ç‰©ç‚«"));
+    //m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_richface.png"));
 
-	nIndex = m_tbMid.AddItem(204, STBI_STYLE_BUTTON);
-	m_tbMid.SetItemSize(nIndex, 30, 27);
-	m_tbMid.SetItemPadding(nIndex, 1);
-	m_tbMid.SetItemToolTipText(nIndex, _T("ÏòºÃÓÑ·¢ËÍ´°¿Ú¶¶¶¯"));
-	m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_twitter.png"));
+    nIndex = m_tbMid.AddItem(204, STBI_STYLE_BUTTON);
+    m_tbMid.SetItemSize(nIndex, 30, 27);
+    m_tbMid.SetItemPadding(nIndex, 1);
+    m_tbMid.SetItemToolTipText(nIndex, _T("å‘å¥½å‹å‘é€çª—å£æŠ–åŠ¨"));
+    m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_twitter.png"));
 
-	//nIndex = m_tbMid.AddItem(205, STBI_STYLE_BUTTON);
-	//m_tbMid.SetItemSize(nIndex, 24, 20);
-	//m_tbMid.SetItemPadding(nIndex, 1);
-	//m_tbMid.SetItemToolTipText(nIndex, _T("Ñ¡Ôñ¶¯Ò»ÏÂ±íÇé"));
-	//m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_flirtationface.png"));
+    //nIndex = m_tbMid.AddItem(205, STBI_STYLE_BUTTON);
+    //m_tbMid.SetItemSize(nIndex, 24, 20);
+    //m_tbMid.SetItemPadding(nIndex, 1);
+    //m_tbMid.SetItemToolTipText(nIndex, _T("é€‰æ‹©åŠ¨ä¸€ä¸‹è¡¨æƒ…"));
+    //m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_flirtationface.png"));
 
-	//nIndex = m_tbMid.AddItem(206, STBI_STYLE_BUTTON|STBI_STYLE_CHECK);
-	//m_tbMid.SetItemSize(nIndex, 24, 20);
-	//m_tbMid.SetItemPadding(nIndex, 2);
-	//m_tbMid.SetItemToolTipText(nIndex, _T("¶à¹¦ÄÜ¸¨ÖúÊäÈë"));
-	//m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\UTalkIme.png"));
+    //nIndex = m_tbMid.AddItem(206, STBI_STYLE_BUTTON|STBI_STYLE_CHECK);
+    //m_tbMid.SetItemSize(nIndex, 24, 20);
+    //m_tbMid.SetItemPadding(nIndex, 2);
+    //m_tbMid.SetItemToolTipText(nIndex, _T("å¤šåŠŸèƒ½è¾…åŠ©è¾“å…¥"));
+    //m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\UTalkIme.png"));
 
-	//nIndex = m_tbMid.AddItem(207, STBI_STYLE_SEPARTOR);
-	//m_tbMid.SetItemSize(nIndex, 4, 27);
-	//m_tbMid.SetItemPadding(nIndex, 1);
-	//m_tbMid.SetItemSepartorPic(nIndex, _T("aio_qzonecutline_normal.png"));
+    //nIndex = m_tbMid.AddItem(207, STBI_STYLE_SEPARTOR);
+    //m_tbMid.SetItemSize(nIndex, 4, 27);
+    //m_tbMid.SetItemPadding(nIndex, 1);
+    //m_tbMid.SetItemSepartorPic(nIndex, _T("aio_qzonecutline_normal.png"));
 
-	nIndex = m_tbMid.AddItem(208, STBI_STYLE_BUTTON);
-	m_tbMid.SetItemSize(nIndex, 30, 27);
-	m_tbMid.SetItemPadding(nIndex, 1);
-	m_tbMid.SetItemToolTipText(nIndex, _T("·¢ËÍÍ¼Æ¬"));
-	m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_sendpic.png"));
+    nIndex = m_tbMid.AddItem(208, STBI_STYLE_BUTTON);
+    m_tbMid.SetItemSize(nIndex, 30, 27);
+    m_tbMid.SetItemPadding(nIndex, 1);
+    m_tbMid.SetItemToolTipText(nIndex, _T("å‘é€å›¾ç‰‡"));
+    m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_sendpic.png"));
 
 
-	//nIndex = m_tbMid.AddItem(209, STBI_STYLE_BUTTON);
-	//m_tbMid.SetItemSize(nIndex, 24, 20);
-	//m_tbMid.SetItemPadding(nIndex, 1);
-	//m_tbMid.SetItemToolTipText(nIndex, _T("µã¸è"));
-	//m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\musicsharebtn20.png"));
+    //nIndex = m_tbMid.AddItem(209, STBI_STYLE_BUTTON);
+    //m_tbMid.SetItemSize(nIndex, 24, 20);
+    //m_tbMid.SetItemPadding(nIndex, 1);
+    //m_tbMid.SetItemToolTipText(nIndex, _T("ç‚¹æ­Œ"));
+    //m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\musicsharebtn20.png"));
 
-	//nIndex = m_tbMid.AddItem(210, STBI_STYLE_BUTTON);
-	//m_tbMid.SetItemSize(nIndex, 24, 20);
-	//m_tbMid.SetItemPadding(nIndex, 1);
-	//m_tbMid.SetItemToolTipText(nIndex, _T("¸øºÃÓÑËÍ·İÀñÎï£¬ËÍ·İ¾ªÏ²"));
-	//m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\present.png"));
+    //nIndex = m_tbMid.AddItem(210, STBI_STYLE_BUTTON);
+    //m_tbMid.SetItemSize(nIndex, 24, 20);
+    //m_tbMid.SetItemPadding(nIndex, 1);
+    //m_tbMid.SetItemToolTipText(nIndex, _T("ç»™å¥½å‹é€ä»½ç¤¼ç‰©ï¼Œé€ä»½æƒŠå–œ"));
+    //m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\present.png"));
 
-	nIndex = m_tbMid.AddItem(211, STBI_STYLE_BUTTON);
-	m_tbMid.SetItemSize(nIndex, 30, 27, 27, 0);
-	//m_tbMid.SetItemSize(nIndex, 30, 27);
-	m_tbMid.SetItemPadding(nIndex, 1);
-	m_tbMid.SetItemToolTipText(nIndex, _T("ÆÁÄ»½ØÍ¼"));
-	m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-		_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
-	//	_T("aio_toolbar_leftdown.png"), CRect(1,0,0,0));
-	//m_tbMid.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
-	//	_T("aio_toolbar_rightdown.png"), CRect(0,0,1,0));
-	//m_tbMid.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_cut.png"));
+    nIndex = m_tbMid.AddItem(211, STBI_STYLE_BUTTON);
+    m_tbMid.SetItemSize(nIndex, 30, 27, 27, 0);
+    //m_tbMid.SetItemSize(nIndex, 30, 27);
+    m_tbMid.SetItemPadding(nIndex, 1);
+    m_tbMid.SetItemToolTipText(nIndex, _T("å±å¹•æˆªå›¾"));
+    m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"),
+        _T("aio_toolbar_down.png"), CRect(3, 3, 3, 3));
+    //m_tbMid.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
+    //	_T("aio_toolbar_leftdown.png"), CRect(1,0,0,0));
+    //m_tbMid.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
+    //	_T("aio_toolbar_rightdown.png"), CRect(0,0,1,0));
+    //m_tbMid.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_cut.png"));
 
-	//nIndex = m_tbMid.AddItem(212, STBI_STYLE_DROPDOWN);
-	//m_tbMid.SetItemSize(nIndex, 31, 20, 23, 8);
-	//m_tbMid.SetItemPadding(nIndex, 2);
-	//m_tbMid.SetItemToolTipText(nIndex, _T("»®´ÊËÑË÷"));
-	//m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
-	//	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
-	//	_T("aio_toolbar_leftdown.png"), CRect(1,0,0,0));
-	//m_tbMid.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
-	//	_T("aio_toolbar_rightdown.png"), CRect(0,0,1,0));
-	//m_tbMid.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	//m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\SoSo.png"));
+    //nIndex = m_tbMid.AddItem(212, STBI_STYLE_DROPDOWN);
+    //m_tbMid.SetItemSize(nIndex, 31, 20, 23, 8);
+    //m_tbMid.SetItemPadding(nIndex, 2);
+    //m_tbMid.SetItemToolTipText(nIndex, _T("åˆ’è¯æœç´¢"));
+    //m_tbMid.SetItemBgPic(nIndex, NULL, _T("aio_toolbar_highligh.png"), 
+    //	_T("aio_toolbar_down.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemLeftBgPic(nIndex, _T("aio_toolbar_leftnormal.png"), 
+    //	_T("aio_toolbar_leftdown.png"), CRect(1,0,0,0));
+    //m_tbMid.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
+    //	_T("aio_toolbar_rightdown.png"), CRect(0,0,1,0));
+    //m_tbMid.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
+    //m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\SoSo.png"));
 
-	//nIndex = m_tbMid.AddItem(213, STBI_STYLE_SEPARTOR);
-	//m_tbMid.SetItemSize(nIndex, 4, 27);
-	//m_tbMid.SetItemPadding(nIndex, 1);
-	//m_tbMid.SetItemSepartorPic(nIndex, _T("aio_qzonecutline_normal.png"));
+    //nIndex = m_tbMid.AddItem(213, STBI_STYLE_SEPARTOR);
+    //m_tbMid.SetItemSize(nIndex, 4, 27);
+    //m_tbMid.SetItemPadding(nIndex, 1);
+    //m_tbMid.SetItemSepartorPic(nIndex, _T("aio_qzonecutline_normal.png"));
 
-	nIndex = m_tbMid.AddItem(214, STBI_STYLE_BUTTON);
-	m_nMsgLogIndexInToolbar = nIndex;
-	m_tbMid.SetItemSize(nIndex, 90, 27, 27, 0);
-	m_tbMid.SetItemPadding(nIndex, 1);
-	m_tbMid.SetItemMargin(nIndex, CHATDLG_WIDTH-235, 0);
-	m_tbMid.SetItemText(nIndex, _T(">>"));
-	m_tbMid.SetItemToolTipText(nIndex, _T("µã»÷²é¿´ÏûÏ¢¼ÇÂ¼"));
-	m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_msglog.png"));
-	//m_tbMid.SetItemLeftBgPic(nIndex, _T("MidToolBar\\aio_quickbar_msglog.png"), _T("MidToolBar\\aio_quickbar_msglog.png"), CRect(3,3,3,3));
-	//m_tbMid.SetItemLeftBgPic(nIndex, _T("Button\\btn_msglog_down.png"), _T("Button\\btn_msglog_down.png"), CRect(1,0,0,0));
-	//m_tbMid.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
-	//	_T("aio_toolbar_rightdown.png"), CRect(0,0,1,0));
-	//m_tbMid.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
-	
+    nIndex = m_tbMid.AddItem(214, STBI_STYLE_BUTTON);
+    m_nMsgLogIndexInToolbar = nIndex;
+    m_tbMid.SetItemSize(nIndex, 90, 27, 27, 0);
+    m_tbMid.SetItemPadding(nIndex, 1);
+    m_tbMid.SetItemMargin(nIndex, CHATDLG_WIDTH - 235, 0);
+    m_tbMid.SetItemText(nIndex, _T(">>"));
+    m_tbMid.SetItemToolTipText(nIndex, _T("ç‚¹å‡»æŸ¥çœ‹æ¶ˆæ¯è®°å½•"));
+    m_tbMid.SetItemIconPic(nIndex, _T("MidToolBar\\aio_quickbar_msglog.png"));
+    //m_tbMid.SetItemLeftBgPic(nIndex, _T("MidToolBar\\aio_quickbar_msglog.png"), _T("MidToolBar\\aio_quickbar_msglog.png"), CRect(3,3,3,3));
+    //m_tbMid.SetItemLeftBgPic(nIndex, _T("Button\\btn_msglog_down.png"), _T("Button\\btn_msglog_down.png"), CRect(1,0,0,0));
+    //m_tbMid.SetItemRightBgPic(nIndex, _T("aio_toolbar_rightnormal.png"), 
+    //	_T("aio_toolbar_rightdown.png"), CRect(0,0,1,0));
+    //m_tbMid.SetItemArrowPic(nIndex, _T("aio_littletoolbar_arrow.png"));
 
-	m_tbMid.SetLeftTop(2, 2);
-	m_tbMid.SetBgPic(_T("MidToolBar\\bg.png"), CRect(0,0,0,0));
 
-	CRect rcMidToolBar(2, CHATDLG_HEIGHT-168, CHATDLG_WIDTH-2, CHATDLG_HEIGHT-136);
-	m_tbMid.Create(m_hWnd, rcMidToolBar, NULL, WS_CHILD|WS_VISIBLE, NULL, ID_TOOLBAR_MID);
+    m_tbMid.SetLeftTop(2, 2);
+    m_tbMid.SetBgPic(_T("MidToolBar\\bg.png"), CRect(0, 0, 0, 0));
 
-	return TRUE;
+    CRect rcMidToolBar(2, CHATDLG_HEIGHT - 168, CHATDLG_WIDTH - 2, CHATDLG_HEIGHT - 136);
+    m_tbMid.Create(m_hWnd, rcMidToolBar, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_TOOLBAR_MID);
+
+    return TRUE;
 }
 
-// ³õÊ¼»¯IRichEditOleCallback½Ó¿Ú
+// åˆå§‹åŒ–IRichEditOleCallbackæ¥å£
 BOOL CBuddyChatDlg::InitRichEditOleCallback()
 {
-	IRichEditOleCallback2* pRichEditOleCallback2 = NULL;
-	HRESULT hr = ::CoCreateInstance(CLSID_ImageOle, NULL, CLSCTX_INPROC_SERVER,
-		__uuidof(IRichEditOleCallback2), (void**)&pRichEditOleCallback2);
-	if (SUCCEEDED(hr))
-	{
-		pRichEditOleCallback2->SetNotifyHwnd(m_hWnd);
-		pRichEditOleCallback2->SetRichEditHwnd(m_richRecv.m_hWnd);
-		m_richRecv.SetOleCallback(pRichEditOleCallback2);
-		pRichEditOleCallback2->Release();
-	}
+    IRichEditOleCallback2* pRichEditOleCallback2 = NULL;
+    HRESULT hr = ::CoCreateInstance(CLSID_ImageOle, NULL, CLSCTX_INPROC_SERVER,
+        __uuidof(IRichEditOleCallback2), (void**)&pRichEditOleCallback2);
+    if (SUCCEEDED(hr))
+    {
+        pRichEditOleCallback2->SetNotifyHwnd(m_hWnd);
+        pRichEditOleCallback2->SetRichEditHwnd(m_richRecv.m_hWnd);
+        m_richRecv.SetOleCallback(pRichEditOleCallback2);
+        pRichEditOleCallback2->Release();
+    }
 
-	pRichEditOleCallback2 = NULL;
-	hr = ::CoCreateInstance(CLSID_ImageOle, NULL, CLSCTX_INPROC_SERVER,
-		__uuidof(IRichEditOleCallback2), (void**)&pRichEditOleCallback2);
-	if (SUCCEEDED(hr))
-	{
-		pRichEditOleCallback2->SetNotifyHwnd(m_hWnd);
-		pRichEditOleCallback2->SetRichEditHwnd(m_richSend.m_hWnd);
-		m_richSend.SetOleCallback(pRichEditOleCallback2);
-		pRichEditOleCallback2->Release();
-	}
+    pRichEditOleCallback2 = NULL;
+    hr = ::CoCreateInstance(CLSID_ImageOle, NULL, CLSCTX_INPROC_SERVER,
+        __uuidof(IRichEditOleCallback2), (void**)&pRichEditOleCallback2);
+    if (SUCCEEDED(hr))
+    {
+        pRichEditOleCallback2->SetNotifyHwnd(m_hWnd);
+        pRichEditOleCallback2->SetRichEditHwnd(m_richSend.m_hWnd);
+        m_richSend.SetOleCallback(pRichEditOleCallback2);
+        pRichEditOleCallback2->Release();
+    }
 
-	pRichEditOleCallback2 = NULL;
-	hr = ::CoCreateInstance(CLSID_ImageOle, NULL, CLSCTX_INPROC_SERVER,
-		__uuidof(IRichEditOleCallback2), (void**)&pRichEditOleCallback2);
-	if (SUCCEEDED(hr))
-	{
-		pRichEditOleCallback2->SetNotifyHwnd(m_hWnd);
-		pRichEditOleCallback2->SetRichEditHwnd(m_richMsgLog.m_hWnd);
-		m_richMsgLog.SetOleCallback(pRichEditOleCallback2);
-		pRichEditOleCallback2->Release();
-	}
+    pRichEditOleCallback2 = NULL;
+    hr = ::CoCreateInstance(CLSID_ImageOle, NULL, CLSCTX_INPROC_SERVER,
+        __uuidof(IRichEditOleCallback2), (void**)&pRichEditOleCallback2);
+    if (SUCCEEDED(hr))
+    {
+        pRichEditOleCallback2->SetNotifyHwnd(m_hWnd);
+        pRichEditOleCallback2->SetRichEditHwnd(m_richMsgLog.m_hWnd);
+        m_richMsgLog.SetOleCallback(pRichEditOleCallback2);
+        pRichEditOleCallback2->Release();
+    }
 
-	return SUCCEEDED(hr);
+    return SUCCEEDED(hr);
 }
 
 
-// ³õÊ¼»¯TabÀ¸
+// åˆå§‹åŒ–Tabæ 
 BOOL CBuddyChatDlg::InitRightTabWindow()
 {
-	CRect rcRightTabCtrl(CHATDLG_WIDTH, 70, CHATDLG_WIDTH-3, 102);
-	//m_RightTabCtrl.Create(m_hWnd, rcRightTabCtrl, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_TABCTRL_CHAT, NULL);
-	//m_RightTabCtrl.SetTransparent(TRUE, m_SkinDlg.GetBgDC());
-	//m_RightTabCtrl.ShowWindow(SW_HIDE);
+    CRect rcRightTabCtrl(CHATDLG_WIDTH, 70, CHATDLG_WIDTH - 3, 102);
+    //m_RightTabCtrl.Create(m_hWnd, rcRightTabCtrl, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_TABCTRL_CHAT, NULL);
+    //m_RightTabCtrl.SetTransparent(TRUE, m_SkinDlg.GetBgDC());
+    //m_RightTabCtrl.ShowWindow(SW_HIDE);
 
 
-	//long nWidth = 80;
-	//long nWidthClose = 21;
+    //long nWidth = 80;
+    //long nWidthClose = 21;
 
-	//int nIndex = m_RightTabCtrl.AddItem(301, STCI_STYLE_DROPDOWN);
-	//m_RightTabCtrl.SetItemSize(nIndex, nWidth, 21, nWidth - nWidthClose, 20);
-	//m_RightTabCtrl.SetItemText(nIndex, _T("ÏûÏ¢¼ÇÂ¼"));
-	//m_RightTabCtrl.SetCurSel(0);
+    //int nIndex = m_RightTabCtrl.AddItem(301, STCI_STYLE_DROPDOWN);
+    //m_RightTabCtrl.SetItemSize(nIndex, nWidth, 21, nWidth - nWidthClose, 20);
+    //m_RightTabCtrl.SetItemText(nIndex, _T("æ¶ˆæ¯è®°å½•"));
+    //m_RightTabCtrl.SetCurSel(0);
 
-	//nIndex = m_RightTabCtrl.AddItem(302, STCI_STYLE_DROPDOWN);
-	//m_RightTabCtrl.SetItemSize(nIndex, nWidth, 21, nWidth - nWidthClose, 20);
-	//m_RightTabCtrl.SetItemText(nIndex, _T("´«ËÍÎÄ¼ş"));
-	//m_RightTabCtrl.SetItemVisible(nIndex, FALSE);
+    //nIndex = m_RightTabCtrl.AddItem(302, STCI_STYLE_DROPDOWN);
+    //m_RightTabCtrl.SetItemSize(nIndex, nWidth, 21, nWidth - nWidthClose, 20);
+    //m_RightTabCtrl.SetItemText(nIndex, _T("ä¼ é€æ–‡ä»¶"));
+    //m_RightTabCtrl.SetItemVisible(nIndex, FALSE);
 
-	// ÏûÏ¢¼ÇÂ¼¸»ÎÄ±¾¶Ô»°¿ò
-	CRect rcMsgLog;
-	rcMsgLog.left = rcRightTabCtrl.left;
-	rcMsgLog.top = rcRightTabCtrl.top + 30;
-	rcMsgLog.right = rcRightTabCtrl.right;
-	rcMsgLog.bottom = rcRightTabCtrl.bottom+300;
-	DWORD dwStyle = WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS|ES_MULTILINE|ES_AUTOVSCROLL|WS_VSCROLL|ES_WANTRETURN;
-	m_richMsgLog.Create(m_hWnd, rcMsgLog, NULL, dwStyle, WS_EX_TRANSPARENT, ID_RICHEDIT_MSGLOG);
-	m_richMsgLog.SetTransparent(FALSE, m_SkinDlg.GetBgDC());
-	m_richMsgLog.SetAutoURLDetect();
-	m_richMsgLog.SetReadOnly();
-	//m_richMsgLog.ShowWindow(SW_HIDE);
-	
-	CRect rcTabMgr(CHATDLG_WIDTH-1, 69, CHATDLG_WIDTH+RIGHT_CHAT_WINDOW_WIDTH-2, 101);
-	m_TabMgr.Create(m_hWnd, rcTabMgr, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_CHAT_TAB_MGR, NULL);
-	m_TabMgr.ShowWindow(SW_HIDE);
+    // æ¶ˆæ¯è®°å½•å¯Œæ–‡æœ¬å¯¹è¯æ¡†
+    CRect rcMsgLog;
+    rcMsgLog.left = rcRightTabCtrl.left;
+    rcMsgLog.top = rcRightTabCtrl.top + 30;
+    rcMsgLog.right = rcRightTabCtrl.right;
+    rcMsgLog.bottom = rcRightTabCtrl.bottom + 300;
+    DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN;
+    m_richMsgLog.Create(m_hWnd, rcMsgLog, NULL, dwStyle, WS_EX_TRANSPARENT, ID_RICHEDIT_MSGLOG);
+    m_richMsgLog.SetTransparent(FALSE, m_SkinDlg.GetBgDC());
+    m_richMsgLog.SetAutoURLDetect();
+    m_richMsgLog.SetReadOnly();
+    //m_richMsgLog.ShowWindow(SW_HIDE);
 
-	return TRUE;
+    CRect rcTabMgr(CHATDLG_WIDTH - 1, 69, CHATDLG_WIDTH + RIGHT_CHAT_WINDOW_WIDTH - 2, 101);
+    m_TabMgr.Create(m_hWnd, rcTabMgr, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_CHAT_TAB_MGR, NULL);
+    m_TabMgr.ShowWindow(SW_HIDE);
+
+    return TRUE;
 }
 
 void CBuddyChatDlg::ShowMsgLogButtons(BOOL bShow)
 {
-	DWORD dwFlag = (bShow ? SW_SHOW : SW_HIDE); 
-	
-	m_btnFirstMsgLog.ShowWindow(dwFlag);
-	m_btnPrevMsgLog.ShowWindow(dwFlag);
-	m_staMsgLogPage.ShowWindow(dwFlag);
-	m_btnNextMsgLog.ShowWindow(dwFlag);
-	m_btnLastMsgLog.ShowWindow(dwFlag);
+    DWORD dwFlag = (bShow ? SW_SHOW : SW_HIDE);
+
+    m_btnFirstMsgLog.ShowWindow(dwFlag);
+    m_btnPrevMsgLog.ShowWindow(dwFlag);
+    m_staMsgLogPage.ShowWindow(dwFlag);
+    m_btnNextMsgLog.ShowWindow(dwFlag);
+    m_btnLastMsgLog.ShowWindow(dwFlag);
 }
 
 void CBuddyChatDlg::InitFileTransferCtrl()
 {
-	HDC hDlgBgDC = m_SkinDlg.GetBgDC();
+    HDC hDlgBgDC = m_SkinDlg.GetBgDC();
 
-	CRect rcTabMgr;
-	m_TabMgr.GetClientRect(&rcTabMgr);
+    CRect rcTabMgr;
+    m_TabMgr.GetClientRect(&rcTabMgr);
 
-	CRect rcClient;
-	GetClientRect(&rcClient);
+    CRect rcClient;
+    GetClientRect(&rcClient);
 
-	CRect rcFileTransferCtrl(rcTabMgr.left, rcTabMgr.bottom, rcTabMgr.right, rcClient.bottom);
-	m_FileTransferCtrl.Create(m_hWnd, rcFileTransferCtrl, NULL, WS_CHILD|WS_VISIBLE, NULL, ID_FILE_TRANSFER);
-	m_FileTransferCtrl.SetTransparent(TRUE, hDlgBgDC);
-	
-	
-	ShowFileTransferCtrl(FALSE);
+    CRect rcFileTransferCtrl(rcTabMgr.left, rcTabMgr.bottom, rcTabMgr.right, rcClient.bottom);
+    m_FileTransferCtrl.Create(m_hWnd, rcFileTransferCtrl, NULL, WS_CHILD | WS_VISIBLE, NULL, ID_FILE_TRANSFER);
+    m_FileTransferCtrl.SetTransparent(TRUE, hDlgBgDC);
+
+
+    ShowFileTransferCtrl(FALSE);
 }
 
 void CBuddyChatDlg::ShowFileTransferCtrl(BOOL bShow)
 {
-	DWORD dwFlag = (bShow ? SW_SHOW : SW_HIDE);
+    DWORD dwFlag = (bShow ? SW_SHOW : SW_HIDE);
 
-	if(bShow)
-	{
-		CRect rcTabMgr;
-		m_TabMgr.GetClientRect(&rcTabMgr);
+    if (bShow)
+    {
+        CRect rcTabMgr;
+        m_TabMgr.GetClientRect(&rcTabMgr);
 
-		CRect rcClient;
-		GetClientRect(&rcClient);
+        CRect rcClient;
+        GetClientRect(&rcClient);
 
-		CRect rcFileTransferCtrl(rcClient.right-rcTabMgr.Width()-6, 100, rcClient.right-2, rcClient.bottom-32);
-		m_FileTransferCtrl.MoveWindow(&rcFileTransferCtrl, FALSE); 
-	}
+        CRect rcFileTransferCtrl(rcClient.right - rcTabMgr.Width() - 6, 100, rcClient.right - 2, rcClient.bottom - 32);
+        m_FileTransferCtrl.MoveWindow(&rcFileTransferCtrl, FALSE);
+    }
 
-	m_FileTransferCtrl.ShowWindow(dwFlag);
-	m_bFileTransferVisible = bShow;
-	//m_RightTabCtrl.SetItemVisible(1, bShow);
+    m_FileTransferCtrl.ShowWindow(dwFlag);
+    m_bFileTransferVisible = bShow;
+    //m_RightTabCtrl.SetItemVisible(1, bShow);
 }
 
 void CBuddyChatDlg::DestroyFileTransferCtrl()
 {
-	if(m_SendFileThumbPicture.IsWindow())
-		m_SendFileThumbPicture.DestroyWindow();
+    if (m_SendFileThumbPicture.IsWindow())
+        m_SendFileThumbPicture.DestroyWindow();
 
-	if(m_staSendFileDesc.IsWindow())
-		m_staSendFileDesc.DestroyWindow();
+    if (m_staSendFileDesc.IsWindow())
+        m_staSendFileDesc.DestroyWindow();
 
-	if(m_staSendFileDesc.IsWindow())
-		m_staSendFileDesc.DestroyWindow();
+    if (m_staSendFileDesc.IsWindow())
+        m_staSendFileDesc.DestroyWindow();
 
-	if(m_ProgressSendFile.IsWindow())
-		m_ProgressSendFile.DestroyWindow();
+    if (m_ProgressSendFile.IsWindow())
+        m_ProgressSendFile.DestroyWindow();
 
-	if(m_lnkSendOffline.IsWindow())
-		m_lnkSendOffline.DestroyWindow();
+    if (m_lnkSendOffline.IsWindow())
+        m_lnkSendOffline.DestroyWindow();
 
-	if(m_lnkSendFileCancel.IsWindow())
-		m_lnkSendFileCancel.DestroyWindow();
+    if (m_lnkSendFileCancel.IsWindow())
+        m_lnkSendFileCancel.DestroyWindow();
 }
 
 LRESULT CBuddyChatDlg::OnTabCtrlDropDown(LPNMHDR pnmh)
 {
-	int nCurSel = m_RightTabCtrl.GetCurSel();
-	//switch (nCurSel)
-	//{
-	//case 0:
-	//	::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
-	//	InvalidateRect(NULL, TRUE);
-	//	break;
+    int nCurSel = m_RightTabCtrl.GetCurSel();
+    //switch (nCurSel)
+    //{
+    //case 0:
+    //	::SendMessage(m_btnMsgLog.m_hWnd, BM_CLICK, 0, 0);
+    //	InvalidateRect(NULL, TRUE);
+    //	break;
 
-	//case 1:
-	//	m_richMsgLog.ShowWindow(SW_HIDE);
-	//	ShowFileTransferCtrl(TRUE);
-	//	break;
+    //case 1:
+    //	m_richMsgLog.ShowWindow(SW_HIDE);
+    //	ShowFileTransferCtrl(TRUE);
+    //	break;
 
-	//default:
-	//	break;
-	//}
+    //default:
+    //	break;
+    //}
 
-	return 1;
+    return 1;
 }
 
 LRESULT CBuddyChatDlg::OnTabCtrlSelChange(LPNMHDR pnmh)
 {
-	int nCurSel = m_RightTabCtrl.GetCurSel();
-	switch (nCurSel)
-	{
-	case 0:
-		ShowMsgLogButtons(TRUE);
-		m_richMsgLog.ShowWindow(SW_SHOW);
-		m_richMsgLog.SetFocus();
-		ShowFileTransferCtrl(FALSE);
-		OpenMsgLogBrowser();
-		m_bFileTransferVisible = FALSE;
-		break;
+    int nCurSel = m_RightTabCtrl.GetCurSel();
+    switch (nCurSel)
+    {
+    case 0:
+        ShowMsgLogButtons(TRUE);
+        m_richMsgLog.ShowWindow(SW_SHOW);
+        m_richMsgLog.SetFocus();
+        ShowFileTransferCtrl(FALSE);
+        OpenMsgLogBrowser();
+        m_bFileTransferVisible = FALSE;
+        break;
 
-	case 1:
-		ShowMsgLogButtons(FALSE);
-		ShowFileTransferCtrl(TRUE);
-		m_richMsgLog.ShowWindow(SW_HIDE);
-		break;
+    case 1:
+        ShowMsgLogButtons(FALSE);
+        ShowFileTransferCtrl(TRUE);
+        m_richMsgLog.ShowWindow(SW_HIDE);
+        break;
 
-	default:
-		break;
-	}
+    default:
+        break;
+    }
 
-	return 1;
+    return 1;
 }
 
 LRESULT CBuddyChatDlg::OnClickTabMgr(LPNMHDR pnmh)
 {
-	TWI_HEADER* pTwi = (TWI_HEADER*)pnmh;
-	if(pTwi==NULL || pTwi->nmhdr.hwndFrom!=m_TabMgr.m_hWnd)
-		return 0;
+    TWI_HEADER* pTwi = (TWI_HEADER*)pnmh;
+    if (pTwi == NULL || pTwi->nmhdr.hwndFrom != m_TabMgr.m_hWnd)
+        return 0;
 
-	if(pTwi->hwndItem == m_richMsgLog.m_hWnd)
-	{
-		//¼¤»îÏûÏ¢¼ÇÂ¼´°¿Ú
-		if(pTwi->nClickType == CLICK_TYPE_ACTIVATE)
-		{
-			ShowMsgLogButtons(TRUE);
-			m_richMsgLog.ShowWindow(SW_SHOW);
-			m_richMsgLog.SetFocus();
-			ShowFileTransferCtrl(FALSE);
-			OpenMsgLogBrowser();
-			m_bFileTransferVisible = FALSE;
-		}
-		//¹Ø±ÕÏûÏ¢¼ÇÂ¼´°¿Ú
-		else if(pTwi->nClickType == CLICK_TYPE_CLOSE)
-		{
-			//m_TabMgr.RemoveItem(m_richMsgLog.m_hWnd);
-			//m_richMsgLog.ShowWindow(SW_HIDE);
-			//ShowMsgLogButtons(FALSE);
-			PostMessage(WM_COMMAND, 214, 0);
-		}
-	}
-	else if(pTwi->hwndItem == m_FileTransferCtrl.m_hWnd)
-	{
-		//¼¤»îÎÄ¼ş´«Êä´°¿Ú
-		if(pTwi->nClickType == CLICK_TYPE_ACTIVATE)
-		{
-			ShowMsgLogButtons(FALSE);
-			ShowFileTransferCtrl(TRUE);
-			m_richMsgLog.ShowWindow(SW_HIDE);
-		}
-		//¹Ø±ÕÎÄ¼ş´«Êä´°¿Ú
-		else if(pTwi->nClickType == CLICK_TYPE_CLOSE)
-		{
-			m_TabMgr.RemoveItem(m_FileTransferCtrl.m_hWnd);
-		}
-	}
+    if (pTwi->hwndItem == m_richMsgLog.m_hWnd)
+    {
+        //æ¿€æ´»æ¶ˆæ¯è®°å½•çª—å£
+        if (pTwi->nClickType == CLICK_TYPE_ACTIVATE)
+        {
+            ShowMsgLogButtons(TRUE);
+            m_richMsgLog.ShowWindow(SW_SHOW);
+            m_richMsgLog.SetFocus();
+            ShowFileTransferCtrl(FALSE);
+            OpenMsgLogBrowser();
+            m_bFileTransferVisible = FALSE;
+        }
+        //å…³é—­æ¶ˆæ¯è®°å½•çª—å£
+        else if (pTwi->nClickType == CLICK_TYPE_CLOSE)
+        {
+            //m_TabMgr.RemoveItem(m_richMsgLog.m_hWnd);
+            //m_richMsgLog.ShowWindow(SW_HIDE);
+            //ShowMsgLogButtons(FALSE);
+            PostMessage(WM_COMMAND, 214, 0);
+        }
+    } else if (pTwi->hwndItem == m_FileTransferCtrl.m_hWnd)
+    {
+        //æ¿€æ´»æ–‡ä»¶ä¼ è¾“çª—å£
+        if (pTwi->nClickType == CLICK_TYPE_ACTIVATE)
+        {
+            ShowMsgLogButtons(FALSE);
+            ShowFileTransferCtrl(TRUE);
+            m_richMsgLog.ShowWindow(SW_HIDE);
+        }
+        //å…³é—­æ–‡ä»¶ä¼ è¾“çª—å£
+        else if (pTwi->nClickType == CLICK_TYPE_CLOSE)
+        {
+            m_TabMgr.RemoveItem(m_FileTransferCtrl.m_hWnd);
+        }
+    }
 
-	return 1;
+    return 1;
 }
 
 LRESULT CBuddyChatDlg::OnBtn_FileTransfer(LPNMHDR pnmh)
 {
-	PFILE_TRANSFER_NMHDREX pNMHDREx = (PFILE_TRANSFER_NMHDREX)pnmh;
-	if(pNMHDREx== NULL || pNMHDREx->btnArea==BTN_NONE || pNMHDREx->nID<0)
-		return 0;
+    PFILE_TRANSFER_NMHDREX pNMHDREx = (PFILE_TRANSFER_NMHDREX)pnmh;
+    if (pNMHDREx == NULL || pNMHDREx->btnArea == BTN_NONE || pNMHDREx->nID < 0)
+        return 0;
 
-	CString strFileName( m_FileTransferCtrl.GetItemFileNameByID(pNMHDREx->nID));
-	if(strFileName == "")
-	{
-		m_FileTransferCtrl.RemoveItemByID(pNMHDREx->nID);
-		return 0;
-	}
-	
-	CString strFileExtension(Hootina::CPath::GetExtension(strFileName).c_str());
-	if(strFileExtension == "")
-		strFileExtension = _T("*");
+    CString strFileName(m_FileTransferCtrl.GetItemFileNameByID(pNMHDREx->nID));
+    if (strFileName == "")
+    {
+        m_FileTransferCtrl.RemoveItemByID(pNMHDREx->nID);
+        return 0;
+    }
 
-	if(pNMHDREx->btnArea == BTN_CANCEL)
-	{
-		CFileItemRequest* pItemRequest = m_FileTransferCtrl.GetFileItemRequestByID(pNMHDREx->nID);
-        //TODO: ½ÓÊÕÎÄ¼şÇëÇó»¹Ã»¿ªÊ¼ÏÂÔØµÄÎÄ¼ş£¬ÇëÇó¿ÉÄÜÎªNULL
+    CString strFileExtension(Hootina::CPath::GetExtension(strFileName).c_str());
+    if (strFileExtension == "")
+        strFileExtension = _T("*");
+
+    if (pNMHDREx->btnArea == BTN_CANCEL)
+    {
+        CFileItemRequest* pItemRequest = m_FileTransferCtrl.GetFileItemRequestByID(pNMHDREx->nID);
+        //TODO: æ¥æ”¶æ–‡ä»¶è¯·æ±‚è¿˜æ²¡å¼€å§‹ä¸‹è½½çš„æ–‡ä»¶ï¼Œè¯·æ±‚å¯èƒ½ä¸ºNULL
         if (pItemRequest != NULL)
         {
             m_lpFMGClient->m_FileTask.RemoveItem(pItemRequest);
         }
-		
-		if(pNMHDREx->nTargetType == RECV_TYPE)
-		{
-			CString strRecvFileResultMsgText;
-			strRecvFileResultMsgText.Format(_T("%sÈ¡ÏûÁË½ÓÊÕÎÄ¼ş[%s]¡£"), m_lpFMGClient->m_UserMgr.m_UserInfo.m_strNickName.c_str(), strFileName);
+
+        if (pNMHDREx->nTargetType == RECV_TYPE)
+        {
+            CString strRecvFileResultMsgText;
+            strRecvFileResultMsgText.Format(_T("%så–æ¶ˆäº†æ¥æ”¶æ–‡ä»¶[%s]ã€‚"), m_lpFMGClient->m_UserMgr.m_UserInfo.m_strNickName.c_str(), strFileName);
             m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), time(NULL), strRecvFileResultMsgText.GetString(), m_hWnd);
-			
-			CString strInfo;
-			strInfo.Format(_T("                                            ¡îÄúÈ¡ÏûÁË½ÓÊÜÎÄ¼ş[%s]¡£¡î\r\n"), strFileName);
-			RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-		}
-		else if(pNMHDREx->nTargetType == SEND_TYPE)
-		{
-			CString strInfo;
-			strInfo.Format(_T("                                            ¡îÄúÈ¡ÏûÁË·¢ËÍÎÄ¼ş[%s]¡£¡î\r\n"), strFileName);
-			RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-		}
-		
-		m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-		m_FileTransferCtrl.RemoveItemByID(pNMHDREx->nID);
-		DisplayFileTransfer(FALSE);	
-		return 1;
-	}
-	
-	CStringA strDownloadName(m_FileTransferCtrl.GetItemDownloadNameByID(pNMHDREx->nID));
-	CFileItemRequest* pFileItemRequest = NULL;
-	pFileItemRequest = new CFileItemRequest();
-	pFileItemRequest->m_hCancelEvent = ::CreateEvent(NULL, TRUE, FALSE, NULL);
-	if(pNMHDREx->btnArea == BTN_ACCEPT)
-	{
-		CString strDefaultPath(m_lpFMGClient->m_UserMgr.GetDefaultRecvFilePath().c_str());
-		if(strDefaultPath == "")
-		{
-			::MessageBox(m_hWnd, _T("ÎŞ·¨±£´æÎÄ¼şÖÁÎÒµÄÎÄµµ£¬ÇëÊ¹ÓÃ[Áí´æÎª]°´Å¥ÖØĞÂÖ¸¶¨ÎÄ¼ş±£´æÂ·¾¶£¡"), g_strAppTitle.c_str(), MB_OK|MB_ICONERROR);
-			delete pFileItemRequest;
-			return 1;
-		}
-		CString strFilePath;
-		strFilePath.Format(_T("%s\\%s"), strDefaultPath, strFileName);
-		if(Hootina::CPath::IsFileExist(strFilePath))
-		{
-			CString strInfo;
-			strInfo.Format(_T("[%s]ÎÄ¼şÒÑ´æÔÚ£¬ÊÇ·ñ¸²¸Ç£¿"), strFilePath);
-			if(IDNO == ::MessageBox(m_hWnd, strInfo, g_strAppTitle.c_str(), MB_YESNO|MB_ICONQUESTION))
-			{
-				delete pFileItemRequest;
-				return 1;
-			}
-		}
-		_tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), strFilePath);	
-		strcpy_s(pFileItemRequest->m_szUtfFilePath, ARRAYSIZE(pFileItemRequest->m_szUtfFilePath), strDownloadName);
-	}
-	else if(pNMHDREx->btnArea == BTN_SAVEAS)
-	{
-		DWORD dwFlags = OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR|OFN_EXTENSIONDIFFERENT;
-		CFileDialog fileDlg(FALSE, NULL, strFileName, dwFlags, _T("ËùÓĞÀàĞÍ(*.*)\0*.*\0\0"), m_hWnd);
-		fileDlg.m_ofn.lpstrTitle = _T("Áí´æÎª");
-		if (fileDlg.DoModal() != IDOK)
-		{
-			delete pFileItemRequest;
-			return 1;
-		}
-		_tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), fileDlg.m_ofn.lpstrFile);
-		strcpy_s(pFileItemRequest->m_szUtfFilePath, ARRAYSIZE(pFileItemRequest->m_szUtfFilePath), strDownloadName);
-	}
 
-	m_FileTransferCtrl.SetItemSaveNameByID(pNMHDREx->nID, pFileItemRequest->m_szFilePath);
-	m_FileTransferCtrl.SetFileItemRequestByID(pNMHDREx->nID, pFileItemRequest);
+            CString strInfo;
+            strInfo.Format(_T("                                            â˜†æ‚¨å–æ¶ˆäº†æ¥å—æ–‡ä»¶[%s]ã€‚â˜†\r\n"), strFileName);
+            RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+        } else if (pNMHDREx->nTargetType == SEND_TYPE)
+        {
+            CString strInfo;
+            strInfo.Format(_T("                                            â˜†æ‚¨å–æ¶ˆäº†å‘é€æ–‡ä»¶[%s]ã€‚â˜†\r\n"), strFileName);
+            RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+        }
 
-	pFileItemRequest->m_nID = pNMHDREx->nID;
-	pFileItemRequest->m_hwndReflection = m_hWnd;
-	pFileItemRequest->m_nFileType = FILE_ITEM_DOWNLOAD_CHAT_OFFLINE_FILE;
+        m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+        m_FileTransferCtrl.RemoveItemByID(pNMHDREx->nID);
+        DisplayFileTransfer(FALSE);
+        return 1;
+    }
 
-	m_lpFMGClient->m_FileTask.AddItem(pFileItemRequest);
+    CStringA strDownloadName(m_FileTransferCtrl.GetItemDownloadNameByID(pNMHDREx->nID));
+    CFileItemRequest* pFileItemRequest = NULL;
+    pFileItemRequest = new CFileItemRequest();
+    pFileItemRequest->m_hCancelEvent = ::CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (pNMHDREx->btnArea == BTN_ACCEPT)
+    {
+        CString strDefaultPath(m_lpFMGClient->m_UserMgr.GetDefaultRecvFilePath().c_str());
+        if (strDefaultPath == "")
+        {
+            ::MessageBox(m_hWnd, _T("æ— æ³•ä¿å­˜æ–‡ä»¶è‡³æˆ‘çš„æ–‡æ¡£ï¼Œè¯·ä½¿ç”¨[å¦å­˜ä¸º]æŒ‰é’®é‡æ–°æŒ‡å®šæ–‡ä»¶ä¿å­˜è·¯å¾„ï¼"), g_strAppTitle.c_str(), MB_OK | MB_ICONERROR);
+            delete pFileItemRequest;
+            return 1;
+        }
+        CString strFilePath;
+        strFilePath.Format(_T("%s\\%s"), strDefaultPath, strFileName);
+        if (Hootina::CPath::IsFileExist(strFilePath))
+        {
+            CString strInfo;
+            strInfo.Format(_T("[%s]æ–‡ä»¶å·²å­˜åœ¨ï¼Œæ˜¯å¦è¦†ç›–ï¼Ÿ"), strFilePath);
+            if (IDNO == ::MessageBox(m_hWnd, strInfo, g_strAppTitle.c_str(), MB_YESNO | MB_ICONQUESTION))
+            {
+                delete pFileItemRequest;
+                return 1;
+            }
+        }
+        _tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), strFilePath);
+        strcpy_s(pFileItemRequest->m_szUtfFilePath, ARRAYSIZE(pFileItemRequest->m_szUtfFilePath), strDownloadName);
+    } else if (pNMHDREx->btnArea == BTN_SAVEAS)
+    {
+        DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXTENSIONDIFFERENT;
+        CFileDialog fileDlg(FALSE, NULL, strFileName, dwFlags, _T("æ‰€æœ‰ç±»å‹(*.*)\0*.*\0\0"), m_hWnd);
+        fileDlg.m_ofn.lpstrTitle = _T("å¦å­˜ä¸º");
+        if (fileDlg.DoModal() != IDOK)
+        {
+            delete pFileItemRequest;
+            return 1;
+        }
+        _tcscpy_s(pFileItemRequest->m_szFilePath, ARRAYSIZE(pFileItemRequest->m_szFilePath), fileDlg.m_ofn.lpstrFile);
+        strcpy_s(pFileItemRequest->m_szUtfFilePath, ARRAYSIZE(pFileItemRequest->m_szUtfFilePath), strDownloadName);
+    }
 
-	m_mapRecvFileInfo.insert(std::pair<CString, long>(pFileItemRequest->m_szFilePath, -1));
+    m_FileTransferCtrl.SetItemSaveNameByID(pNMHDREx->nID, pFileItemRequest->m_szFilePath);
+    m_FileTransferCtrl.SetFileItemRequestByID(pNMHDREx->nID, pFileItemRequest);
 
-	m_FileTransferCtrl.SetAcceptButtonVisibleByID(pNMHDREx->nID, FALSE);
-	m_FileTransferCtrl.SetSaveAsButtonVisibleByID(pNMHDREx->nID, FALSE);
+    pFileItemRequest->m_nID = pNMHDREx->nID;
+    pFileItemRequest->m_hwndReflection = m_hWnd;
+    pFileItemRequest->m_nFileType = FILE_ITEM_DOWNLOAD_CHAT_OFFLINE_FILE;
 
-	m_FileTransferCtrl.Invalidate(FALSE);
-	
-	return 1;
+    m_lpFMGClient->m_FileTask.AddItem(pFileItemRequest);
+
+    m_mapRecvFileInfo.insert(std::pair<CString, long>(pFileItemRequest->m_szFilePath, -1));
+
+    m_FileTransferCtrl.SetAcceptButtonVisibleByID(pNMHDREx->nID, FALSE);
+    m_FileTransferCtrl.SetSaveAsButtonVisibleByID(pNMHDREx->nID, FALSE);
+
+    m_FileTransferCtrl.Invalidate(FALSE);
+
+    return 1;
 }
 
-// ³õÊ¼»¯¿Ø¼ş
+// åˆå§‹åŒ–æ§ä»¶
 BOOL CBuddyChatDlg::Init()
 {
-	m_SkinDlg.SubclassWindow(m_hWnd);
-	m_SkinDlg.SetBgPic(CHAT_BG_IMAGE_NAME, CRect(CHATDLG_LEFT_FIXED_WIDTH, CHATDLG_TOP_FIXED_HEIGHT, CHATDLG_RIGHT_FIXED_WIDTH, CHATDLG_BOTTOM_FIXED_HEIGHT));
-	m_SkinDlg.SetMinSysBtnPic(_T("SysBtn\\btn_mini_normal.png"), _T("SysBtn\\btn_mini_highlight.png"), _T("SysBtn\\btn_mini_down.png"));
-	m_SkinDlg.SetMaxSysBtnPic(_T("SysBtn\\btn_max_normal.png"), _T("SysBtn\\btn_max_highlight.png"), _T("SysBtn\\btn_max_down.png"));
-	m_SkinDlg.SetRestoreSysBtnPic(_T("SysBtn\\btn_restore_normal.png"), _T("SysBtn\\btn_restore_highlight.png"), _T("SysBtn\\btn_restore_down.png"));
-	m_SkinDlg.SetCloseSysBtnPic(_T("SysBtn\\btn_close_normal.png"), _T("SysBtn\\btn_close_highlight.png"), _T("SysBtn\\btn_close_down.png"));
-	
+    m_SkinDlg.SubclassWindow(m_hWnd);
+    m_SkinDlg.SetBgPic(CHAT_BG_IMAGE_NAME, CRect(CHATDLG_LEFT_FIXED_WIDTH, CHATDLG_TOP_FIXED_HEIGHT, CHATDLG_RIGHT_FIXED_WIDTH, CHATDLG_BOTTOM_FIXED_HEIGHT));
+    m_SkinDlg.SetMinSysBtnPic(_T("SysBtn\\btn_mini_normal.png"), _T("SysBtn\\btn_mini_highlight.png"), _T("SysBtn\\btn_mini_down.png"));
+    m_SkinDlg.SetMaxSysBtnPic(_T("SysBtn\\btn_max_normal.png"), _T("SysBtn\\btn_max_highlight.png"), _T("SysBtn\\btn_max_down.png"));
+    m_SkinDlg.SetRestoreSysBtnPic(_T("SysBtn\\btn_restore_normal.png"), _T("SysBtn\\btn_restore_highlight.png"), _T("SysBtn\\btn_restore_down.png"));
+    m_SkinDlg.SetCloseSysBtnPic(_T("SysBtn\\btn_close_normal.png"), _T("SysBtn\\btn_close_highlight.png"), _T("SysBtn\\btn_close_down.png"));
 
-	HDC hDlgBgDC = m_SkinDlg.GetBgDC();
 
-	
-	m_picHead.SubclassWindow(GetDlgItem(ID_PIC_HEAD));
-	m_picHead.SetTransparent(TRUE, hDlgBgDC);
-	m_picHead.SetShowCursor(TRUE);
-	m_picHead.SetBgPic(_T("HeadCtrl\\Padding4Normal.png"), _T("HeadCtrl\\Padding4Hot.png"), _T("HeadCtrl\\Padding4Hot.png"));
-	m_picHead.MoveWindow(10, 10, 54, 54, FALSE);
-	
-	tstring strNickName(m_lpFMGClient->m_UserMgr.GetNickName(m_nUTalkUin));
-	CString strTooltip;
-	strTooltip.Format(_T("µã»÷²é¿´%sµÄ×ÊÁÏ"), strNickName.c_str());
-	m_picHead.SetToolTipText(strTooltip);
+    HDC hDlgBgDC = m_SkinDlg.GetBgDC();
 
-	m_lnkBuddyName.SubclassWindow(GetDlgItem(ID_LINK_BUDDYNAME));
-	m_lnkBuddyName.SetTransparent(TRUE, hDlgBgDC);
-	m_lnkBuddyName.SetLinkColor(RGB(0,0,0));
-	m_lnkBuddyName.SetHoverLinkColor(RGB(0,0,0));
-	m_lnkBuddyName.SetVisitedLinkColor(RGB(0,0,0));
-	m_lnkBuddyName.MoveWindow(70, 12, 60, 14, FALSE);
 
-	HFONT hFontBuddyNameLink = CGDIFactory::GetFont(22);
-	m_lnkBuddyName.SetNormalFont(hFontBuddyNameLink);
-	
-	m_staBuddySign.SubclassWindow(GetDlgItem(ID_STATIC_BUDDYSIGN));
-	m_staBuddySign.SetTransparent(TRUE, hDlgBgDC);
-	m_staBuddySign.MoveWindow(70, 38, CHATDLG_WIDTH-50, 20, FALSE);
+    m_picHead.SubclassWindow(GetDlgItem(ID_PIC_HEAD));
+    m_picHead.SetTransparent(TRUE, hDlgBgDC);
+    m_picHead.SetShowCursor(TRUE);
+    m_picHead.SetBgPic(_T("HeadCtrl\\Padding4Normal.png"), _T("HeadCtrl\\Padding4Hot.png"), _T("HeadCtrl\\Padding4Hot.png"));
+    m_picHead.MoveWindow(10, 10, 54, 54, FALSE);
 
-	HFONT hFontBuddySignature = CGDIFactory::GetFont(19);
-	m_staBuddySign.SetFont(hFontBuddySignature);
+    tstring strNickName(m_lpFMGClient->m_UserMgr.GetNickName(m_nUTalkUin));
+    CString strTooltip;
+    strTooltip.Format(_T("ç‚¹å‡»æŸ¥çœ‹%sçš„èµ„æ–™"), strNickName.c_str());
+    m_picHead.SetToolTipText(strTooltip);
 
-	//Í¼Æ¬ÉÏ´«½ø¶ÈĞÅÏ¢ÎÄ±¾
-	m_staPicUploadProgress.SubclassWindow(GetDlgItem(IDC_STATIC_PICPROGRESS));
-	m_staPicUploadProgress.SetTransparent(TRUE, hDlgBgDC);
-	m_staPicUploadProgress.MoveWindow(10, CHATDLG_HEIGHT-25, 380, 25, FALSE);
-	m_staPicUploadProgress.ShowWindow(SW_HIDE);
+    m_lnkBuddyName.SubclassWindow(GetDlgItem(ID_LINK_BUDDYNAME));
+    m_lnkBuddyName.SetTransparent(TRUE, hDlgBgDC);
+    m_lnkBuddyName.SetLinkColor(RGB(0, 0, 0));
+    m_lnkBuddyName.SetHoverLinkColor(RGB(0, 0, 0));
+    m_lnkBuddyName.SetVisitedLinkColor(RGB(0, 0, 0));
+    m_lnkBuddyName.MoveWindow(70, 12, 60, 14, FALSE);
 
-	m_btnClose.SubclassWindow(GetDlgItem(ID_BTN_CLOSE));
-	m_btnClose.SetTransparent(TRUE, hDlgBgDC);
-	m_btnClose.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnClose.SetBgPic(_T("Button\\btn_close_normal.png"), _T("Button\\btn_close_highlight.png"),_T("Button\\btn_close_down.png"), _T("Button\\btn_close_focus.png"));
-	m_btnClose.MoveWindow(CHATDLG_WIDTH-190, CHATDLG_HEIGHT-30, 77, 25, FALSE);
+    HFONT hFontBuddyNameLink = CGDIFactory::GetFont(22);
+    m_lnkBuddyName.SetNormalFont(hFontBuddyNameLink);
 
-	m_btnSend.SubclassWindow(GetDlgItem(ID_BTN_SEND));
-	m_btnSend.SetTransparent(TRUE, hDlgBgDC);
-	m_btnSend.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnSend.SetTextColor(RGB(255, 255, 255));
-	m_btnSend.SetBgPic(_T("Button\\btn_send_normal.png"), _T("Button\\btn_send_highlight.png"),_T("Button\\btn_send_down.png"), _T("Button\\btn_send_focus.png"));
-	m_btnSend.MoveWindow(CHATDLG_WIDTH-110, CHATDLG_HEIGHT-30, 77, 25, FALSE);
+    m_staBuddySign.SubclassWindow(GetDlgItem(ID_STATIC_BUDDYSIGN));
+    m_staBuddySign.SetTransparent(TRUE, hDlgBgDC);
+    m_staBuddySign.MoveWindow(70, 38, CHATDLG_WIDTH - 50, 20, FALSE);
 
-	m_btnArrow.SubclassWindow(GetDlgItem(ID_BTN_ARROW));
-	m_btnArrow.SetTransparent(TRUE, hDlgBgDC);
-	m_btnArrow.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnArrow.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
-	m_btnArrow.MoveWindow(CHATDLG_WIDTH-33, CHATDLG_HEIGHT-30, 28, 25, FALSE);
+    HFONT hFontBuddySignature = CGDIFactory::GetFont(19);
+    m_staBuddySign.SetFont(hFontBuddySignature);
 
-	//ÏûÏ¢¼ÇÂ¼µÄËÄ¸ö°´Å¥
-	m_btnFirstMsgLog.SubclassWindow(GetDlgItem(IDC_FIRSTMSGLOG));
-	m_btnFirstMsgLog.SetTransparent(TRUE, hDlgBgDC);
-	m_btnFirstMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnFirstMsgLog.SetToolTipText(_T("µÚÒ»Ò³"));
-	//m_btnFirstMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
-	m_btnFirstMsgLog.MoveWindow(CHATDLG_WIDTH+110, CHATDLG_HEIGHT-30, 28, 25, FALSE);
+    //å›¾ç‰‡ä¸Šä¼ è¿›åº¦ä¿¡æ¯æ–‡æœ¬
+    m_staPicUploadProgress.SubclassWindow(GetDlgItem(IDC_STATIC_PICPROGRESS));
+    m_staPicUploadProgress.SetTransparent(TRUE, hDlgBgDC);
+    m_staPicUploadProgress.MoveWindow(10, CHATDLG_HEIGHT - 25, 380, 25, FALSE);
+    m_staPicUploadProgress.ShowWindow(SW_HIDE);
 
-	m_btnPrevMsgLog.SubclassWindow(GetDlgItem(IDC_PREVMSGLOG));
-	m_btnPrevMsgLog.SetTransparent(TRUE, hDlgBgDC);
-	m_btnPrevMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnPrevMsgLog.SetToolTipText(_T("ÉÏÒ»Ò³"));
-	//m_btnPrevMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
-	m_btnPrevMsgLog.MoveWindow(CHATDLG_WIDTH+140, CHATDLG_HEIGHT-30, 28, 25, FALSE);
+    m_btnClose.SubclassWindow(GetDlgItem(ID_BTN_CLOSE));
+    m_btnClose.SetTransparent(TRUE, hDlgBgDC);
+    m_btnClose.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnClose.SetBgPic(_T("Button\\btn_close_normal.png"), _T("Button\\btn_close_highlight.png"), _T("Button\\btn_close_down.png"), _T("Button\\btn_close_focus.png"));
+    m_btnClose.MoveWindow(CHATDLG_WIDTH - 190, CHATDLG_HEIGHT - 30, 77, 25, FALSE);
 
-	m_staMsgLogPage.SubclassWindow(GetDlgItem(IDC_STATIC_MSGLOGPAGE));
-	m_staMsgLogPage.SetTransparent(TRUE, hDlgBgDC);
-	m_staMsgLogPage.MoveWindow(CHATDLG_WIDTH+170, CHATDLG_HEIGHT-24, 60, 25, FALSE);
+    m_btnSend.SubclassWindow(GetDlgItem(ID_BTN_SEND));
+    m_btnSend.SetTransparent(TRUE, hDlgBgDC);
+    m_btnSend.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnSend.SetTextColor(RGB(255, 255, 255));
+    m_btnSend.SetBgPic(_T("Button\\btn_send_normal.png"), _T("Button\\btn_send_highlight.png"), _T("Button\\btn_send_down.png"), _T("Button\\btn_send_focus.png"));
+    m_btnSend.MoveWindow(CHATDLG_WIDTH - 110, CHATDLG_HEIGHT - 30, 77, 25, FALSE);
 
-	m_btnNextMsgLog.SubclassWindow(GetDlgItem(IDC_NEXTMSGLOG));
-	m_btnNextMsgLog.SetTransparent(TRUE, hDlgBgDC);
-	m_btnNextMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnNextMsgLog.SetToolTipText(_T("ÏÂÒ»Ò³"));
-	//m_btnNextMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
-	m_btnNextMsgLog.MoveWindow(CHATDLG_WIDTH+240, CHATDLG_HEIGHT-30, 28, 25, FALSE);
+    m_btnArrow.SubclassWindow(GetDlgItem(ID_BTN_ARROW));
+    m_btnArrow.SetTransparent(TRUE, hDlgBgDC);
+    m_btnArrow.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnArrow.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"), _T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
+    m_btnArrow.MoveWindow(CHATDLG_WIDTH - 33, CHATDLG_HEIGHT - 30, 28, 25, FALSE);
 
-	m_btnLastMsgLog.SubclassWindow(GetDlgItem(IDC_LASTMSGLOG));
-	m_btnLastMsgLog.SetTransparent(TRUE, hDlgBgDC);
-	m_btnLastMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
-	m_btnLastMsgLog.SetToolTipText(_T("×îºóÒ³"));
-	//m_btnLastMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
-	m_btnLastMsgLog.MoveWindow(CHATDLG_WIDTH+270, CHATDLG_HEIGHT-30, 28, 25, FALSE);
+    //æ¶ˆæ¯è®°å½•çš„å››ä¸ªæŒ‰é’®
+    m_btnFirstMsgLog.SubclassWindow(GetDlgItem(IDC_FIRSTMSGLOG));
+    m_btnFirstMsgLog.SetTransparent(TRUE, hDlgBgDC);
+    m_btnFirstMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnFirstMsgLog.SetToolTipText(_T("ç¬¬ä¸€é¡µ"));
+    //m_btnFirstMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
+    m_btnFirstMsgLog.MoveWindow(CHATDLG_WIDTH + 110, CHATDLG_HEIGHT - 30, 28, 25, FALSE);
 
-	ShowMsgLogButtons(FALSE);
+    m_btnPrevMsgLog.SubclassWindow(GetDlgItem(IDC_PREVMSGLOG));
+    m_btnPrevMsgLog.SetTransparent(TRUE, hDlgBgDC);
+    m_btnPrevMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnPrevMsgLog.SetToolTipText(_T("ä¸Šä¸€é¡µ"));
+    //m_btnPrevMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
+    m_btnPrevMsgLog.MoveWindow(CHATDLG_WIDTH + 140, CHATDLG_HEIGHT - 30, 28, 25, FALSE);
 
-	m_SkinMenu.LoadMenu(ID_MENU_BUDDYCHAT);
-	m_SkinMenu.SetBgPic(_T("Menu\\menu_left_bg.png"), _T("Menu\\menu_right_bg.png"));
-	m_SkinMenu.SetSelectedPic(_T("Menu\\menu_selected.png"));
-	m_SkinMenu.SetSepartorPic(_T("Menu\\menu_separtor.png"));
-	m_SkinMenu.SetArrowPic(_T("Menu\\menu_arrow.png"));
-	m_SkinMenu.SetCheckPic(_T("Menu\\menu_check.png"));
-	m_SkinMenu.SetTextColor(RGB(0, 20, 35));
-	m_SkinMenu.SetSelTextColor(RGB(254, 254, 254));
-	
-	InitTopToolBar();				// ³õÊ¼»¯Top¹¤¾ßÀ¸
-	InitMidToolBar();				// ³õÊ¼»¯Middle¹¤¾ßÀ¸
-	m_PicBarDlg.Create(m_hWnd);		// ´´½¨Í¼Æ¬Ğü¸¡¹¤¾ßÀ¸
+    m_staMsgLogPage.SubclassWindow(GetDlgItem(IDC_STATIC_MSGLOGPAGE));
+    m_staMsgLogPage.SetTransparent(TRUE, hDlgBgDC);
+    m_staMsgLogPage.MoveWindow(CHATDLG_WIDTH + 170, CHATDLG_HEIGHT - 24, 60, 25, FALSE);
 
-	// ½ÓÊÕÏûÏ¢¸»ÎÄ±¾¿ò¿Ø¼ş
-	CRect rcRecv(6, 107, 583, 430);
-	DWORD dwStyle = WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|ES_MULTILINE|ES_AUTOVSCROLL|WS_VSCROLL|ES_WANTRETURN;
+    m_btnNextMsgLog.SubclassWindow(GetDlgItem(IDC_NEXTMSGLOG));
+    m_btnNextMsgLog.SetTransparent(TRUE, hDlgBgDC);
+    m_btnNextMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnNextMsgLog.SetToolTipText(_T("ä¸‹ä¸€é¡µ"));
+    //m_btnNextMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
+    m_btnNextMsgLog.MoveWindow(CHATDLG_WIDTH + 240, CHATDLG_HEIGHT - 30, 28, 25, FALSE);
+
+    m_btnLastMsgLog.SubclassWindow(GetDlgItem(IDC_LASTMSGLOG));
+    m_btnLastMsgLog.SetTransparent(TRUE, hDlgBgDC);
+    m_btnLastMsgLog.SetButtonType(SKIN_PUSH_BUTTON);
+    m_btnLastMsgLog.SetToolTipText(_T("æœ€åé¡µ"));
+    //m_btnLastMsgLog.SetBgPic(_T("Button\\btnright_normal.png"), _T("Button\\btnright_highlight.png"),_T("Button\\btnright_down.png"), _T("Button\\btnright_fouce.png"));
+    m_btnLastMsgLog.MoveWindow(CHATDLG_WIDTH + 270, CHATDLG_HEIGHT - 30, 28, 25, FALSE);
+
+    ShowMsgLogButtons(FALSE);
+
+    m_SkinMenu.LoadMenu(ID_MENU_BUDDYCHAT);
+    m_SkinMenu.SetBgPic(_T("Menu\\menu_left_bg.png"), _T("Menu\\menu_right_bg.png"));
+    m_SkinMenu.SetSelectedPic(_T("Menu\\menu_selected.png"));
+    m_SkinMenu.SetSepartorPic(_T("Menu\\menu_separtor.png"));
+    m_SkinMenu.SetArrowPic(_T("Menu\\menu_arrow.png"));
+    m_SkinMenu.SetCheckPic(_T("Menu\\menu_check.png"));
+    m_SkinMenu.SetTextColor(RGB(0, 20, 35));
+    m_SkinMenu.SetSelTextColor(RGB(254, 254, 254));
+
+    InitTopToolBar();				// åˆå§‹åŒ–Topå·¥å…·æ 
+    InitMidToolBar();				// åˆå§‹åŒ–Middleå·¥å…·æ 
+    m_PicBarDlg.Create(m_hWnd);		// åˆ›å»ºå›¾ç‰‡æ‚¬æµ®å·¥å…·æ 
+
+    // æ¥æ”¶æ¶ˆæ¯å¯Œæ–‡æœ¬æ¡†æ§ä»¶
+    CRect rcRecv(6, 107, 583, 430);
+    DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN;
     m_richRecv.Create(m_hWnd, rcRecv, NULL, dwStyle, WS_EX_TRANSPARENT, ID_RICHEDIT_RECV);
-	m_richRecv.SetTransparent(TRUE, hDlgBgDC);	
-	DWORD dwMask = m_richRecv.GetEventMask();
-	dwMask = dwMask | ENM_LINK  | ENM_MOUSEEVENTS | ENM_SCROLLEVENTS | ENM_KEYEVENTS;
-	m_richRecv.SetEventMask(dwMask);
-	m_richRecv.SetAutoURLDetect();
-	m_richRecv.SetReadOnly();
+    m_richRecv.SetTransparent(TRUE, hDlgBgDC);
+    DWORD dwMask = m_richRecv.GetEventMask();
+    dwMask = dwMask | ENM_LINK | ENM_MOUSEEVENTS | ENM_SCROLLEVENTS | ENM_KEYEVENTS;
+    m_richRecv.SetEventMask(dwMask);
+    m_richRecv.SetAutoURLDetect();
+    m_richRecv.SetReadOnly();
 
-	CRect rcSend(6, 405, 603, 495);
+    CRect rcSend(6, 405, 603, 495);
     m_richSend.Create(m_hWnd, rcSend, NULL, dwStyle, WS_EX_TRANSPARENT, ID_RICHEDIT_SEND);
-	m_richSend.SetTransparent(TRUE, hDlgBgDC);
+    m_richSend.SetTransparent(TRUE, hDlgBgDC);
 
-	//½ÓÊÕricheditÓëmidToolbarÖ®¼äµÄ·Ö¸ôÌõ
-	CRect rcSplitter(6, 400, 603, 405);
-	m_SplitterCtrl.Create(m_hWnd, rcSplitter, NULL, WS_CHILD|WS_VISIBLE, 0, ID_SPLITTER_CTRL);
+    //æ¥æ”¶richeditä¸midToolbarä¹‹é—´çš„åˆ†éš”æ¡
+    CRect rcSplitter(6, 400, 603, 405);
+    m_SplitterCtrl.Create(m_hWnd, rcSplitter, NULL, WS_CHILD | WS_VISIBLE, 0, ID_SPLITTER_CTRL);
 
-	if(!m_FontSelDlg.IsWindow())
-	{
-		m_FontSelDlg.Create(m_hWnd);
-		m_FontSelDlg.ShowWindow(SW_HIDE);
-	}
-	
-	InitRightTabWindow();
+    if (!m_FontSelDlg.IsWindow())
+    {
+        m_FontSelDlg.Create(m_hWnd);
+        m_FontSelDlg.ShowWindow(SW_HIDE);
+    }
 
-
-	//³õÊ¼»¯ÓëÎÄ¼ş´«ÊäÏà¹ØµÄ¿Ø¼ş
-	InitFileTransferCtrl();
-	ShowFileTransferCtrl(FALSE);
-	
-	// ·¢ËÍÏûÏ¢¸»ÎÄ±¾¿ò¿Ø¼ş
-	//CFontInfo fontInfo = m_FontSelDlg.GetPublicFontInfo();
-	CFontInfo fontInfo;
-	std::vector<tstring> arrSysFont;
-	EnumSysFont(&arrSysFont);
-	long nCustomFontNameIndex = -1;
-	if(arrSysFont.empty())
-	{
-		::MessageBox(m_hWnd, _T("³õÊ¼»¯ÁÄÌì¶Ô»°¿òÊ§°Ü£¡"), g_strAppTitle.c_str(), MB_OK|MB_ICONERROR);
-		return FALSE;
-	}
-	
-	size_t nFontCount = arrSysFont.size();
-
-	CString strCustomFontName(m_lpFMGClient->m_UserConfig.GetFontName());
-	if(!strCustomFontName.IsEmpty())
-	{
-		BOOL bFound = FALSE;
-		for(size_t i=0; i<nFontCount; ++i)
-		{
-			if(strCustomFontName.CompareNoCase(arrSysFont[i].c_str()) == 0)
-			{
-				bFound = TRUE;
-				break;
-			}
-		}
-
-		if(!bFound)
-			strCustomFontName = _T("Î¢ÈíÑÅºÚ");
-	}
-	else
-		strCustomFontName = _T("Î¢ÈíÑÅºÚ");
-
-	
-	m_lpFMGClient->m_UserConfig.SetFontName(strCustomFontName);
-	fontInfo.m_strName = strCustomFontName;
-	fontInfo.m_nSize = m_lpFMGClient->m_UserConfig.GetFontSize();
-	fontInfo.m_clrText = m_lpFMGClient->m_UserConfig.GetFontColor();
-	fontInfo.m_bBold = m_lpFMGClient->m_UserConfig.IsEnableFontBold();
-	fontInfo.m_bItalic = m_lpFMGClient->m_UserConfig.IsEnableFontItalic();
-	fontInfo.m_bUnderLine = m_lpFMGClient->m_UserConfig.IsEnableFontUnderline();
-
-	RichEdit_SetDefFont(m_richSend.m_hWnd, fontInfo.m_strName.c_str(),
-		fontInfo.m_nSize, fontInfo.m_clrText, fontInfo.m_bBold,
-		fontInfo.m_bItalic, fontInfo.m_bUnderLine, FALSE);
+    InitRightTabWindow();
 
 
+    //åˆå§‹åŒ–ä¸æ–‡ä»¶ä¼ è¾“ç›¸å…³çš„æ§ä»¶
+    InitFileTransferCtrl();
+    ShowFileTransferCtrl(FALSE);
 
-	UpdateDlgTitle();
-	UpdateBuddyNameCtrl();
-	UpdateBuddySignCtrl();
-	OnUpdateBuddyHeadPic();
+    // å‘é€æ¶ˆæ¯å¯Œæ–‡æœ¬æ¡†æ§ä»¶
+    //CFontInfo fontInfo = m_FontSelDlg.GetPublicFontInfo();
+    CFontInfo fontInfo;
+    std::vector<tstring> arrSysFont;
+    EnumSysFont(&arrSysFont);
+    long nCustomFontNameIndex = -1;
+    if (arrSysFont.empty())
+    {
+        ::MessageBox(m_hWnd, _T("åˆå§‹åŒ–èŠå¤©å¯¹è¯æ¡†å¤±è´¥ï¼"), g_strAppTitle.c_str(), MB_OK | MB_ICONERROR);
+        return FALSE;
+    }
 
-	m_Accelerator.LoadAccelerators(ID_ACCE_CHATDLG);
+    size_t nFontCount = arrSysFont.size();
 
-	InitRichEditOleCallback();	// ³õÊ¼»¯IRichEditOleCallback½Ó¿Ú
+    CString strCustomFontName(m_lpFMGClient->m_UserConfig.GetFontName());
+    if (!strCustomFontName.IsEmpty())
+    {
+        BOOL bFound = FALSE;
+        for (size_t i = 0; i < nFontCount; ++i)
+        {
+            if (strCustomFontName.CompareNoCase(arrSysFont[i].c_str()) == 0)
+            {
+                bFound = TRUE;
+                break;
+            }
+        }
 
-	
-	return TRUE;
+        if (!bFound)
+            strCustomFontName = _T("å¾®è½¯é›…é»‘");
+    } else
+        strCustomFontName = _T("å¾®è½¯é›…é»‘");
+
+
+    m_lpFMGClient->m_UserConfig.SetFontName(strCustomFontName);
+    fontInfo.m_strName = strCustomFontName;
+    fontInfo.m_nSize = m_lpFMGClient->m_UserConfig.GetFontSize();
+    fontInfo.m_clrText = m_lpFMGClient->m_UserConfig.GetFontColor();
+    fontInfo.m_bBold = m_lpFMGClient->m_UserConfig.IsEnableFontBold();
+    fontInfo.m_bItalic = m_lpFMGClient->m_UserConfig.IsEnableFontItalic();
+    fontInfo.m_bUnderLine = m_lpFMGClient->m_UserConfig.IsEnableFontUnderline();
+
+    RichEdit_SetDefFont(m_richSend.m_hWnd, fontInfo.m_strName.c_str(),
+        fontInfo.m_nSize, fontInfo.m_clrText, fontInfo.m_bBold,
+        fontInfo.m_bItalic, fontInfo.m_bUnderLine, FALSE);
+
+
+
+    UpdateDlgTitle();
+    UpdateBuddyNameCtrl();
+    UpdateBuddySignCtrl();
+    OnUpdateBuddyHeadPic();
+
+    m_Accelerator.LoadAccelerators(ID_ACCE_CHATDLG);
+
+    InitRichEditOleCallback();	// åˆå§‹åŒ–IRichEditOleCallbackæ¥å£
+
+
+    return TRUE;
 }
 
 
 void CBuddyChatDlg::SetHotRgn()
 {
-	RECT rtWindow;
-	HRGN hTemp;
-	
-	CRect rtClient;
-	GetClientRect(&rtClient);
-	rtWindow.left = 0;
-	rtWindow.top = 0;
-	rtWindow.right = rtClient.right;
-	rtWindow.bottom = 106;
-	m_HotRgn = ::CreateRectRgnIndirect(&rtWindow);
+    RECT rtWindow;
+    HRGN hTemp;
 
-	m_picHead.GetClientRect(&rtWindow);
-	hTemp = ::CreateRectRgnIndirect(&rtWindow);
-	::CombineRgn(m_HotRgn, m_HotRgn, hTemp, RGN_DIFF);
-	::DeleteObject(hTemp);
+    CRect rtClient;
+    GetClientRect(&rtClient);
+    rtWindow.left = 0;
+    rtWindow.top = 0;
+    rtWindow.right = rtClient.right;
+    rtWindow.bottom = 106;
+    m_HotRgn = ::CreateRectRgnIndirect(&rtWindow);
 
-	m_lnkBuddyName.GetClientRect(&rtWindow);
-	hTemp = ::CreateRectRgnIndirect(&rtWindow);
-	::CombineRgn(m_HotRgn, m_HotRgn, hTemp, RGN_DIFF);
-	::DeleteObject(hTemp);
+    m_picHead.GetClientRect(&rtWindow);
+    hTemp = ::CreateRectRgnIndirect(&rtWindow);
+    ::CombineRgn(m_HotRgn, m_HotRgn, hTemp, RGN_DIFF);
+    ::DeleteObject(hTemp);
 
-	m_staBuddySign.GetClientRect(&rtWindow);
-	hTemp = ::CreateRectRgnIndirect(&rtWindow);
-	::CombineRgn(m_HotRgn, m_HotRgn, hTemp, RGN_DIFF);
-	::DeleteObject(hTemp);
-	
-	m_SkinDlg.SetDragRegion(m_HotRgn);
+    m_lnkBuddyName.GetClientRect(&rtWindow);
+    hTemp = ::CreateRectRgnIndirect(&rtWindow);
+    ::CombineRgn(m_HotRgn, m_HotRgn, hTemp, RGN_DIFF);
+    ::DeleteObject(hTemp);
+
+    m_staBuddySign.GetClientRect(&rtWindow);
+    hTemp = ::CreateRectRgnIndirect(&rtWindow);
+    ::CombineRgn(m_HotRgn, m_HotRgn, hTemp, RGN_DIFF);
+    ::DeleteObject(hTemp);
+
+    m_SkinDlg.SetDragRegion(m_HotRgn);
 }
 
 //void CBuddyChatDlg::CalcTitleBarRect()
@@ -3243,1249 +3201,1233 @@ void CBuddyChatDlg::SetHotRgn()
 //	}
 //}
 
-// ·´³õÊ¼»¯¿Ø¼ş
+// ååˆå§‹åŒ–æ§ä»¶
 BOOL CBuddyChatDlg::UnInit()
 {
-	if (m_PicBarDlg.IsWindow())
-		m_PicBarDlg.DestroyWindow();
+    if (m_PicBarDlg.IsWindow())
+        m_PicBarDlg.DestroyWindow();
 
-	if (m_picHead.IsWindow())
-		m_picHead.DestroyWindow();
+    if (m_picHead.IsWindow())
+        m_picHead.DestroyWindow();
 
-	if (m_lnkBuddyName.IsWindow())
-		m_lnkBuddyName.DestroyWindow();
+    if (m_lnkBuddyName.IsWindow())
+        m_lnkBuddyName.DestroyWindow();
 
-	if (m_staBuddySign.IsWindow())
-		m_staBuddySign.DestroyWindow();
+    if (m_staBuddySign.IsWindow())
+        m_staBuddySign.DestroyWindow();
 
-	//if (m_picAD_1.IsWindow())
-	//	m_picAD_1.DestroyWindow();
+    //if (m_picAD_1.IsWindow())
+    //	m_picAD_1.DestroyWindow();
 
-	//if (m_picAD_2.IsWindow())
-	//	m_picAD_2.DestroyWindow();
+    //if (m_picAD_2.IsWindow())
+    //	m_picAD_2.DestroyWindow();
 
-	//if (m_picAD_3.IsWindow())
-	//	m_picAD_3.DestroyWindow();
+    //if (m_picAD_3.IsWindow())
+    //	m_picAD_3.DestroyWindow();
 
-	if (m_btnMsgLog.IsWindow())
-	{
-		m_btnMsgLog.DestroyWindow();
-	}
+    if (m_btnMsgLog.IsWindow())
+    {
+        m_btnMsgLog.DestroyWindow();
+    }
 
-	if (m_btnClose.IsWindow())
-		m_btnClose.DestroyWindow();
+    if (m_btnClose.IsWindow())
+        m_btnClose.DestroyWindow();
 
-	if (m_btnSend.IsWindow())
-		m_btnSend.DestroyWindow();
+    if (m_btnSend.IsWindow())
+        m_btnSend.DestroyWindow();
 
-	if (m_btnArrow.IsWindow())
-		m_btnArrow.DestroyWindow();
+    if (m_btnArrow.IsWindow())
+        m_btnArrow.DestroyWindow();
 
-	m_SkinMenu.DestroyMenu();
+    m_SkinMenu.DestroyMenu();
 
-	if (m_tbTop.IsWindow())
-		m_tbTop.DestroyWindow();
+    if (m_tbTop.IsWindow())
+        m_tbTop.DestroyWindow();
 
-	if (m_tbMid.IsWindow())
-		m_tbMid.DestroyWindow();
+    if (m_tbMid.IsWindow())
+        m_tbMid.DestroyWindow();
 
-	if (m_FontSelDlg.IsWindow())
-		m_FontSelDlg.DestroyWindow();
+    if (m_FontSelDlg.IsWindow())
+        m_FontSelDlg.DestroyWindow();
 
-	if (m_FaceSelDlg.IsWindow())
-		m_FaceSelDlg.DestroyWindow();
+    if (m_FaceSelDlg.IsWindow())
+        m_FaceSelDlg.DestroyWindow();
 
-	if (m_richRecv.IsWindow())
-		m_richRecv.DestroyWindow();
+    if (m_richRecv.IsWindow())
+        m_richRecv.DestroyWindow();
 
-	if (m_richSend.IsWindow())
-		m_richSend.DestroyWindow();
+    if (m_richSend.IsWindow())
+        m_richSend.DestroyWindow();
 
-	if (m_richMsgLog.IsWindow())
-		m_richMsgLog.DestroyWindow();
+    if (m_richMsgLog.IsWindow())
+        m_richMsgLog.DestroyWindow();
 
-	m_Accelerator.DestroyObject();
-	//	m_menuRichEdit.DestroyMenu();
+    m_Accelerator.DestroyObject();
+    //	m_menuRichEdit.DestroyMenu();
 
-	DestroyFileTransferCtrl();
+    DestroyFileTransferCtrl();
 
-	return TRUE;
+    return TRUE;
 }
 
 void CBuddyChatDlg::_RichEdit_ReplaceSel(HWND hWnd, LPCTSTR lpszNewText)
 {
-	if (hWnd == m_richRecv.m_hWnd)
-	{
-		CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
-		RichEdit_ReplaceSel(hWnd, lpszNewText, 
-			fontInfo.m_strName.c_str(), fontInfo.m_nSize, 
-			fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, 
-			fontInfo.m_bUnderLine, FALSE, 300);
-	}
-	else
-	{
-		RichEdit_ReplaceSel(hWnd, lpszNewText);
-	}
+    if (hWnd == m_richRecv.m_hWnd)
+    {
+        CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
+        RichEdit_ReplaceSel(hWnd, lpszNewText,
+            fontInfo.m_strName.c_str(), fontInfo.m_nSize,
+            fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic,
+            fontInfo.m_bUnderLine, FALSE, 300);
+    } else
+    {
+        RichEdit_ReplaceSel(hWnd, lpszNewText);
+    }
 }
 
 BOOL CBuddyChatDlg::_RichEdit_InsertFace(HWND hWnd, LPCTSTR lpszFileName, int nFaceId, int nFaceIndex)
 {
-	ITextServices* pTextServices;
-	ITextHost* pTextHost;
-	BOOL bRet;
-	long nImageWidth = 0;
-	long nImageHeight = 0;
-	GetImageDisplaySizeInRichEdit(lpszFileName, hWnd, nImageWidth, nImageHeight);
+    ITextServices* pTextServices;
+    ITextHost* pTextHost;
+    BOOL bRet;
+    long nImageWidth = 0;
+    long nImageHeight = 0;
+    GetImageDisplaySizeInRichEdit(lpszFileName, hWnd, nImageWidth, nImageHeight);
 
-	if (hWnd == m_richRecv.m_hWnd)
-	{
-		pTextServices = m_richRecv.GetTextServices();
-		pTextHost = m_richRecv.GetTextHost();
+    if (hWnd == m_richRecv.m_hWnd)
+    {
+        pTextServices = m_richRecv.GetTextServices();
+        pTextHost = m_richRecv.GetTextHost();
 
-		long lStartChar = 0, lEndChar = 0;
-		RichEdit_GetSel(hWnd, lStartChar, lEndChar);
-		bRet = RichEdit_InsertFace(pTextServices, pTextHost, lpszFileName, nFaceId, nFaceIndex, RGB(255,255,255), TRUE, 40, nImageWidth, nImageHeight);
-		if (bRet)
-		{
-			lEndChar = lStartChar + 1;
-			RichEdit_SetSel(hWnd, lStartChar, lEndChar);
-			RichEdit_SetStartIndent(hWnd, 300);
-			RichEdit_SetSel(hWnd, lEndChar, lEndChar);
-		}
-	}
-	else if (hWnd == m_richSend.m_hWnd)
-	{
-		pTextServices = m_richSend.GetTextServices();
-		pTextHost = m_richSend.GetTextHost();
+        long lStartChar = 0, lEndChar = 0;
+        RichEdit_GetSel(hWnd, lStartChar, lEndChar);
+        bRet = RichEdit_InsertFace(pTextServices, pTextHost, lpszFileName, nFaceId, nFaceIndex, RGB(255, 255, 255), TRUE, 40, nImageWidth, nImageHeight);
+        if (bRet)
+        {
+            lEndChar = lStartChar + 1;
+            RichEdit_SetSel(hWnd, lStartChar, lEndChar);
+            RichEdit_SetStartIndent(hWnd, 300);
+            RichEdit_SetSel(hWnd, lEndChar, lEndChar);
+        }
+    } else if (hWnd == m_richSend.m_hWnd)
+    {
+        pTextServices = m_richSend.GetTextServices();
+        pTextHost = m_richSend.GetTextHost();
 
-		long lStartChar = 0, lEndChar = 0;
-		RichEdit_GetSel(hWnd, lStartChar, lEndChar);
-		long nWidthImage = 0;
-		long nHeightImage = 0;
-		
-		bRet = RichEdit_InsertFace(pTextServices, pTextHost, lpszFileName, nFaceId, nFaceIndex, RGB(255,255,255), TRUE, 40, nImageWidth, nImageHeight);
-		if (bRet)
-		{
-			lEndChar = lStartChar + 1;
-			RichEdit_SetSel(hWnd, lStartChar, lEndChar);
-			//RichEdit_SetStartIndent(hWnd, 300);
-			RichEdit_SetSel(hWnd, lEndChar, lEndChar);
-		}
-	}
-	else if (hWnd == m_richMsgLog.m_hWnd)
-	{
-		pTextServices = m_richMsgLog.GetTextServices();
-		pTextHost = m_richMsgLog.GetTextHost();
+        long lStartChar = 0, lEndChar = 0;
+        RichEdit_GetSel(hWnd, lStartChar, lEndChar);
+        long nWidthImage = 0;
+        long nHeightImage = 0;
 
-		long lStartChar = 0, lEndChar = 0;
-		RichEdit_GetSel(hWnd, lStartChar, lEndChar);
-		bRet = RichEdit_InsertFace(pTextServices, pTextHost, lpszFileName, nFaceId, nFaceIndex, RGB(255,255,255), TRUE, 40, nImageWidth, nImageHeight);
-		if (bRet)
-		{
-			lEndChar = lStartChar + 1;
-			RichEdit_SetSel(hWnd, lStartChar, lEndChar);
-			RichEdit_SetStartIndent(hWnd, 300);
-			RichEdit_SetSel(hWnd, lEndChar, lEndChar);
-		}
-	}
+        bRet = RichEdit_InsertFace(pTextServices, pTextHost, lpszFileName, nFaceId, nFaceIndex, RGB(255, 255, 255), TRUE, 40, nImageWidth, nImageHeight);
+        if (bRet)
+        {
+            lEndChar = lStartChar + 1;
+            RichEdit_SetSel(hWnd, lStartChar, lEndChar);
+            //RichEdit_SetStartIndent(hWnd, 300);
+            RichEdit_SetSel(hWnd, lEndChar, lEndChar);
+        }
+    } else if (hWnd == m_richMsgLog.m_hWnd)
+    {
+        pTextServices = m_richMsgLog.GetTextServices();
+        pTextHost = m_richMsgLog.GetTextHost();
 
-	if (pTextServices != NULL)
-		pTextServices->Release();
-	if (pTextHost != NULL)
-		pTextHost->Release();
+        long lStartChar = 0, lEndChar = 0;
+        RichEdit_GetSel(hWnd, lStartChar, lEndChar);
+        bRet = RichEdit_InsertFace(pTextServices, pTextHost, lpszFileName, nFaceId, nFaceIndex, RGB(255, 255, 255), TRUE, 40, nImageWidth, nImageHeight);
+        if (bRet)
+        {
+            lEndChar = lStartChar + 1;
+            RichEdit_SetSel(hWnd, lStartChar, lEndChar);
+            RichEdit_SetStartIndent(hWnd, 300);
+            RichEdit_SetSel(hWnd, lEndChar, lEndChar);
+        }
+    }
 
-	return bRet;
+    if (pTextServices != NULL)
+        pTextServices->Release();
+    if (pTextHost != NULL)
+        pTextHost->Release();
+
+    return bRet;
 }
 
 BOOL CBuddyChatDlg::HandleSysFaceId(HWND hRichEditWnd, LPCTSTR& p, CString& strText)
 {
-	int nFaceId = GetBetweenInt(p+2, _T("[\""), _T("\"]"), -1);
-	CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(nFaceId);
-	if (lpFaceInfo != NULL)
-	{
-		if (!strText.IsEmpty())
-		{
-			_RichEdit_ReplaceSel(hRichEditWnd, strText); 
-			strText = _T("");
-		}
+    int nFaceId = GetBetweenInt(p + 2, _T("[\""), _T("\"]"), -1);
+    CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(nFaceId);
+    if (lpFaceInfo != NULL)
+    {
+        if (!strText.IsEmpty())
+        {
+            _RichEdit_ReplaceSel(hRichEditWnd, strText);
+            strText = _T("");
+        }
 
-		_RichEdit_InsertFace(hRichEditWnd, lpFaceInfo->m_strFileName.c_str(), 
-			lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
+        _RichEdit_InsertFace(hRichEditWnd, lpFaceInfo->m_strFileName.c_str(),
+            lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleSysFaceIndex(HWND hRichEditWnd, LPCTSTR& p, CString& strText)
 {
-	int nFaceIndex = GetBetweenInt(p+2, _T("[\""), _T("\"]"), -1);
-	CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoByIndex(nFaceIndex);
-	if (lpFaceInfo != NULL)
-	{
-		if (!strText.IsEmpty())
-		{
-			_RichEdit_ReplaceSel(hRichEditWnd, strText); 
-			strText = _T("");
-		}
+    int nFaceIndex = GetBetweenInt(p + 2, _T("[\""), _T("\"]"), -1);
+    CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoByIndex(nFaceIndex);
+    if (lpFaceInfo != NULL)
+    {
+        if (!strText.IsEmpty())
+        {
+            _RichEdit_ReplaceSel(hRichEditWnd, strText);
+            strText = _T("");
+        }
 
-		_RichEdit_InsertFace(hRichEditWnd, lpFaceInfo->m_strFileName.c_str(), 
-			lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
+        _RichEdit_InsertFace(hRichEditWnd, lpFaceInfo->m_strFileName.c_str(),
+            lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL CBuddyChatDlg::HandleCustomPic(HWND hRichEditWnd, LPCTSTR& p, CString& strText)
 {
-	CString strFileName = GetBetweenString(p+2, _T("[\""), _T("\"]")).c_str();
-	if (!strFileName.IsEmpty())
-	{
-		if (!strText.IsEmpty())
-		{
-			_RichEdit_ReplaceSel(hRichEditWnd, strText); 
-			strText = _T("");
-		}
+    CString strFileName = GetBetweenString(p + 2, _T("[\""), _T("\"]")).c_str();
+    if (!strFileName.IsEmpty())
+    {
+        if (!strText.IsEmpty())
+        {
+            _RichEdit_ReplaceSel(hRichEditWnd, strText);
+            strText = _T("");
+        }
 
-		if (::PathIsRelative(strFileName))
-			strFileName = m_lpFMGClient->GetChatPicFullName(strFileName).c_str();
+        if (::PathIsRelative(strFileName))
+            strFileName = m_lpFMGClient->GetChatPicFullName(strFileName).c_str();
 
-		_RichEdit_InsertFace(hRichEditWnd, strFileName, -1, -1);
+        _RichEdit_InsertFace(hRichEditWnd, strFileName, -1, -1);
 
-		p = _tcsstr(p+2, _T("\"]"));
-		p++;
-		return TRUE;
-	}
-	return FALSE;
+        p = _tcsstr(p + 2, _T("\"]"));
+        p++;
+        return TRUE;
+    }
+    return FALSE;
 }
 
-// "/f["ÏµÍ³±íÇéid"]/s["ÏµÍ³±íÇéindex"]/c["×Ô¶¨ÒåÍ¼Æ¬Â·¾¶"]"
+// "/f["ç³»ç»Ÿè¡¨æƒ…id"]/s["ç³»ç»Ÿè¡¨æƒ…index"]/c["è‡ªå®šä¹‰å›¾ç‰‡è·¯å¾„"]"
 void CBuddyChatDlg::AddMsg(HWND hRichEditWnd, LPCTSTR lpText)
 {
-	if (NULL == lpText || NULL ==*lpText)
-		return;
+    if (NULL == lpText || NULL == *lpText)
+        return;
 
-	CString strText;
+    CString strText;
 
-	for (LPCTSTR p = lpText;*p != _T('\0'); p++)
-	{
-		if (*p == _T('/'))
-		{
-			if (*(p+1) == _T('/'))
-			{
-				strText +=*p;
-				p++;
-				continue;
-			}
-			else if (*(p+1) == _T('f'))
-			{
-				if (HandleSysFaceId(hRichEditWnd, p, strText))
-					continue;
-			}
-			else if (*(p+1) == _T('s'))
-			{
-				if (HandleSysFaceIndex(hRichEditWnd, p, strText))
-					continue;
-			}
-			else if (*(p+1) == _T('c'))
-			{
-				if (HandleCustomPic(hRichEditWnd, p, strText))
-					continue;
-			}
-		}
-		strText +=*p;
-	}
+    for (LPCTSTR p = lpText; *p != _T('\0'); p++)
+    {
+        if (*p == _T('/'))
+        {
+            if (*(p + 1) == _T('/'))
+            {
+                strText += *p;
+                p++;
+                continue;
+            } else if (*(p + 1) == _T('f'))
+            {
+                if (HandleSysFaceId(hRichEditWnd, p, strText))
+                    continue;
+            } else if (*(p + 1) == _T('s'))
+            {
+                if (HandleSysFaceIndex(hRichEditWnd, p, strText))
+                    continue;
+            } else if (*(p + 1) == _T('c'))
+            {
+                if (HandleCustomPic(hRichEditWnd, p, strText))
+                    continue;
+            }
+        }
+        strText += *p;
+    }
 
-	if (!strText.IsEmpty())
-		_RichEdit_ReplaceSel(hRichEditWnd, strText);
+    if (!strText.IsEmpty())
+        _RichEdit_ReplaceSel(hRichEditWnd, strText);
 }
 
 void CBuddyChatDlg::AddMsgToSendEdit(LPCTSTR lpText)
 {
-	AddMsg(m_richSend.m_hWnd, lpText);
-	m_richSend.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+    AddMsg(m_richSend.m_hWnd, lpText);
+    m_richSend.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
 }
 
 void CBuddyChatDlg::AddMsgToRecvEdit(time_t nTime, LPCTSTR lpText)
 {
-	if (NULL == lpText || NULL ==*lpText)
-		return;
+    if (NULL == lpText || NULL == *lpText)
+        return;
 
-	TCHAR cTime[32] = {0};
-	FormatTime(nTime, _T("%H:%M:%S"), cTime, sizeof(cTime)/sizeof(TCHAR));
+    TCHAR cTime[32] = { 0 };
+    FormatTime(nTime, _T("%H:%M:%S"), cTime, sizeof(cTime) / sizeof(TCHAR));
 
-	CString strText;
-	strText.Format(_T("%s  %s\r\n"), m_strUserName, cTime);
+    CString strText;
+    strText.Format(_T("%s  %s\r\n"), m_strUserName, cTime);
 
-	RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, 
-		_T("Î¢ÈíÑÅºÚ"), 10, RGB(0,128,64), FALSE, FALSE, FALSE, FALSE, 0);
-	strText = _T("");
- 
-	AddMsg(m_richRecv.m_hWnd, lpText);
+    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText,
+        _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 128, 64), FALSE, FALSE, FALSE, FALSE, 0);
+    strText = _T("");
 
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
-	RichEdit_SetStartIndent(m_richRecv.m_hWnd, 0);
-	m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	
-	//CRect rtRichRecv;
-	//::GetWindowRect(m_richRecv.m_hWnd, &rtRichRecv);
-	//CRect rtLastImage;
-	//IImageOle* pImageOle = NULL;
-	//if(!RichEdit_GetImageOle(m_richRecv.m_hWnd, rtLastImage, &pImageOle))
-	//	return;
-	//CRect rtUploadInfo;
-	//::GetClientRect(m_staPicUploadProgress.m_hWnd, &rtUploadInfo);
-	//m_staPicUploadProgress.SetWindowText(_T("100%11111111111111111111111111111111111111111111111111111111111111"));
-	//::SetWindowPos(m_staPicUploadProgress.m_hWnd, m_richRecv.m_hWnd, rtRichRecv.left+rtLastImage.right-rtUploadInfo.Width(), rtRichRecv.top+rtLastImage.bottom-rtUploadInfo.Height(), 500, 300/*rtUploadInfo.Width(), rtUploadInfo.Height()*/, SWP_SHOWWINDOW);
-	//if(pImageOle != NULL)
-	//	pImageOle->Release();
+    AddMsg(m_richRecv.m_hWnd, lpText);
+
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
+    RichEdit_SetStartIndent(m_richRecv.m_hWnd, 0);
+    m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+
+    //CRect rtRichRecv;
+    //::GetWindowRect(m_richRecv.m_hWnd, &rtRichRecv);
+    //CRect rtLastImage;
+    //IImageOle* pImageOle = NULL;
+    //if(!RichEdit_GetImageOle(m_richRecv.m_hWnd, rtLastImage, &pImageOle))
+    //	return;
+    //CRect rtUploadInfo;
+    //::GetClientRect(m_staPicUploadProgress.m_hWnd, &rtUploadInfo);
+    //m_staPicUploadProgress.SetWindowText(_T("100%11111111111111111111111111111111111111111111111111111111111111"));
+    //::SetWindowPos(m_staPicUploadProgress.m_hWnd, m_richRecv.m_hWnd, rtRichRecv.left+rtLastImage.right-rtUploadInfo.Width(), rtRichRecv.top+rtLastImage.bottom-rtUploadInfo.Height(), 500, 300/*rtUploadInfo.Width(), rtUploadInfo.Height()*/, SWP_SHOWWINDOW);
+    //if(pImageOle != NULL)
+    //	pImageOle->Release();
 }
 
 void CBuddyChatDlg::AddMsgToRecvEdit(CBuddyMessage* lpBuddyMsg)
 {
-	if (NULL == lpBuddyMsg || NULL == m_lpFMGClient)
-		return;
+    if (NULL == lpBuddyMsg || NULL == m_lpFMGClient)
+        return;
 
-	UINT nMsgType = lpBuddyMsg->m_nMsgType;
-	tstring strMsgText(_T("                                       ¡î"));
-	
-	TCHAR cTime[32] = {0};
-	if (IsToday(lpBuddyMsg->m_nTime))
-		FormatTime(lpBuddyMsg->m_nTime, _T("%H:%M:%S"), cTime, sizeof(cTime)/sizeof(TCHAR));
-	else
-		FormatTime(lpBuddyMsg->m_nTime, _T("%Y-%m-%d %H:%M:%S"), cTime, sizeof(cTime)/sizeof(TCHAR));
+    UINT nMsgType = lpBuddyMsg->m_nMsgType;
+    tstring strMsgText(_T("                                       â˜†"));
 
-	RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+    TCHAR cTime[32] = { 0 };
+    if (IsToday(lpBuddyMsg->m_nTime))
+        FormatTime(lpBuddyMsg->m_nTime, _T("%H:%M:%S"), cTime, sizeof(cTime) / sizeof(TCHAR));
+    else
+        FormatTime(lpBuddyMsg->m_nTime, _T("%Y-%m-%d %H:%M:%S"), cTime, sizeof(cTime) / sizeof(TCHAR));
 
-	//´°¿Ú¶¶¶¯ÏûÏ¢»òÕßÍ¼Æ¬ÉÏ´«È·ÈÏÏûÏ¢¾ù²»ÏÔÊ¾·¢ËÍÈËĞÅÏ¢
-	if(!lpBuddyMsg->IsShakeWindowMsg() && nMsgType!=CONTENT_TYPE_IMAGE_CONFIRM)
-	{
-		CString strText;
-		RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-		if(lpBuddyMsg->m_nFromUin == m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID)
-		{
-			strText.Format(_T("%s  %s\r\n"), m_lpFMGClient->m_UserMgr.m_UserInfo.m_strNickName.c_str(), cTime);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,128,64), FALSE, FALSE, FALSE, FALSE, 0);
-		}
-		else
-		{
-			strText.Format(_T("%s  %s\r\n"), m_strBuddyName, cTime);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
-		}
-	}
+    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
 
-	CString strInfo;
-	tstring	strFileName;
-	tstring strFileNameWithoutPath;
-	
-	//£¡£¡×ÖÌåĞÅÏ¢±ØĞë·ÅÔÚÎÄ±¾ĞÅÏ¢µÄÇ°Ãæ
-	CFontInfo fontInfo;
-	for (int i = 0; i < (int)lpBuddyMsg->m_arrContent.size(); i++)
-	{
-		CContent* lpContent = lpBuddyMsg->m_arrContent[i];
-		if (lpContent != NULL)
-		{
-			switch (lpContent->m_nType)
-			{
-			case CONTENT_TYPE_FONT_INFO:
-				{
-					fontInfo.m_strName = lpContent->m_FontInfo.m_strName;
-					fontInfo.m_nSize = lpContent->m_FontInfo.m_nSize;
-					fontInfo.m_clrText = lpContent->m_FontInfo.m_clrText;
-					fontInfo.m_bBold = lpContent->m_FontInfo.m_bBold;
-					fontInfo.m_bItalic = lpContent->m_FontInfo.m_bItalic;
-					fontInfo.m_bUnderLine = lpContent->m_FontInfo.m_bUnderLine;
-				}
-				break;
+    //çª—å£æŠ–åŠ¨æ¶ˆæ¯æˆ–è€…å›¾ç‰‡ä¸Šä¼ ç¡®è®¤æ¶ˆæ¯å‡ä¸æ˜¾ç¤ºå‘é€äººä¿¡æ¯
+    if (!lpBuddyMsg->IsShakeWindowMsg() && nMsgType != CONTENT_TYPE_IMAGE_CONFIRM)
+    {
+        CString strText;
+        RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+        if (lpBuddyMsg->m_nFromUin == m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID)
+        {
+            strText.Format(_T("%s  %s\r\n"), m_lpFMGClient->m_UserMgr.m_UserInfo.m_strNickName.c_str(), cTime);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 128, 64), FALSE, FALSE, FALSE, FALSE, 0);
+        } else
+        {
+            strText.Format(_T("%s  %s\r\n"), m_strBuddyName, cTime);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
+        }
+    }
 
-			case CONTENT_TYPE_TEXT:
-				{
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_strText.c_str(), 
-						fontInfo.m_strName.c_str(), fontInfo.m_nSize, 
-						fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, 
-						fontInfo.m_bUnderLine, FALSE, 300);
-				}
-				break;
+    CString strInfo;
+    tstring	strFileName;
+    tstring strFileNameWithoutPath;
 
-			case CONTENT_TYPE_FACE:
-				{
-					if (m_lpFaceList != NULL)
-					{
-						CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(lpContent->m_nFaceId);
-						if (lpFaceInfo != NULL)
-						{
-							_RichEdit_InsertFace(m_richRecv.m_hWnd, 
-								lpFaceInfo->m_strFileName.c_str(), lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
-						}
-					}
-				}
-				break;
+    //ï¼ï¼å­—ä½“ä¿¡æ¯å¿…é¡»æ”¾åœ¨æ–‡æœ¬ä¿¡æ¯çš„å‰é¢
+    CFontInfo fontInfo;
+    for (int i = 0; i < (int)lpBuddyMsg->m_arrContent.size(); i++)
+    {
+        CContent* lpContent = lpBuddyMsg->m_arrContent[i];
+        if (lpContent != NULL)
+        {
+            switch (lpContent->m_nType)
+            {
+            case CONTENT_TYPE_FONT_INFO:
+            {
+                fontInfo.m_strName = lpContent->m_FontInfo.m_strName;
+                fontInfo.m_nSize = lpContent->m_FontInfo.m_nSize;
+                fontInfo.m_clrText = lpContent->m_FontInfo.m_clrText;
+                fontInfo.m_bBold = lpContent->m_FontInfo.m_bBold;
+                fontInfo.m_bItalic = lpContent->m_FontInfo.m_bItalic;
+                fontInfo.m_bUnderLine = lpContent->m_FontInfo.m_bUnderLine;
+            }
+            break;
 
-			case CONTENT_TYPE_SHAKE_WINDOW:
-				{
-					strMsgText += m_strBuddyName;
-					strMsgText += _T("¸øÄú·¢ËÍÁËÒ»¸ö´°¿Ú¶¶¶¯¡î") ;
-					RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, strMsgText.c_str(), _T("Î¢ÈíÑÅºÚ"), 10,  0, FALSE, FALSE, FALSE, FALSE, 300);
-				}
-				break;
+            case CONTENT_TYPE_TEXT:
+            {
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_strText.c_str(),
+                    fontInfo.m_strName.c_str(), fontInfo.m_nSize,
+                    fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic,
+                    fontInfo.m_bUnderLine, FALSE, 300);
+            }
+            break;
 
-			case CONTENT_TYPE_FILE:
-				{
-					strInfo.Format(_T("%sÏòÄú·¢ËÍÎÄ¼ş["), m_strBuddyName);
-					RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("Î¢ÈíÑÅºÚ"), 10,  0, FALSE, FALSE, FALSE, FALSE, 300);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_CFaceInfo.m_strFileName.c_str(), _T("Î¢ÈíÑÅºÚ"), 10,  RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 300);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("]\r\n"), _T("Î¢ÈíÑÅºÚ"), 10,  0, FALSE, FALSE, FALSE, FALSE, 300);
-					ShowRequestRecvFile(lpContent->m_CFaceInfo.m_bOnline, lpContent->m_CFaceInfo.m_strFilePath.c_str(), lpContent->m_CFaceInfo.m_strFileName.c_str(), (long)lpContent->m_CFaceInfo.m_dwFileSize);
-				}
-				break;
+            case CONTENT_TYPE_FACE:
+            {
+                if (m_lpFaceList != NULL)
+                {
+                    CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(lpContent->m_nFaceId);
+                    if (lpFaceInfo != NULL)
+                    {
+                        _RichEdit_InsertFace(m_richRecv.m_hWnd,
+                            lpFaceInfo->m_strFileName.c_str(), lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
+                    }
+                }
+            }
+            break;
 
-			case CONTENT_TYPE_CHAT_IMAGE:
-				{
-					if(nMsgType == CONTENT_TYPE_TEXT)
-					{
-						long lStartChar = 0, lEndChar = 0;
-						RichEdit_GetSel(m_richRecv.m_hWnd, lStartChar, lEndChar);
-						strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(lpContent->m_CFaceInfo.m_strFileName.c_str());
-						if(!Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str())<=0)
-						{
-							m_mapRecvFileInfo.insert(std::pair<CString, long>(strFileName.c_str(), lStartChar));						
-							strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadImageProgress.gif");
-						}
-						
-						_RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
-					}
-					else if(nMsgType == CONTENT_TYPE_IMAGE_CONFIRM)
-					{
-						strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(lpContent->m_CFaceInfo.m_strFileName.c_str());
-                        //strFileName += _T(".jpg");
-						std::map<CString, long>::const_iterator iter = m_mapRecvFileInfo.find(strFileName.c_str());
-						if(iter != m_mapRecvFileInfo.end())
-						{
-							if(lpContent->m_CFaceInfo.m_strFilePath.empty() || !Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str())==0)
-								strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
-							
-							RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second+1);
-							_RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
-						}
-					}
-					else if(nMsgType == CONTENT_TYPE_MOBILE_IMAGE)
-					{
-						strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(lpContent->m_CFaceInfo.m_strFileName.c_str());
-						if(!Hootina::CPath::IsFileExist(strFileName.c_str()))
-							strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
+            case CONTENT_TYPE_SHAKE_WINDOW:
+            {
+                strMsgText += m_strBuddyName;
+                strMsgText += _T("ç»™æ‚¨å‘é€äº†ä¸€ä¸ªçª—å£æŠ–åŠ¨â˜†");
+                RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, strMsgText.c_str(), _T("å¾®è½¯é›…é»‘"), 10, 0, FALSE, FALSE, FALSE, FALSE, 300);
+            }
+            break;
 
-						RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-						_RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
-					}
-				}
-				break;
+            case CONTENT_TYPE_FILE:
+            {
+                strInfo.Format(_T("%så‘æ‚¨å‘é€æ–‡ä»¶["), m_strBuddyName);
+                RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("å¾®è½¯é›…é»‘"), 10, 0, FALSE, FALSE, FALSE, FALSE, 300);
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_CFaceInfo.m_strFileName.c_str(), _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 300);
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("]\r\n"), _T("å¾®è½¯é›…é»‘"), 10, 0, FALSE, FALSE, FALSE, FALSE, 300);
+                ShowRequestRecvFile(lpContent->m_CFaceInfo.m_bOnline, lpContent->m_CFaceInfo.m_strFilePath.c_str(), lpContent->m_CFaceInfo.m_strFileName.c_str(), (long)lpContent->m_CFaceInfo.m_dwFileSize);
+            }
+            break;
+
+            case CONTENT_TYPE_CHAT_IMAGE:
+            {
+                if (nMsgType == CONTENT_TYPE_TEXT)
+                {
+                    long lStartChar = 0, lEndChar = 0;
+                    RichEdit_GetSel(m_richRecv.m_hWnd, lStartChar, lEndChar);
+                    strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(lpContent->m_CFaceInfo.m_strFileName.c_str());
+                    if (!Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str()) <= 0)
+                    {
+                        m_mapRecvFileInfo.insert(std::pair<CString, long>(strFileName.c_str(), lStartChar));
+                        strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadImageProgress.gif");
+                    }
+
+                    _RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
+                } else if (nMsgType == CONTENT_TYPE_IMAGE_CONFIRM)
+                {
+                    strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(lpContent->m_CFaceInfo.m_strFileName.c_str());
+                    //strFileName += _T(".jpg");
+                    std::map<CString, long>::const_iterator iter = m_mapRecvFileInfo.find(strFileName.c_str());
+                    if (iter != m_mapRecvFileInfo.end())
+                    {
+                        if (lpContent->m_CFaceInfo.m_strFilePath.empty() || !Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str()) == 0)
+                            strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
+
+                        RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second + 1);
+                        _RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
+                    }
+                } else if (nMsgType == CONTENT_TYPE_MOBILE_IMAGE)
+                {
+                    strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(lpContent->m_CFaceInfo.m_strFileName.c_str());
+                    if (!Hootina::CPath::IsFileExist(strFileName.c_str()))
+                        strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
+
+                    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+                    _RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
+                }
+            }
+            break;
 
             case CONTENT_TYPE_REMOTE_DESKTOP:
-                {
-                    int k = 0;
-                }
-                break;
-			}
+            {
+                int k = 0;
+            }
+            break;
+            }
 
-			if( lpContent->m_nType!=CONTENT_TYPE_FONT_INFO && nMsgType!=CONTENT_TYPE_IMAGE_CONFIRM)
-			{
-				if(m_bEnableAutoReply)
-				{
-					InsertAutoReplyContent();
-				}
-			}
-		}
-	}
-	
-	
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
-	RichEdit_SetStartIndent(m_richRecv.m_hWnd, 0);
-	m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	
+            if (lpContent->m_nType != CONTENT_TYPE_FONT_INFO && nMsgType != CONTENT_TYPE_IMAGE_CONFIRM)
+            {
+                if (m_bEnableAutoReply)
+                {
+                    InsertAutoReplyContent();
+                }
+            }
+        }
+    }
+
+
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
+    RichEdit_SetStartIndent(m_richRecv.m_hWnd, 0);
+    m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+
 }
 
 void CBuddyChatDlg::InsertAutoReplyContent()
 {
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
-	CString strAutoReplyContent(m_lpFMGClient->m_UserConfig.GetAutoReplyContent());
-	if(strAutoReplyContent == "")
-		strAutoReplyContent = _T("[×Ô¶¯»Ø¸´]ÄúºÃ£¬ÎÒÏÖÔÚÓĞÊÂ²»ÔÚ£¬ÉÔºòÔÙÁªÏµÄú¡£");
-	else
-		strAutoReplyContent.Insert(0, _T("[×Ô¶¯»Ø¸´]"));
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
+    CString strAutoReplyContent(m_lpFMGClient->m_UserConfig.GetAutoReplyContent());
+    if (strAutoReplyContent == "")
+        strAutoReplyContent = _T("[è‡ªåŠ¨å›å¤]æ‚¨å¥½ï¼Œæˆ‘ç°åœ¨æœ‰äº‹ä¸åœ¨ï¼Œç¨å€™å†è”ç³»æ‚¨ã€‚");
+    else
+        strAutoReplyContent.Insert(0, _T("[è‡ªåŠ¨å›å¤]"));
 
-	TCHAR szTime[32] = {0};
-	time_t nAutoReplyTime = time(NULL);
-	FormatTime(nAutoReplyTime, _T("%H:%M:%S"), szTime, ARRAYSIZE(szTime));
+    TCHAR szTime[32] = { 0 };
+    time_t nAutoReplyTime = time(NULL);
+    FormatTime(nAutoReplyTime, _T("%H:%M:%S"), szTime, ARRAYSIZE(szTime));
 
-	CString strText;
-	strText.Format(_T("%s  %s\r\n"), m_strUserName, szTime);
+    CString strText;
+    strText.Format(_T("%s  %s\r\n"), m_strUserName, szTime);
 
-	RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("ËÎÌå"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
-	
-	CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, strAutoReplyContent, _T("Î¢ÈíÑÅºÚ"), fontInfo.m_nSize, fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, fontInfo.m_bUnderLine, FALSE, 300);
-	//×ÖÌåĞÅÏ¢¸ñÊ½ÊÇ£º/0["×ÖÌåÃû,×ÖºÅ,ÑÕÉ«,´ÖÌå,Ğ±Ìå,ÏÂ»®Ïß"]
-	TCHAR szFontInfo[1024] = {0};
-	TCHAR szColor[32] = {0};
-	RGBToHexStr(fontInfo.m_clrText, szColor, ARRAYSIZE(szColor));
-	LPCTSTR lpFontFmt = _T("/o[\"%s,%d,%s,%d,%d,%d\"]");
-	wsprintf(szFontInfo, lpFontFmt, fontInfo.m_strName.c_str(), fontInfo.m_nSize, szColor, fontInfo.m_bBold, fontInfo.m_bItalic, fontInfo.m_bUnderLine);
+    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("å®‹ä½“"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
 
-	strAutoReplyContent += szFontInfo;
+    CFontInfo fontInfo = m_FontSelDlg.GetFontInfo();
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strAutoReplyContent, _T("å¾®è½¯é›…é»‘"), fontInfo.m_nSize, fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, fontInfo.m_bUnderLine, FALSE, 300);
+    //å­—ä½“ä¿¡æ¯æ ¼å¼æ˜¯ï¼š/0["å­—ä½“å,å­—å·,é¢œè‰²,ç²—ä½“,æ–œä½“,ä¸‹åˆ’çº¿"]
+    TCHAR szFontInfo[1024] = { 0 };
+    TCHAR szColor[32] = { 0 };
+    RGBToHexStr(fontInfo.m_clrText, szColor, ARRAYSIZE(szColor));
+    LPCTSTR lpFontFmt = _T("/o[\"%s,%d,%s,%d,%d,%d\"]");
+    wsprintf(szFontInfo, lpFontFmt, fontInfo.m_strName.c_str(), fontInfo.m_nSize, szColor, fontInfo.m_bBold, fontInfo.m_bItalic, fontInfo.m_bUnderLine);
+
+    strAutoReplyContent += szFontInfo;
     m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nAutoReplyTime, strAutoReplyContent.GetString(), m_hWnd);
 }
 void CBuddyChatDlg::AddMsgToMsgLogEdit(std::vector<CContent*>& arrContent)
 {
-	//£¡£¡×ÖÌåĞÅÏ¢±ØĞë·ÅÔÚÎÄ±¾ĞÅÏ¢µÄÇ°Ãæ
-	static CFontInfo fontInfo;
-	for (long i = 0; i < (long)arrContent.size(); i++)
-	{
-		CContent* lpContent = arrContent[i];
-		if (lpContent != NULL)
-		{
-			switch (lpContent->m_nType)
-			{
-			case CONTENT_TYPE_SHAKE_WINDOW:
-				{
-					RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, _T("¶¶ÁËÄúÒ»ÏÂ¡£"), _T("Î¢ÈíÑÅºÚ"), 10,  0, TRUE, FALSE, FALSE, FALSE, 300);
-				}
-				break;
+    //ï¼ï¼å­—ä½“ä¿¡æ¯å¿…é¡»æ”¾åœ¨æ–‡æœ¬ä¿¡æ¯çš„å‰é¢
+    static CFontInfo fontInfo;
+    for (long i = 0; i < (long)arrContent.size(); i++)
+    {
+        CContent* lpContent = arrContent[i];
+        if (lpContent != NULL)
+        {
+            switch (lpContent->m_nType)
+            {
+            case CONTENT_TYPE_SHAKE_WINDOW:
+            {
+                RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, _T("æŠ–äº†æ‚¨ä¸€ä¸‹ã€‚"), _T("å¾®è½¯é›…é»‘"), 10, 0, TRUE, FALSE, FALSE, FALSE, 300);
+            }
+            break;
 
-			case CONTENT_TYPE_FONT_INFO:
-				{
-					fontInfo.m_strName = lpContent->m_FontInfo.m_strName;
-					fontInfo.m_nSize = lpContent->m_FontInfo.m_nSize;
-					fontInfo.m_clrText = lpContent->m_FontInfo.m_clrText;
-					fontInfo.m_bBold = lpContent->m_FontInfo.m_bBold;
-					fontInfo.m_bItalic = lpContent->m_FontInfo.m_bItalic;
-					fontInfo.m_bUnderLine = lpContent->m_FontInfo.m_bUnderLine;
-				}
-				break;
+            case CONTENT_TYPE_FONT_INFO:
+            {
+                fontInfo.m_strName = lpContent->m_FontInfo.m_strName;
+                fontInfo.m_nSize = lpContent->m_FontInfo.m_nSize;
+                fontInfo.m_clrText = lpContent->m_FontInfo.m_clrText;
+                fontInfo.m_bBold = lpContent->m_FontInfo.m_bBold;
+                fontInfo.m_bItalic = lpContent->m_FontInfo.m_bItalic;
+                fontInfo.m_bUnderLine = lpContent->m_FontInfo.m_bUnderLine;
+            }
+            break;
 
-			case CONTENT_TYPE_TEXT:
-				{
-					RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, lpContent->m_strText.c_str(), 
-						fontInfo.m_strName.c_str(), fontInfo.m_nSize, 
-						fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, 
-						fontInfo.m_bUnderLine, FALSE, 300);
-				}
-				break;
+            case CONTENT_TYPE_TEXT:
+            {
+                RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, lpContent->m_strText.c_str(),
+                    fontInfo.m_strName.c_str(), fontInfo.m_nSize,
+                    fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic,
+                    fontInfo.m_bUnderLine, FALSE, 300);
+            }
+            break;
 
-			case CONTENT_TYPE_FACE:
-				{
-					if (m_lpFaceList != NULL)
-					{
-						CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(lpContent->m_nFaceId);
-						if (lpFaceInfo != NULL)
-						{
-							_RichEdit_InsertFace(m_richMsgLog.m_hWnd, 
-								lpFaceInfo->m_strFileName.c_str(), lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
-						}
-					}
-				}
-				break;
+            case CONTENT_TYPE_FACE:
+            {
+                if (m_lpFaceList != NULL)
+                {
+                    CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(lpContent->m_nFaceId);
+                    if (lpFaceInfo != NULL)
+                    {
+                        _RichEdit_InsertFace(m_richMsgLog.m_hWnd,
+                            lpFaceInfo->m_strFileName.c_str(), lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
+                    }
+                }
+            }
+            break;
 
-			case CONTENT_TYPE_CHAT_IMAGE:
-				{
-					tstring strFileName;
-					//°²×¿·¢ËÍ¹ıÀ´µÄÂ·¾¶ÀàËÆÕâÑù£º/storage/sdcard/windows/BstSharedFolder/]FHGGRBAA@85{PP{W3S]8C52.jpg
-					//ÏÈ¼ì²âÊÇ·ñÊÇÀàËÆÓÚC:\dd\xx.pngµÄÂ·¾¶
-					if(::PathIsRelative(lpContent->m_CFaceInfo.m_strName.c_str()))
-						strFileName	= m_lpFMGClient->m_UserMgr.GetChatPicFullName(::PathFindFileName(lpContent->m_CFaceInfo.m_strName.c_str()));
-					else
-						strFileName = lpContent->m_CFaceInfo.m_strName;
-					if (!Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str())==0)
-						strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
-					_RichEdit_InsertFace(m_richMsgLog.m_hWnd, strFileName.c_str(), -1, -1);
-				}
-				break;
+            case CONTENT_TYPE_CHAT_IMAGE:
+            {
+                tstring strFileName;
+                //å®‰å“å‘é€è¿‡æ¥çš„è·¯å¾„ç±»ä¼¼è¿™æ ·ï¼š/storage/sdcard/windows/BstSharedFolder/]FHGGRBAA@85{PP{W3S]8C52.jpg
+                //å…ˆæ£€æµ‹æ˜¯å¦æ˜¯ç±»ä¼¼äºC:\dd\xx.pngçš„è·¯å¾„
+                if (::PathIsRelative(lpContent->m_CFaceInfo.m_strName.c_str()))
+                    strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(::PathFindFileName(lpContent->m_CFaceInfo.m_strName.c_str()));
+                else
+                    strFileName = lpContent->m_CFaceInfo.m_strName;
+                if (!Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str()) == 0)
+                    strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
+                _RichEdit_InsertFace(m_richMsgLog.m_hWnd, strFileName.c_str(), -1, -1);
+            }
+            break;
 
-			case CONTENT_TYPE_FILE:
-				RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, lpContent->m_CFaceInfo.m_strFileName.c_str(), 
-						fontInfo.m_strName.c_str(), fontInfo.m_nSize, 
-						fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, 
-						fontInfo.m_bUnderLine, FALSE, 300);
-				break;
-			}
-		}
-	}
+            case CONTENT_TYPE_FILE:
+                RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                    fontInfo.m_strName.c_str(), fontInfo.m_nSize,
+                    fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic,
+                    fontInfo.m_bUnderLine, FALSE, 300);
+                break;
+            }
+        }
+    }
 }
 void CBuddyChatDlg::AddMsgToMsgLogEdit(std::vector<BUDDY_MSG_LOG*>& arrMsgLog)
 {
-	UINT	nID;
-	UINT	nUTalkNum;
-	tstring strNickName;
-	UINT64	nTime;
-	BOOL	bSendFlag;
-	tstring strContent;
-	TCHAR	szTime[32];
-	CString strText;
-	
-	COLORREF clrNickName(RGB(0, 0, 0));
-	size_t nSize = arrMsgLog.size();
-	for (size_t i = 0; i < nSize; ++i)
-	{
-		nID = arrMsgLog[i]->nID;
-		nUTalkNum = arrMsgLog[i]->nUTalkNum;
-		strNickName = arrMsgLog[i]->strNickName;
-		nTime = arrMsgLog[i]->nTime;
-		bSendFlag = arrMsgLog[i]->bSendFlag;
-		strContent = arrMsgLog[i]->strContent;
+    UINT	nID;
+    UINT	nUTalkNum;
+    tstring strNickName;
+    UINT64	nTime;
+    BOOL	bSendFlag;
+    tstring strContent;
+    TCHAR	szTime[32];
+    CString strText;
 
-		
-		memset(szTime, 0, sizeof(szTime));
-		if(IsToday(nTime))	
-			FormatTime(nTime, _T("%H:%M:%S"), szTime, ARRAYSIZE(szTime));
-		else
-			FormatTime(nTime, _T("%Y-%m-%d %H:%M:%S"), szTime, ARRAYSIZE(szTime));
+    COLORREF clrNickName(RGB(0, 0, 0));
+    size_t nSize = arrMsgLog.size();
+    for (size_t i = 0; i < nSize; ++i)
+    {
+        nID = arrMsgLog[i]->nID;
+        nUTalkNum = arrMsgLog[i]->nUTalkNum;
+        strNickName = arrMsgLog[i]->strNickName;
+        nTime = arrMsgLog[i]->nTime;
+        bSendFlag = arrMsgLog[i]->bSendFlag;
+        strContent = arrMsgLog[i]->strContent;
 
-		strText.Format(_T("%s  %s\r\n"), strNickName.c_str(), szTime);
 
-		RichEdit_SetSel(m_richMsgLog.m_hWnd, -1, -1);
-		if(bSendFlag)
-			clrNickName = RGB(0, 128, 64);
-		else
-			clrNickName = RGB(0, 0, 255);
-		RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, strText, _T("Î¢ÈíÑÅºÚ"), 10, clrNickName, FALSE, FALSE, FALSE, FALSE, 0);
-		//strText = _T("");
+        memset(szTime, 0, sizeof(szTime));
+        if (IsToday(nTime))
+            FormatTime(nTime, _T("%H:%M:%S"), szTime, ARRAYSIZE(szTime));
+        else
+            FormatTime(nTime, _T("%Y-%m-%d %H:%M:%S"), szTime, ARRAYSIZE(szTime));
 
-		AnalyseContent(strContent);
-		
-		//AddMsg(m_richMsgLog.m_hWnd, strContent.c_str());
-		//×îºóÒ»ĞĞ²»Òª²åÈë»»ĞĞ·û
-		if(i != nSize-1)
-		{
-			RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, _T("\r\n"));
-			RichEdit_SetStartIndent(m_richMsgLog.m_hWnd, 0);
-		}
-		
-		//m_richMsgLog.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	}
-	
-	m_richMsgLog.Invalidate();
-	//TODO: ĞŞÕı¹ö¶¯ÌõÄÚÈİÓëÊµ¼ÊÄÚÈİ³¤¶È²»Æ¥ÅäµÄÎÊÌâ
-	//m_richMsgLog.UpdateWindow();
-	//m_richMsgLog.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	//m_richMsgLog.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);	
+        strText.Format(_T("%s  %s\r\n"), strNickName.c_str(), szTime);
+
+        RichEdit_SetSel(m_richMsgLog.m_hWnd, -1, -1);
+        if (bSendFlag)
+            clrNickName = RGB(0, 128, 64);
+        else
+            clrNickName = RGB(0, 0, 255);
+        RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, strText, _T("å¾®è½¯é›…é»‘"), 10, clrNickName, FALSE, FALSE, FALSE, FALSE, 0);
+        //strText = _T("");
+
+        AnalyseContent(strContent);
+
+        //AddMsg(m_richMsgLog.m_hWnd, strContent.c_str());
+        //æœ€åä¸€è¡Œä¸è¦æ’å…¥æ¢è¡Œç¬¦
+        if (i != nSize - 1)
+        {
+            RichEdit_ReplaceSel(m_richMsgLog.m_hWnd, _T("\r\n"));
+            RichEdit_SetStartIndent(m_richMsgLog.m_hWnd, 0);
+        }
+
+        //m_richMsgLog.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+    }
+
+    m_richMsgLog.Invalidate();
+    //TODO: ä¿®æ­£æ»šåŠ¨æ¡å†…å®¹ä¸å®é™…å†…å®¹é•¿åº¦ä¸åŒ¹é…çš„é—®é¢˜
+    //m_richMsgLog.UpdateWindow();
+    //m_richMsgLog.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+    //m_richMsgLog.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);	
 }
 
 void CBuddyChatDlg::AddMsgToRecvEdit(std::vector<BUDDY_MSG_LOG*>& arrMsgLog)
 {
-	UINT	nID;
-	UINT	nUTalkNum;
-	tstring strNickName;
-	UINT64	nTime;
-	BOOL	bSendFlag;
-	tstring strContent;
-	TCHAR	szTime[32];
-	CString strText;
-	
-	size_t nSize = arrMsgLog.size();
-	for (size_t i = 0; i < nSize; ++i)
-	{
-		nID = arrMsgLog[i]->nID;
-		nUTalkNum = arrMsgLog[i]->nUTalkNum;
-		strNickName = arrMsgLog[i]->strNickName;
-		nTime = arrMsgLog[i]->nTime;
-		bSendFlag = arrMsgLog[i]->bSendFlag;
-		strContent = arrMsgLog[i]->strContent;
+    UINT	nID;
+    UINT	nUTalkNum;
+    tstring strNickName;
+    UINT64	nTime;
+    BOOL	bSendFlag;
+    tstring strContent;
+    TCHAR	szTime[32];
+    CString strText;
 
-		
-		memset(szTime, 0, sizeof(szTime));
-		if(IsToday(nTime))	
-			FormatTime(nTime, _T("%H:%M:%S"), szTime, ARRAYSIZE(szTime));
-		else
-			FormatTime(nTime, _T("%Y-%m-%d %H:%M:%S"), szTime, ARRAYSIZE(szTime));
+    size_t nSize = arrMsgLog.size();
+    for (size_t i = 0; i < nSize; ++i)
+    {
+        nID = arrMsgLog[i]->nID;
+        nUTalkNum = arrMsgLog[i]->nUTalkNum;
+        strNickName = arrMsgLog[i]->strNickName;
+        nTime = arrMsgLog[i]->nTime;
+        bSendFlag = arrMsgLog[i]->bSendFlag;
+        strContent = arrMsgLog[i]->strContent;
 
-		
-		strText.Format(_T("%s  %s\r\n"), strNickName.c_str(), szTime);
 
-		RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-		if(bSendFlag)
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,128,64), FALSE, FALSE, FALSE, FALSE, 0);
-		else
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
+        memset(szTime, 0, sizeof(szTime));
+        if (IsToday(nTime))
+            FormatTime(nTime, _T("%H:%M:%S"), szTime, ARRAYSIZE(szTime));
+        else
+            FormatTime(nTime, _T("%Y-%m-%d %H:%M:%S"), szTime, ARRAYSIZE(szTime));
 
-		//strText = _T("");
 
-		AnalyseContent(strContent, m_richRecv.m_hWnd);
-		
-		RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
-		RichEdit_SetStartIndent(m_richRecv.m_hWnd, 0);
-		m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-		
-	}
+        strText.Format(_T("%s  %s\r\n"), strNickName.c_str(), szTime);
 
-	if(nSize > 0)
-	{
-		RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-		RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("                                            ¡ª¡ª¡ª¡ªÒÔÉÏÊÇÀúÊ·ÏûÏ¢¡ª¡ª¡ª¡ª\r\n"), _T("Î¢ÈíÑÅºÚ"), 9, RGB(128,128,128), FALSE, FALSE, FALSE, FALSE, 0);
-		m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	}
-	//RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\n"));
-	////TODO: Ææ¹Ö£¬¹ö¶¯ÌõÎªÊ²Ã´²»ÄÜ¹öµ½µÍ£¿
-	//m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+        RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+        if (bSendFlag)
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 128, 64), FALSE, FALSE, FALSE, FALSE, 0);
+        else
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, strText, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
+
+        //strText = _T("");
+
+        AnalyseContent(strContent, m_richRecv.m_hWnd);
+
+        RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\r\n"));
+        RichEdit_SetStartIndent(m_richRecv.m_hWnd, 0);
+        m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+
+    }
+
+    if (nSize > 0)
+    {
+        RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+        RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("                                            â€”â€”â€”â€”ä»¥ä¸Šæ˜¯å†å²æ¶ˆæ¯â€”â€”â€”â€”\r\n"), _T("å¾®è½¯é›…é»‘"), 9, RGB(128, 128, 128), FALSE, FALSE, FALSE, FALSE, 0);
+        m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+    }
+    //RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("\n"));
+    ////TODO: å¥‡æ€ªï¼Œæ»šåŠ¨æ¡ä¸ºä»€ä¹ˆä¸èƒ½æ»šåˆ°ä½ï¼Ÿ
+    //m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
 }
 
 void CBuddyChatDlg::AddMsgToRecvEdit(std::vector<CContent*>& arrContent)
 {
-	//£¡£¡×ÖÌåĞÅÏ¢±ØĞë·ÅÔÚÎÄ±¾ĞÅÏ¢µÄÇ°Ãæ
-	static CFontInfo fontInfo;
-	for (long i = 0; i < (long)arrContent.size(); i++)
-	{
-		CContent* lpContent = arrContent[i];
-		if (lpContent != NULL)
-		{
-			switch (lpContent->m_nType)
-			{
-			case CONTENT_TYPE_SHAKE_WINDOW:
-				{
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("¶¶ÁËÄúÒ»ÏÂ¡£"), _T("Î¢ÈíÑÅºÚ"), 10,  0, TRUE, FALSE, FALSE, FALSE, 300);
-				}
-				break;
+    //ï¼ï¼å­—ä½“ä¿¡æ¯å¿…é¡»æ”¾åœ¨æ–‡æœ¬ä¿¡æ¯çš„å‰é¢
+    static CFontInfo fontInfo;
+    for (long i = 0; i < (long)arrContent.size(); i++)
+    {
+        CContent* lpContent = arrContent[i];
+        if (lpContent != NULL)
+        {
+            switch (lpContent->m_nType)
+            {
+            case CONTENT_TYPE_SHAKE_WINDOW:
+            {
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("æŠ–äº†æ‚¨ä¸€ä¸‹ã€‚"), _T("å¾®è½¯é›…é»‘"), 10, 0, TRUE, FALSE, FALSE, FALSE, 300);
+            }
+            break;
 
-			case CONTENT_TYPE_FONT_INFO:
-				{
-					fontInfo.m_strName = lpContent->m_FontInfo.m_strName;
-					fontInfo.m_nSize = lpContent->m_FontInfo.m_nSize;
-					fontInfo.m_clrText = lpContent->m_FontInfo.m_clrText;
-					fontInfo.m_bBold = lpContent->m_FontInfo.m_bBold;
-					fontInfo.m_bItalic = lpContent->m_FontInfo.m_bItalic;
-					fontInfo.m_bUnderLine = lpContent->m_FontInfo.m_bUnderLine;
-				}
-				break;
+            case CONTENT_TYPE_FONT_INFO:
+            {
+                fontInfo.m_strName = lpContent->m_FontInfo.m_strName;
+                fontInfo.m_nSize = lpContent->m_FontInfo.m_nSize;
+                fontInfo.m_clrText = lpContent->m_FontInfo.m_clrText;
+                fontInfo.m_bBold = lpContent->m_FontInfo.m_bBold;
+                fontInfo.m_bItalic = lpContent->m_FontInfo.m_bItalic;
+                fontInfo.m_bUnderLine = lpContent->m_FontInfo.m_bUnderLine;
+            }
+            break;
 
-			case CONTENT_TYPE_TEXT:
-				{
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_strText.c_str(), 
-						fontInfo.m_strName.c_str(), fontInfo.m_nSize, 
-						fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, 
-						fontInfo.m_bUnderLine, FALSE, 300);
-				}
-				break;
+            case CONTENT_TYPE_TEXT:
+            {
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_strText.c_str(),
+                    fontInfo.m_strName.c_str(), fontInfo.m_nSize,
+                    fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic,
+                    fontInfo.m_bUnderLine, FALSE, 300);
+            }
+            break;
 
-			case CONTENT_TYPE_FACE:
-				{
-					if (m_lpFaceList != NULL)
-					{
-						CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(lpContent->m_nFaceId);
-						if (lpFaceInfo != NULL)
-						{
-							_RichEdit_InsertFace(m_richRecv.m_hWnd, 
-								lpFaceInfo->m_strFileName.c_str(), lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
-						}
-					}
-				}
-				break;
+            case CONTENT_TYPE_FACE:
+            {
+                if (m_lpFaceList != NULL)
+                {
+                    CFaceInfo* lpFaceInfo = m_lpFaceList->GetFaceInfoById(lpContent->m_nFaceId);
+                    if (lpFaceInfo != NULL)
+                    {
+                        _RichEdit_InsertFace(m_richRecv.m_hWnd,
+                            lpFaceInfo->m_strFileName.c_str(), lpFaceInfo->m_nId, lpFaceInfo->m_nIndex);
+                    }
+                }
+            }
+            break;
 
-			case CONTENT_TYPE_CHAT_IMAGE:
-				{
-					tstring strFileName;
-					//°²×¿·¢ËÍ¹ıÀ´µÄÂ·¾¶ÀàËÆÕâÑù£º/storage/sdcard/windows/BstSharedFolder/]FHGGRBAA@85{PP{W3S]8C52.jpg
-					//ÏÈ¼ì²âÊÇ·ñÊÇÀàËÆÓÚC:\dd\xx.pngµÄÂ·¾¶
-					if(::PathIsRelative(lpContent->m_CFaceInfo.m_strName.c_str()))
-						strFileName	= m_lpFMGClient->m_UserMgr.GetChatPicFullName(::PathFindFileName(lpContent->m_CFaceInfo.m_strName.c_str()));
-					else
-						strFileName = lpContent->m_CFaceInfo.m_strName;
-					if (!Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str())==0)
-						strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
-					_RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
-				}
-				break;
+            case CONTENT_TYPE_CHAT_IMAGE:
+            {
+                tstring strFileName;
+                //å®‰å“å‘é€è¿‡æ¥çš„è·¯å¾„ç±»ä¼¼è¿™æ ·ï¼š/storage/sdcard/windows/BstSharedFolder/]FHGGRBAA@85{PP{W3S]8C52.jpg
+                //å…ˆæ£€æµ‹æ˜¯å¦æ˜¯ç±»ä¼¼äºC:\dd\xx.pngçš„è·¯å¾„
+                if (::PathIsRelative(lpContent->m_CFaceInfo.m_strName.c_str()))
+                    strFileName = m_lpFMGClient->m_UserMgr.GetChatPicFullName(::PathFindFileName(lpContent->m_CFaceInfo.m_strName.c_str()));
+                else
+                    strFileName = lpContent->m_CFaceInfo.m_strName;
+                if (!Hootina::CPath::IsFileExist(strFileName.c_str()) || IUGetFileSize(strFileName.c_str()) == 0)
+                    strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
+                _RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
+            }
+            break;
 
-			case CONTENT_TYPE_FILE:
-				RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_CFaceInfo.m_strFileName.c_str(), 
-						fontInfo.m_strName.c_str(), fontInfo.m_nSize, 
-						fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic, 
-						fontInfo.m_bUnderLine, FALSE, 300);
-				break;
-			}
-		}
-	}
+            case CONTENT_TYPE_FILE:
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, lpContent->m_CFaceInfo.m_strFileName.c_str(),
+                    fontInfo.m_strName.c_str(), fontInfo.m_nSize,
+                    fontInfo.m_clrText, fontInfo.m_bBold, fontInfo.m_bItalic,
+                    fontInfo.m_bUnderLine, FALSE, 300);
+                break;
+            }
+        }
+    }
 }
 
-// ´ò¿ªÏûÏ¢¼ÇÂ¼ä¯ÀÀ´°¿Ú
+// æ‰“å¼€æ¶ˆæ¯è®°å½•æµè§ˆçª—å£
 void CBuddyChatDlg::OpenMsgLogBrowser()
 {
-	CString strMsgFile = m_lpFMGClient->GetMsgLogFullName().c_str();
-	strMsgFile.Replace(_T("\\"), _T("/"));
-	m_MsgLogger.SetMsgLogFileName(strMsgFile);
+    CString strMsgFile = m_lpFMGClient->GetMsgLogFullName().c_str();
+    strMsgFile.Replace(_T("\\"), _T("/"));
+    m_MsgLogger.SetMsgLogFileName(strMsgFile);
 
-	CString strChatPicDir = m_lpFMGClient->GetChatPicFolder().c_str();
-	strChatPicDir.Replace(_T("\\"), _T("/"));
+    CString strChatPicDir = m_lpFMGClient->GetChatPicFolder().c_str();
+    strChatPicDir.Replace(_T("\\"), _T("/"));
 
-	
-	std::vector<BUDDY_MSG_LOG*> arrMsgLog;
-	UINT nRows = 10;
-	UINT nOffset = 0;
-	if(m_nMsgLogRecordOffset > 1)
-		nOffset = m_nMsgLogRecordOffset-1;
-	//´ÓÏûÏ¢¼ÇÂ¼ÎÄ¼şÖĞ»ñÈ¡ÏûÏ¢¼ÇÂ¼
-	long cntArrMsgLog = m_MsgLogger.ReadBuddyMsgLog(m_nUTalkUin, nOffset, nRows, arrMsgLog);
-	
-	m_richMsgLog.SetWindowText(_T(""));
-	//Ìí¼Óµ½ÏûÏ¢¼ÇÂ¼¸»ÎÄ±¾¿Ø¼şÖĞ
-	AddMsgToMsgLogEdit(arrMsgLog);
-	//m_richMsgLog.Invalidate(TRUE);
 
-	ShowMsgLogButtons(TRUE);
-	m_richMsgLog.SetFocus();
+    std::vector<BUDDY_MSG_LOG*> arrMsgLog;
+    UINT nRows = 10;
+    UINT nOffset = 0;
+    if (m_nMsgLogRecordOffset > 1)
+        nOffset = m_nMsgLogRecordOffset - 1;
+    //ä»æ¶ˆæ¯è®°å½•æ–‡ä»¶ä¸­è·å–æ¶ˆæ¯è®°å½•
+    long cntArrMsgLog = m_MsgLogger.ReadBuddyMsgLog(m_nUTalkUin, nOffset, nRows, arrMsgLog);
+
+    m_richMsgLog.SetWindowText(_T(""));
+    //æ·»åŠ åˆ°æ¶ˆæ¯è®°å½•å¯Œæ–‡æœ¬æ§ä»¶ä¸­
+    AddMsgToMsgLogEdit(arrMsgLog);
+    //m_richMsgLog.Invalidate(TRUE);
+
+    ShowMsgLogButtons(TRUE);
+    m_richMsgLog.SetFocus();
 }
 
-// ¹Ø±ÕÏûÏ¢¼ÇÂ¼ä¯ÀÀ´°¿Ú
+// å…³é—­æ¶ˆæ¯è®°å½•æµè§ˆçª—å£
 void CBuddyChatDlg::CloseMsgLogBrowser()
 {
-	::SendMessage(m_richMsgLog.m_hWnd, WM_SETTEXT, 0, 0L);
-	//if (m_dwThreadId != NULL)
-	//{
-	//	::PostThreadMessage(m_dwThreadId, WM_CLOSE_MSGLOGDLG, 0, 0);
-	//	m_dwThreadId = NULL;
-	//}
+    ::SendMessage(m_richMsgLog.m_hWnd, WM_SETTEXT, 0, 0L);
+    //if (m_dwThreadId != NULL)
+    //{
+    //	::PostThreadMessage(m_dwThreadId, WM_CLOSE_MSGLOGDLG, 0, 0);
+    //	m_dwThreadId = NULL;
+    //}
 
-	ShowMsgLogButtons(FALSE);
+    ShowMsgLogButtons(FALSE);
 
-	CalculateMsgLogCountAndOffset();
+    CalculateMsgLogCountAndOffset();
 }
 
 BOOL CBuddyChatDlg::GetImageDisplaySizeInRichEdit(PCTSTR pszFileName, HWND hWnd, long& nWidth, long& nHeight)
 {
-	//1ÏñËØÔ¼µÈÓÚ20ç¾
-	const long TWIPS = 20;
-	long nWidthImage = 0;
-	long nHeightImage = 0;
-	GetImageWidthAndHeight(pszFileName, nWidthImage, nHeightImage);
+    //1åƒç´ çº¦ç­‰äº20ç¼‡
+    const long TWIPS = 20;
+    long nWidthImage = 0;
+    long nHeightImage = 0;
+    GetImageWidthAndHeight(pszFileName, nWidthImage, nHeightImage);
 
-	if(hWnd == m_richSend.m_hWnd)
-	{
-		CRect rtRichSend;
-		::GetClientRect(hWnd, &rtRichSend);
-		//Í¼Æ¬Ì«Ğ¡£¬²»Ëõ·Å
-		if(nHeightImage <= rtRichSend.Height())
-		{
-			nWidth = 0;
-			nHeight = 0;
-			return TRUE;
-		}
-		//³ö´í
-		if(nHeightImage == 0)
-		{
-			nWidth = 0;
-			nHeight = 0;
-			return FALSE;
-		}
-		//°´±ÈÀıËõ·Å
-		nWidth = rtRichSend.Height()*nWidthImage/nHeightImage*TWIPS;
-		nHeight = rtRichSend.Height()*TWIPS;
-	}
-	else if(hWnd==m_richRecv.m_hWnd)
-	{
-		CRect rtRecv;
-		::GetClientRect(hWnd, &rtRecv);
+    if (hWnd == m_richSend.m_hWnd)
+    {
+        CRect rtRichSend;
+        ::GetClientRect(hWnd, &rtRichSend);
+        //å›¾ç‰‡å¤ªå°ï¼Œä¸ç¼©æ”¾
+        if (nHeightImage <= rtRichSend.Height())
+        {
+            nWidth = 0;
+            nHeight = 0;
+            return TRUE;
+        }
+        //å‡ºé”™
+        if (nHeightImage == 0)
+        {
+            nWidth = 0;
+            nHeight = 0;
+            return FALSE;
+        }
+        //æŒ‰æ¯”ä¾‹ç¼©æ”¾
+        nWidth = rtRichSend.Height() * nWidthImage / nHeightImage * TWIPS;
+        nHeight = rtRichSend.Height() * TWIPS;
+    } else if (hWnd == m_richRecv.m_hWnd)
+    {
+        CRect rtRecv;
+        ::GetClientRect(hWnd, &rtRecv);
 
-		//Í¼Æ¬Ì«Ğ¡£¬²»Ëõ·Å
-		if(nHeightImage <= rtRecv.Height())
-		{
-			nWidth = 0;
-			nHeight = 0;
-			return TRUE;
-		}
-		//³ö´í
-		if(nHeightImage == 0)
-		{
-			nWidth = 0;
-			nHeight = 0;
-			return FALSE;
-		}
-		//°´±ÈÀıËõ·Å
-		//Í¼Æ¬¿í¶ÈÎª´°¿ÚµÄËÄ·ÖÖ®Èı
-		nWidth = rtRecv.Height()*3/4*nWidthImage/nHeightImage*TWIPS;
-		nHeight = rtRecv.Height()*3/4*TWIPS;
-	}
-	else if(hWnd == m_richMsgLog.m_hWnd)
-	{
-		CRect rtMsgLog;
-		::GetClientRect(hWnd, &rtMsgLog);
+        //å›¾ç‰‡å¤ªå°ï¼Œä¸ç¼©æ”¾
+        if (nHeightImage <= rtRecv.Height())
+        {
+            nWidth = 0;
+            nHeight = 0;
+            return TRUE;
+        }
+        //å‡ºé”™
+        if (nHeightImage == 0)
+        {
+            nWidth = 0;
+            nHeight = 0;
+            return FALSE;
+        }
+        //æŒ‰æ¯”ä¾‹ç¼©æ”¾
+        //å›¾ç‰‡å®½åº¦ä¸ºçª—å£çš„å››åˆ†ä¹‹ä¸‰
+        nWidth = rtRecv.Height() * 3 / 4 * nWidthImage / nHeightImage * TWIPS;
+        nHeight = rtRecv.Height() * 3 / 4 * TWIPS;
+    } else if (hWnd == m_richMsgLog.m_hWnd)
+    {
+        CRect rtMsgLog;
+        ::GetClientRect(hWnd, &rtMsgLog);
 
-		//Í¼Æ¬Ì«Ğ¡£¬²»Ëõ·Å
-		if(nWidthImage <= rtMsgLog.Width()-20)
-		{
-			nWidth = 0;
-			nHeight = 0;
-			return TRUE;
-		}
-		//³ö´í
-		if(nHeightImage == 0)
-		{
-			nWidth = 0;
-			nHeight = 0;
-			return FALSE;
-		}
-		//°´±ÈÀıËõ·Å
-		//Í¼Æ¬¿í¶ÈÎª´°¿ÚµÄËÄ·ÖÖ®Ò»
-		nWidth = (rtMsgLog.Width()/4)*TWIPS;
-		nHeight = nWidth*nHeightImage/nWidthImage;
-	}
+        //å›¾ç‰‡å¤ªå°ï¼Œä¸ç¼©æ”¾
+        if (nWidthImage <= rtMsgLog.Width() - 20)
+        {
+            nWidth = 0;
+            nHeight = 0;
+            return TRUE;
+        }
+        //å‡ºé”™
+        if (nHeightImage == 0)
+        {
+            nWidth = 0;
+            nHeight = 0;
+            return FALSE;
+        }
+        //æŒ‰æ¯”ä¾‹ç¼©æ”¾
+        //å›¾ç‰‡å®½åº¦ä¸ºçª—å£çš„å››åˆ†ä¹‹ä¸€
+        nWidth = (rtMsgLog.Width() / 4) * TWIPS;
+        nHeight = nWidth * nHeightImage / nWidthImage;
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 void CBuddyChatDlg::ResizeImageInRecvRichEdit()
 {
-	std::vector<ImageInfo*> arrImageInfo;
-	RichEdit_GetImageInfo(m_richRecv, arrImageInfo);
-	size_t nSize = arrImageInfo.size();
-	if(nSize == 0)
-		return;
-	
-	ImageInfo* pImage = NULL;
-	for(size_t i=0; i<nSize; ++i)
-	{
-		pImage = arrImageInfo[i];
-		if(pImage == NULL)
-			continue;
-		
-		RichEdit_SetSel(m_richRecv.m_hWnd, pImage->nStartPos, pImage->nEndPos);
-		_RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T(""));
-		_RichEdit_InsertFace(m_richRecv.m_hWnd, pImage->szPath, -1, -1);
-		delete pImage;
-	}
+    std::vector<ImageInfo*> arrImageInfo;
+    RichEdit_GetImageInfo(m_richRecv, arrImageInfo);
+    size_t nSize = arrImageInfo.size();
+    if (nSize == 0)
+        return;
 
-	arrImageInfo.clear();
+    ImageInfo* pImage = NULL;
+    for (size_t i = 0; i < nSize; ++i)
+    {
+        pImage = arrImageInfo[i];
+        if (pImage == NULL)
+            continue;
+
+        RichEdit_SetSel(m_richRecv.m_hWnd, pImage->nStartPos, pImage->nEndPos);
+        _RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T(""));
+        _RichEdit_InsertFace(m_richRecv.m_hWnd, pImage->szPath, -1, -1);
+        delete pImage;
+    }
+
+    arrImageInfo.clear();
 
 }
 
 LRESULT CBuddyChatDlg::OnSendChatMsgResult(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CString strInfo;
-	if(wParam == SEND_WHOLE_MSG_FAILED)
-	{
-		strInfo = _T("                                            ¡ïÏûÏ¢·¢ËÍÊ§°Ü£¬ÇëÖØÊÔ£¡¡ï\r\n");
-	}
-	else if(wParam == SEND_IMGAE_FAILED)
-	{
-		strInfo = _T("                                            ¡ïÍ¼Æ¬·¢ËÍÊ§°Ü£¬ÇëÖØÊÔ£¡¡ï\r\n");
-	}
-	else if(wParam == SEND_FILE_FAILED)
-	{
-		strInfo = _T("                                            ¡ïÎÄ¼ş·¢ËÍÊ§°Ü£¬ÇëÖØÊÔ£¡¡ï\r\n");
-	}
+    CString strInfo;
+    if (wParam == SEND_WHOLE_MSG_FAILED)
+    {
+        strInfo = _T("                                            â˜…æ¶ˆæ¯å‘é€å¤±è´¥ï¼Œè¯·é‡è¯•ï¼â˜…\r\n");
+    } else if (wParam == SEND_IMGAE_FAILED)
+    {
+        strInfo = _T("                                            â˜…å›¾ç‰‡å‘é€å¤±è´¥ï¼Œè¯·é‡è¯•ï¼â˜…\r\n");
+    } else if (wParam == SEND_FILE_FAILED)
+    {
+        strInfo = _T("                                            â˜…æ–‡ä»¶å‘é€å¤±è´¥ï¼Œè¯·é‡è¯•ï¼â˜…\r\n");
+    }
 
-	RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-	RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(255,0,0), FALSE, FALSE, FALSE, FALSE, 0);
+    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+    RichEdit_ReplaceSel(m_richRecv.m_hWnd, strInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(255, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
 
-	return (LRESULT)1;
+    return (LRESULT)1;
 }
 
 BOOL CBuddyChatDlg::ShowRequestRecvFile(BOOL bOnlineFile, PCTSTR lpszDownloadName, PCTSTR pszFileName, long nFileSize)
 {
-	if(lpszDownloadName==NULL || pszFileName==NULL || nFileSize<=0)
-		return FALSE;
-	
-	if(!bOnlineFile)
-		RecvOfflineFile(lpszDownloadName, pszFileName, nFileSize);
+    if (lpszDownloadName == NULL || pszFileName == NULL || nFileSize <= 0)
+        return FALSE;
 
-	
-	return (LRESULT)1;
+    if (!bOnlineFile)
+        RecvOfflineFile(lpszDownloadName, pszFileName, nFileSize);
+
+
+    return (LRESULT)1;
 }
 
 void CBuddyChatDlg::ShowLastMsgInRecvRichEdit()
 {
-	CString strMsgFile(m_lpFMGClient->GetMsgLogFullName().c_str());
-	//strMsgFile.Replace(_T("\\"), _T("/"));
-	m_MsgLogger.SetMsgLogFileName(strMsgFile);
+    CString strMsgFile(m_lpFMGClient->GetMsgLogFullName().c_str());
+    //strMsgFile.Replace(_T("\\"), _T("/"));
+    m_MsgLogger.SetMsgLogFileName(strMsgFile);
 
-	//CString strChatPicDir = m_lpFMGClient->GetChatPicFolder().c_str();
-	//strChatPicDir.Replace(_T("\\"), _T("/"));
+    //CString strChatPicDir = m_lpFMGClient->GetChatPicFolder().c_str();
+    //strChatPicDir.Replace(_T("\\"), _T("/"));
 
-	//ÏûÏ¢¼ÇÂ¼ÖĞÓÃ»§Î´¶ÁµÄÏûÏ¢¸öÊı
-	long nMsgCntUnread = 0;
-	CMessageList* lpMsgList = m_lpFMGClient->GetMessageList();
-	if(lpMsgList != NULL)
-	{
-		CMessageSender* lpMsgSender = lpMsgList->GetMsgSender(FMG_MSG_TYPE_BUDDY, m_nUTalkUin);
-		if (lpMsgSender != NULL)
-			nMsgCntUnread = lpMsgSender->GetMsgCount();
-	}
-	
-	long nTotalCount = (long)m_MsgLogger.GetBuddyMsgLogCount(m_nUTalkUin);
-	//½«Î´¶ÁÏûÏ¢´ÓÀúÊ·¼ÇÂ¼ÖĞÈ¥³ı
-	nTotalCount -= nMsgCntUnread;
-	if(nTotalCount < 0)
-		nTotalCount = 0;
+    //æ¶ˆæ¯è®°å½•ä¸­ç”¨æˆ·æœªè¯»çš„æ¶ˆæ¯ä¸ªæ•°
+    long nMsgCntUnread = 0;
+    CMessageList* lpMsgList = m_lpFMGClient->GetMessageList();
+    if (lpMsgList != NULL)
+    {
+        CMessageSender* lpMsgSender = lpMsgList->GetMsgSender(FMG_MSG_TYPE_BUDDY, m_nUTalkUin);
+        if (lpMsgSender != NULL)
+            nMsgCntUnread = lpMsgSender->GetMsgCount();
+    }
 
-	if(nTotalCount == 0)
-		return;
+    long nTotalCount = (long)m_MsgLogger.GetBuddyMsgLogCount(m_nUTalkUin);
+    //å°†æœªè¯»æ¶ˆæ¯ä»å†å²è®°å½•ä¸­å»é™¤
+    nTotalCount -= nMsgCntUnread;
+    if (nTotalCount < 0)
+        nTotalCount = 0;
 
-	UINT nRows = 5;
-	if((UINT)nTotalCount < nRows)
-		nRows = (UINT)nTotalCount;
+    if (nTotalCount == 0)
+        return;
 
-	std::vector<BUDDY_MSG_LOG*> arrMsgLog;
-	//´ÓÏûÏ¢¼ÇÂ¼ÎÄ¼şÖĞ»ñÈ¡ÏûÏ¢¼ÇÂ¼
-	long cntArrMsgLog = 0;
-	if(nTotalCount > 5)
-		cntArrMsgLog = m_MsgLogger.ReadBuddyMsgLog(m_nUTalkUin, nTotalCount-5, nRows, arrMsgLog);
-	else
-		cntArrMsgLog = m_MsgLogger.ReadBuddyMsgLog(m_nUTalkUin, 0, nRows, arrMsgLog);
-	
-	//Ìí¼Óµ½ÏûÏ¢¼ÇÂ¼¸»ÎÄ±¾¿Ø¼şÖĞ
-	AddMsgToRecvEdit(arrMsgLog);
+    UINT nRows = 5;
+    if ((UINT)nTotalCount < nRows)
+        nRows = (UINT)nTotalCount;
+
+    std::vector<BUDDY_MSG_LOG*> arrMsgLog;
+    //ä»æ¶ˆæ¯è®°å½•æ–‡ä»¶ä¸­è·å–æ¶ˆæ¯è®°å½•
+    long cntArrMsgLog = 0;
+    if (nTotalCount > 5)
+        cntArrMsgLog = m_MsgLogger.ReadBuddyMsgLog(m_nUTalkUin, nTotalCount - 5, nRows, arrMsgLog);
+    else
+        cntArrMsgLog = m_MsgLogger.ReadBuddyMsgLog(m_nUTalkUin, 0, nRows, arrMsgLog);
+
+    //æ·»åŠ åˆ°æ¶ˆæ¯è®°å½•å¯Œæ–‡æœ¬æ§ä»¶ä¸­
+    AddMsgToRecvEdit(arrMsgLog);
 }
 
 LRESULT CBuddyChatDlg::OnSendFileProgress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	FileProgress* pFileProgress = (FileProgress*)lParam;
-	if(pFileProgress == NULL)
-		return (LRESULT)0;
+    FileProgress* pFileProgress = (FileProgress*)lParam;
+    if (pFileProgress == NULL)
+        return (LRESULT)0;
 
-	long nPercent = pFileProgress->nPercent;
-	
-	std::map<CString, long>::const_iterator iter=m_mapSendFileInfo.find(pFileProgress->szDestPath);
-	//·¢ËÍÁÄÌìÍ¼Æ¬µÄ½ø¶È
-	if(iter == m_mapSendFileInfo.end())
-	{
-		if(nPercent != -1)
-		{
-			m_staPicUploadProgress.ShowWindow(SW_SHOW);
-			TCHAR szProgressInfo[MAX_PATH] = {0};
-			_stprintf_s(szProgressInfo, ARRAYSIZE(szProgressInfo), _T("ÕıÔÚ·¢ËÍÍ¼Æ¬%s£º%d%%."), Hootina::CPath::GetFileName(pFileProgress->szDestPath).c_str(), nPercent);
+    long nPercent = pFileProgress->nPercent;
 
-			m_staPicUploadProgress.SetWindowText(szProgressInfo);
+    std::map<CString, long>::const_iterator iter = m_mapSendFileInfo.find(pFileProgress->szDestPath);
+    //å‘é€èŠå¤©å›¾ç‰‡çš„è¿›åº¦
+    if (iter == m_mapSendFileInfo.end())
+    {
+        if (nPercent != -1)
+        {
+            m_staPicUploadProgress.ShowWindow(SW_SHOW);
+            TCHAR szProgressInfo[MAX_PATH] = { 0 };
+            _stprintf_s(szProgressInfo, ARRAYSIZE(szProgressInfo), _T("æ­£åœ¨å‘é€å›¾ç‰‡%sï¼š%d%%."), Hootina::CPath::GetFileName(pFileProgress->szDestPath).c_str(), nPercent);
 
-			if(nPercent >=100 )
-				m_staPicUploadProgress.ShowWindow(SW_HIDE);
-		}
-	}
-	//ÎÄ¼şÉÏ´«½ø¶È
-	else
-	{
-		if(iter->second != -1)
-		{
-			delete pFileProgress;
-			return 0;
-		}
-		long nFileItemID = m_FileTransferCtrl.GetItemIDByFullName(pFileProgress->szDestPath);
-		if(nFileItemID == -1)
-		{
-			delete pFileProgress;
-			return 0;
-		}
+            m_staPicUploadProgress.SetWindowText(szProgressInfo);
 
-		//AtlTrace(_T("Progress: %d\n"), nPercent);
-		m_FileTransferCtrl.SetItemProgressPercentByID(nFileItemID, nPercent);
-		m_FileTransferCtrl.SetItemVerificationPercentByID(nFileItemID, pFileProgress->nVerificationPercent);
-	}
-	
-	delete pFileProgress;
+            if (nPercent >= 100)
+                m_staPicUploadProgress.ShowWindow(SW_HIDE);
+        }
+    }
+    //æ–‡ä»¶ä¸Šä¼ è¿›åº¦
+    else
+    {
+        if (iter->second != -1)
+        {
+            delete pFileProgress;
+            return 0;
+        }
+        long nFileItemID = m_FileTransferCtrl.GetItemIDByFullName(pFileProgress->szDestPath);
+        if (nFileItemID == -1)
+        {
+            delete pFileProgress;
+            return 0;
+        }
 
-	return (LRESULT)1;
+        //AtlTrace(_T("Progress: %d\n"), nPercent);
+        m_FileTransferCtrl.SetItemProgressPercentByID(nFileItemID, nPercent);
+        m_FileTransferCtrl.SetItemVerificationPercentByID(nFileItemID, pFileProgress->nVerificationPercent);
+    }
+
+    delete pFileProgress;
+
+    return (LRESULT)1;
 }
 
 LRESULT CBuddyChatDlg::OnSendFileResult(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CUploadFileResult* pResult = (CUploadFileResult*)lParam;
-	if(pResult == NULL)
-		return (LRESULT)0;
-	
-	//ÉÏ´«Í¼Æ¬½á¹û
-	std::map<CString, long>::const_iterator iter=m_mapSendFileInfo.find(pResult->m_szLocalName);
-	if(iter == m_mapSendFileInfo.end())
-	{
-		if(pResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
-		{
-			if(wParam == SEND_FILE_FAILED)
-			{
-				//AtlTrace(_T("Fail to send file:%s.\n"), pResult->m_szLocalName);
-				TCHAR szInfo[MAX_PATH] = {0};
-				_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            ¡î·¢ËÍÍ¼Æ¬[%s]Ê§°Ü£¬ÇëÖØÊÔ£¡¡î\r\n"), ::PathFindFileName(pResult->m_szLocalName));
-				RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-				RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(255,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-			}
-            //Í¼Æ¬·¢ËÍ³É¹¦£¬×·¼ÓÉÏ´«Í¼Æ¬³É¹¦ÏûÏ¢
+    CUploadFileResult* pResult = (CUploadFileResult*)lParam;
+    if (pResult == NULL)
+        return (LRESULT)0;
+
+    //ä¸Šä¼ å›¾ç‰‡ç»“æœ
+    std::map<CString, long>::const_iterator iter = m_mapSendFileInfo.find(pResult->m_szLocalName);
+    if (iter == m_mapSendFileInfo.end())
+    {
+        if (pResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
+        {
+            if (wParam == SEND_FILE_FAILED)
+            {
+                //AtlTrace(_T("Fail to send file:%s.\n"), pResult->m_szLocalName);
+                TCHAR szInfo[MAX_PATH] = { 0 };
+                _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            â˜†å‘é€å›¾ç‰‡[%s]å¤±è´¥ï¼Œè¯·é‡è¯•ï¼â˜†\r\n"), ::PathFindFileName(pResult->m_szLocalName));
+                RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+                RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(255, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+            }
+            //å›¾ç‰‡å‘é€æˆåŠŸï¼Œè¿½åŠ ä¸Šä¼ å›¾ç‰‡æˆåŠŸæ¶ˆæ¯
             else
             {
                 SendConfirmMessage(pResult);
             }
-		}
-	}
-	//ÉÏ´«ÎÄ¼ş½á¹û
-	else
-	{
-		if(iter->second == -1)
-		{
-			if(pResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_OFFLINE_FILE)
-			{
-				long nFileItemID = m_FileTransferCtrl.GetItemIDByFullName(pResult->m_szLocalName);
-				if(nFileItemID == -1)
-				{
-					delete pResult;
-					return 0;
-				}
-				
-				if(wParam == SEND_FILE_SUCCESS)
-				{
-					TCHAR szRemoteName[MAX_PATH] = {0};
+        }
+    }
+    //ä¸Šä¼ æ–‡ä»¶ç»“æœ
+    else
+    {
+        if (iter->second == -1)
+        {
+            if (pResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_OFFLINE_FILE)
+            {
+                long nFileItemID = m_FileTransferCtrl.GetItemIDByFullName(pResult->m_szLocalName);
+                if (nFileItemID == -1)
+                {
+                    delete pResult;
+                    return 0;
+                }
+
+                if (wParam == SEND_FILE_SUCCESS)
+                {
+                    TCHAR szRemoteName[MAX_PATH] = { 0 };
                     EncodeUtil::Utf8ToUnicode(pResult->m_szRemoteName, szRemoteName, ARRAYSIZE(szRemoteName));
-					//×·¼ÓÒ»ÌõÁÄÌìÏûÏ¢
-					time_t nMsgTime(time(NULL));
-					CString strFileInfo;
-					strFileInfo.Format(_T("/i[\"%s,%s,%d,0\"]"), ::PathFindFileName(pResult->m_szLocalName), szRemoteName, m_FileTransferCtrl.GetItemFileSizeByID(nFileItemID));
+                    //è¿½åŠ ä¸€æ¡èŠå¤©æ¶ˆæ¯
+                    time_t nMsgTime(time(NULL));
+                    CString strFileInfo;
+                    strFileInfo.Format(_T("/i[\"%s,%s,%d,0\"]"), ::PathFindFileName(pResult->m_szLocalName), szRemoteName, m_FileTransferCtrl.GetItemFileSizeByID(nFileItemID));
                     m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nMsgTime, strFileInfo.GetString(), m_hWnd);
 
-					
-					//ÌáÊ¾ÓÃ»§ÎÄ¼ş·¢ËÍ³É¹¦
-					TCHAR szInfo[MAX_PATH] = {0};
-					//_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            ¡î·¢ËÍ%s³É¹¦¡î\r\n"), ::PathFindFileName(pResult->m_szLocalName));
-					RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("                                            ¡î³É¹¦·¢ËÍ["), _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-					_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("%s"), ::PathFindFileName(pResult->m_szLocalName));
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,255), FALSE, FALSE, FALSE, FALSE, 0);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("]¡î\r\n"), _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-					//RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-				}
-				else if(wParam == SEND_FILE_FAILED)
-				{
-					TCHAR szInfo[MAX_PATH] = {0};
-					_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            ¡î·¢ËÍ%sÊ§°Ü£¬ÇëÉÔºóÖØÊÔ£¡¡î\r\n"), ::PathFindFileName(pResult->m_szLocalName));
-					RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-					RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(255,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-				}
 
-				m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-				m_FileTransferCtrl.RemoveItemByID(nFileItemID);
-				m_mapSendFileInfo.erase(iter);
-				DisplayFileTransfer(FALSE);
-			}
-		}
-	}
-	
-	delete pResult;
+                    //æç¤ºç”¨æˆ·æ–‡ä»¶å‘é€æˆåŠŸ
+                    TCHAR szInfo[MAX_PATH] = { 0 };
+                    //_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            â˜†å‘é€%sæˆåŠŸâ˜†\r\n"), ::PathFindFileName(pResult->m_szLocalName));
+                    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+                    RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("                                            â˜†æˆåŠŸå‘é€["), _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+                    _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("%s"), ::PathFindFileName(pResult->m_szLocalName));
+                    RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
+                    RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("]â˜†\r\n"), _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+                    //RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
+                } else if (wParam == SEND_FILE_FAILED)
+                {
+                    TCHAR szInfo[MAX_PATH] = { 0 };
+                    _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            â˜†å‘é€%så¤±è´¥ï¼Œè¯·ç¨åé‡è¯•ï¼â˜†\r\n"), ::PathFindFileName(pResult->m_szLocalName));
+                    RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+                    RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(255, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+                }
 
-	return 1;
+                m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+                m_FileTransferCtrl.RemoveItemByID(nFileItemID);
+                m_mapSendFileInfo.erase(iter);
+                DisplayFileTransfer(FALSE);
+            }
+        }
+    }
+
+    delete pResult;
+
+    return 1;
 }
 
 LRESULT CBuddyChatDlg::OnRecvFileProgress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	FileProgress* pFileProgress = (FileProgress*)lParam;
-	if(pFileProgress == NULL)
-		return 0;
+    FileProgress* pFileProgress = (FileProgress*)lParam;
+    if (pFileProgress == NULL)
+        return 0;
 
-	long nPercent = pFileProgress->nPercent;
-	std::map<CString, long>::const_iterator iter = m_mapRecvFileInfo.find(pFileProgress->szDestPath);
-	if(iter != m_mapRecvFileInfo.end())
-	{
-		//ÀëÏßÎÄ¼şÏÂÔØ½ø¶È
-		if(iter->second == -1)
-		{
-			long nFileItemID = m_FileTransferCtrl.GetItemIDBySaveName(pFileProgress->szDestPath);
-			if(nFileItemID < 0)
-				return 0;
-			
-			m_FileTransferCtrl.SetItemProgressPercentByID(nFileItemID, nPercent);
+    long nPercent = pFileProgress->nPercent;
+    std::map<CString, long>::const_iterator iter = m_mapRecvFileInfo.find(pFileProgress->szDestPath);
+    if (iter != m_mapRecvFileInfo.end())
+    {
+        //ç¦»çº¿æ–‡ä»¶ä¸‹è½½è¿›åº¦
+        if (iter->second == -1)
+        {
+            long nFileItemID = m_FileTransferCtrl.GetItemIDBySaveName(pFileProgress->szDestPath);
+            if (nFileItemID < 0)
+                return 0;
 
-		}
-		//ÁÄÌìÍ¼Æ¬ÏÂÔØ½ø¶È
-		else
-		{
-			long nIndex = nPercent / 10;
-			RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second+1);
-			CString strProgressFile;
-			strProgressFile.Format(_T("%sImage\\FileProgress\\percent%d.png"), g_szHomePath, nIndex);
-			_RichEdit_InsertFace(m_richRecv.m_hWnd, strProgressFile, -1, -1);
-		}
-	}
+            m_FileTransferCtrl.SetItemProgressPercentByID(nFileItemID, nPercent);
 
-	delete pFileProgress;
-	
-	return 1;
+        }
+        //èŠå¤©å›¾ç‰‡ä¸‹è½½è¿›åº¦
+        else
+        {
+            long nIndex = nPercent / 10;
+            RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second + 1);
+            CString strProgressFile;
+            strProgressFile.Format(_T("%sImage\\FileProgress\\percent%d.png"), g_szHomePath, nIndex);
+            _RichEdit_InsertFace(m_richRecv.m_hWnd, strProgressFile, -1, -1);
+        }
+    }
+
+    delete pFileProgress;
+
+    return 1;
 }
 
 LRESULT CBuddyChatDlg::OnRecvFileResult(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CFileItemRequest* pFileItem = (CFileItemRequest*)lParam;
-	if(pFileItem == NULL)
-		return 0;
+    CFileItemRequest* pFileItem = (CFileItemRequest*)lParam;
+    if (pFileItem == NULL)
+        return 0;
 
-	std::map<CString, long>::const_iterator iter = m_mapRecvFileInfo.find(pFileItem->m_szFilePath);
-	if(iter == m_mapRecvFileInfo.end())
-		return 0;
-	
-	//ÁÄÌìÍ¼Æ¬ÏÂÔØ½á¹û
-	if(iter->second > 0)
-	{
-		if(wParam == RECV_FILE_SUCCESS)
-		{
-			RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second+1);
-			_RichEdit_InsertFace(m_richRecv.m_hWnd, pFileItem->m_szFilePath, -1, -1);
-		}
-		else if(wParam == RECV_FILE_FAILED)
-		{
-			RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second+1);
-			tstring strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
-			_RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
-		}
-	}
-	//ÀëÏßÎÄ¼şÏÂÔØ½á¹û
-	else
-	{
-		long nFileItemID = pFileItem->m_nID;
-		if(wParam == RECV_FILE_SUCCESS)
-		{
-			m_richRecv.SetAutoURLDetect(FALSE);
-			TCHAR szInfo[MAX_PATH] = {0};
-			RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("                                            ¡î³É¹¦½ÓÊÕÎÄ¼ş["), _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, ::PathFindFileName(pFileItem->m_szFilePath), _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,255), FALSE, FALSE, FALSE, FALSE, 0);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("]¡£¡î\r\n"), _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-			memset(szInfo, 0, sizeof(szInfo));
-			_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            ¡îÎÄ¼ş±£´æÎ»ÖÃ£º"));
-			RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-			memset(szInfo, 0, sizeof(szInfo));
-			_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("%s"), pFileItem->m_szFilePath);
-			//RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, TRUE, TRUE, 0);
-			memset(szInfo, 0, sizeof(szInfo));
-			_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("%s ¡î\r\n"), pFileItem->m_szFilePath);
-			//RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(0,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-			m_richRecv.SetAutoURLDetect(TRUE);
+    std::map<CString, long>::const_iterator iter = m_mapRecvFileInfo.find(pFileItem->m_szFilePath);
+    if (iter == m_mapRecvFileInfo.end())
+        return 0;
 
-			time_t nTime = time(NULL);
-			CString strSuccessfulInfo;
-			strSuccessfulInfo.Format(_T("%sÒÑ³É¹¦½ÓÊÕÎÄ¼ş[%s]."), m_strUserName.GetString(), ::PathFindFileName(pFileItem->m_szFilePath));
+    //èŠå¤©å›¾ç‰‡ä¸‹è½½ç»“æœ
+    if (iter->second > 0)
+    {
+        if (wParam == RECV_FILE_SUCCESS)
+        {
+            RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second + 1);
+            _RichEdit_InsertFace(m_richRecv.m_hWnd, pFileItem->m_szFilePath, -1, -1);
+        } else if (wParam == RECV_FILE_FAILED)
+        {
+            RichEdit_SetSel(m_richRecv.m_hWnd, iter->second, iter->second + 1);
+            tstring strFileName = Hootina::CPath::GetAppPath() + _T("Image\\DownloadFailed.gif");
+            _RichEdit_InsertFace(m_richRecv.m_hWnd, strFileName.c_str(), -1, -1);
+        }
+    }
+    //ç¦»çº¿æ–‡ä»¶ä¸‹è½½ç»“æœ
+    else
+    {
+        long nFileItemID = pFileItem->m_nID;
+        if (wParam == RECV_FILE_SUCCESS)
+        {
+            m_richRecv.SetAutoURLDetect(FALSE);
+            TCHAR szInfo[MAX_PATH] = { 0 };
+            RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("                                            â˜†æˆåŠŸæ¥æ”¶æ–‡ä»¶["), _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, ::PathFindFileName(pFileItem->m_szFilePath), _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 255), FALSE, FALSE, FALSE, FALSE, 0);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, _T("]ã€‚â˜†\r\n"), _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+            memset(szInfo, 0, sizeof(szInfo));
+            _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            â˜†æ–‡ä»¶ä¿å­˜ä½ç½®ï¼š"));
+            RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+            memset(szInfo, 0, sizeof(szInfo));
+            _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("%s"), pFileItem->m_szFilePath);
+            //RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, TRUE, TRUE, 0);
+            memset(szInfo, 0, sizeof(szInfo));
+            _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("%s â˜†\r\n"), pFileItem->m_szFilePath);
+            //RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(0, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+            m_richRecv.SetAutoURLDetect(TRUE);
+
+            time_t nTime = time(NULL);
+            CString strSuccessfulInfo;
+            strSuccessfulInfo.Format(_T("%så·²æˆåŠŸæ¥æ”¶æ–‡ä»¶[%s]."), m_strUserName.GetString(), ::PathFindFileName(pFileItem->m_szFilePath));
             m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nTime, strSuccessfulInfo.GetString(), m_hWnd);
-		}
-		else if(wParam == RECV_FILE_FAILED)
-		{
-			TCHAR szInfo[MAX_PATH] = {0};
-			_stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            ¡î½ÓÊÕÎÄ¼ş%sÊ§°Ü£¬ÇëÁªÏµ¶Ô·½ÖØ´«¡£¡î\r\n"), ::PathFindFileName(pFileItem->m_szFilePath));
-			RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
-			RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("Î¢ÈíÑÅºÚ"), 10, RGB(255,0,0), FALSE, FALSE, FALSE, FALSE, 0);
-			time_t nTime = time(NULL);
-			CString strFailedInfo;
-			strFailedInfo.Format(_T("%sÒÑ½ÓÊÕÎÄ¼ş[%s]Ê§°Ü."), m_strUserName.GetString(), ::PathFindFileName(pFileItem->m_szFilePath));
+        } else if (wParam == RECV_FILE_FAILED)
+        {
+            TCHAR szInfo[MAX_PATH] = { 0 };
+            _stprintf_s(szInfo, ARRAYSIZE(szInfo), _T("                                            â˜†æ¥æ”¶æ–‡ä»¶%så¤±è´¥ï¼Œè¯·è”ç³»å¯¹æ–¹é‡ä¼ ã€‚â˜†\r\n"), ::PathFindFileName(pFileItem->m_szFilePath));
+            RichEdit_SetSel(m_richRecv.m_hWnd, -1, -1);
+            RichEdit_ReplaceSel(m_richRecv.m_hWnd, szInfo, _T("å¾®è½¯é›…é»‘"), 10, RGB(255, 0, 0), FALSE, FALSE, FALSE, FALSE, 0);
+            time_t nTime = time(NULL);
+            CString strFailedInfo;
+            strFailedInfo.Format(_T("%så·²æ¥æ”¶æ–‡ä»¶[%s]å¤±è´¥."), m_strUserName.GetString(), ::PathFindFileName(pFileItem->m_szFilePath));
             m_lpFMGClient->SendBuddyMsg(m_LoginUserId, m_strUserName.GetString(), m_UserId, m_strBuddyName.GetString(), nTime, strFailedInfo.GetString(), m_hWnd);
-		}
+        }
 
-		m_FileTransferCtrl.RemoveItemByID(nFileItemID);
-		//ÏÈÒª¼ì²â¶ÓÁĞÖĞÊÇ·ñ»¹ÓĞÆäËüÎÄ¼şÔÚ´«ÊäÒÔ¾ö¶¨ÊÇ·ñÊÕÆğÓÒ²à´°¿Ú
-		DisplayFileTransfer(FALSE);	
-	}
+        m_FileTransferCtrl.RemoveItemByID(nFileItemID);
+        //å…ˆè¦æ£€æµ‹é˜Ÿåˆ—ä¸­æ˜¯å¦è¿˜æœ‰å…¶å®ƒæ–‡ä»¶åœ¨ä¼ è¾“ä»¥å†³å®šæ˜¯å¦æ”¶èµ·å³ä¾§çª—å£
+        DisplayFileTransfer(FALSE);
+    }
 
-	m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	m_mapRecvFileInfo.erase(iter);
-	
-	return 1;
+    m_richRecv.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+    m_mapRecvFileInfo.erase(iter);
+
+    return 1;
 }
 
 
@@ -4494,7 +4436,7 @@ void CBuddyChatDlg::SendConfirmMessage(const CUploadFileResult* pUploadFileResul
     if (pUploadFileResult == NULL)
         return;
 
-    //ÉÏ´«Í¼Æ¬½á¹û
+    //ä¸Šä¼ å›¾ç‰‡ç»“æœ
     if (pUploadFileResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
     {
         time_t nTime = time(NULL);
@@ -4540,87 +4482,86 @@ void CBuddyChatDlg::SendConfirmMessage(const CUploadFileResult* pUploadFileResul
 }
 
 void CBuddyChatDlg::RecordWindowSize()
-{	
-	if(IsZoomed() || IsIconic())
-		return;
+{
+    if (IsZoomed() || IsIconic())
+        return;
 
-	CRect rtWindow;
-	GetWindowRect(&rtWindow);
-	if(m_bMsgLogWindowVisible || m_bFileTransferVisible)
-		m_lpFMGClient->m_UserConfig.SetChatDlgWidth(rtWindow.Width()-RIGHT_CHAT_WINDOW_WIDTH);
-	else
-		m_lpFMGClient->m_UserConfig.SetChatDlgWidth(rtWindow.Width());
+    CRect rtWindow;
+    GetWindowRect(&rtWindow);
+    if (m_bMsgLogWindowVisible || m_bFileTransferVisible)
+        m_lpFMGClient->m_UserConfig.SetChatDlgWidth(rtWindow.Width() - RIGHT_CHAT_WINDOW_WIDTH);
+    else
+        m_lpFMGClient->m_UserConfig.SetChatDlgWidth(rtWindow.Width());
 
-	m_lpFMGClient->m_UserConfig.SetChatDlgHeight(rtWindow.Height());	
+    m_lpFMGClient->m_UserConfig.SetChatDlgHeight(rtWindow.Height());
 }
 
 void CBuddyChatDlg::ReCaculateCtrlPostion(long nMouseY)
 {
-	CRect rtClient;
-	::GetClientRect(m_hWnd, &rtClient);
-	
-	//²»ÔÊĞí½«·¢ËÍ¿ò³ß´çÀ­µÄÌ«´ó»òÕßÌ«Ğ¡£¬ÄÇÑù»áÓ°ÏìÄ³Ğ©¿Ø¼şÄÚ²¿µÄ»­·¨£¨Ä³Ğ©¿Ø¼şÄÚ²¿»­·¨ÒªÇó±ØĞëÂú×ãÒ»¶¨µÄ³ß´ç£©
-	if(nMouseY<=280 || nMouseY>= rtClient.Height()-95)
-		return;
+    CRect rtClient;
+    ::GetClientRect(m_hWnd, &rtClient);
 
-	
-	RECT rtBase;
-	::GetWindowRect(m_richRecv, &rtBase);
-	POINT ptBase;
-	ptBase.x = rtBase.left;
-	ptBase.y = rtBase.top;
-	::ScreenToClient(m_hWnd, &ptBase);
-	
-	CRect rtRichRecv, rtSplitter, rtMidToolbar, rtRichSend;
-	::GetClientRect(m_richRecv, &rtRichRecv);
-	::GetClientRect(m_SplitterCtrl, &rtSplitter);
-	::GetClientRect(m_tbMid, &rtMidToolbar);
-	::GetClientRect(m_richSend, &rtRichSend);
-	HDWP hdwp = ::BeginDeferWindowPos(5);
-	//½ÓÊÕ¿ò
+    //ä¸å…è®¸å°†å‘é€æ¡†å°ºå¯¸æ‹‰çš„å¤ªå¤§æˆ–è€…å¤ªå°ï¼Œé‚£æ ·ä¼šå½±å“æŸäº›æ§ä»¶å†…éƒ¨çš„ç”»æ³•ï¼ˆæŸäº›æ§ä»¶å†…éƒ¨ç”»æ³•è¦æ±‚å¿…é¡»æ»¡è¶³ä¸€å®šçš„å°ºå¯¸ï¼‰
+    if (nMouseY <= 280 || nMouseY >= rtClient.Height() - 95)
+        return;
+
+
+    RECT rtBase;
+    ::GetWindowRect(m_richRecv, &rtBase);
+    POINT ptBase;
+    ptBase.x = rtBase.left;
+    ptBase.y = rtBase.top;
+    ::ScreenToClient(m_hWnd, &ptBase);
+
+    CRect rtRichRecv, rtSplitter, rtMidToolbar, rtRichSend;
+    ::GetClientRect(m_richRecv, &rtRichRecv);
+    ::GetClientRect(m_SplitterCtrl, &rtSplitter);
+    ::GetClientRect(m_tbMid, &rtMidToolbar);
+    ::GetClientRect(m_richSend, &rtRichSend);
+    HDWP hdwp = ::BeginDeferWindowPos(5);
+    //æ¥æ”¶æ¡†
     if (m_FontSelDlg.IsWindow() && m_FontSelDlg.IsWindowVisible())
-	{
-		//AtlTrace(_T("nMouseY-ptBase.y-3*CHATDLG_TOOLBAR_HEIGHT: %d\n"), nMouseY-ptBase.y-3*CHATDLG_TOOLBAR_HEIGHT);
-		//TODO: nMouseY-ptBase.y-2*CHATDLG_TOOLBAR_HEIGHTÎªÊ²Ã´²»Æğ×÷ÓÃÄØ£¿
-		::DeferWindowPos(hdwp, m_richRecv, NULL, 0, 0, rtRichRecv.Width(), nMouseY-ptBase.y-2*CHATDLG_TOOLBAR_HEIGHT, SWP_NOMOVE|SWP_NOZORDER);
-		::DeferWindowPos(hdwp, m_FontSelDlg, NULL, 0, ptBase.y+rtRichRecv.Height()-CHATDLG_TOOLBAR_HEIGHT, 0, CHATDLG_TOOLBAR_HEIGHT, SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-		::DeferWindowPos(hdwp, m_richRecv, NULL, 0, 0, rtRichRecv.Width(), nMouseY-ptBase.y-CHATDLG_TOOLBAR_HEIGHT, SWP_NOMOVE|SWP_NOZORDER);
-	
-	//MidToolBar
-	::GetClientRect(m_SplitterCtrl, &rtSplitter);
-	//AtlTrace(_T("ptBase.y+rtRichRecv.Height()+rtSplitter.Height(): %d\n"), ptBase.y+rtRichRecv.Height()+rtSplitter.Height());
-	::DeferWindowPos(hdwp, m_tbMid, NULL, 3, ptBase.y+rtRichRecv.Height(), 0, 0, SWP_NOSIZE|SWP_NOZORDER);
-	//·Ö¸îÏß
-	::GetClientRect(m_richRecv, &rtRichRecv);
-	//AtlTrace(_T("ptBase.y+rtRichRecv.Height(): %d\n"), ptBase.y+rtRichRecv.Height());
-	::DeferWindowPos(hdwp, m_SplitterCtrl, NULL, 6, ptBase.y+rtRichRecv.Height()+rtMidToolbar.Height(), 0, 0, SWP_NOSIZE|SWP_NOZORDER);
-	//·¢ËÍ¿ò
-	long nHeightRichSend = rtClient.Height()-100-44-(rtRichRecv.Height()+rtSplitter.Height()+rtMidToolbar.Height());
-	::GetClientRect(m_tbMid, &rtMidToolbar);
-	//AtlTrace(_T("RichSend top: %d\n"), ptBase.y+rtRichRecv.bottom-rtRichRecv.top+rtSplitter.top-rtSplitter.bottom+rtMidToolbar.bottom-rtMidToolbar.top);
-	if(m_bMsgLogWindowVisible || m_bFileTransferVisible)
-		::DeferWindowPos(hdwp, m_richSend, NULL, 6, ptBase.y+rtRichRecv.Height()+rtSplitter.Height()+rtMidToolbar.Height(), rtClient.Width()-8-RIGHT_CHAT_WINDOW_WIDTH, nHeightRichSend, SWP_NOZORDER);
-	else
-		::DeferWindowPos(hdwp, m_richSend, NULL, 6, ptBase.y+rtRichRecv.Height()+rtSplitter.Height()+rtMidToolbar.Height(), rtClient.Width()-8, nHeightRichSend, SWP_NOZORDER);
-	::EndDeferWindowPos(hdwp);
+    {
+        //AtlTrace(_T("nMouseY-ptBase.y-3*CHATDLG_TOOLBAR_HEIGHT: %d\n"), nMouseY-ptBase.y-3*CHATDLG_TOOLBAR_HEIGHT);
+        //TODO: nMouseY-ptBase.y-2*CHATDLG_TOOLBAR_HEIGHTä¸ºä»€ä¹ˆä¸èµ·ä½œç”¨å‘¢ï¼Ÿ
+        ::DeferWindowPos(hdwp, m_richRecv, NULL, 0, 0, rtRichRecv.Width(), nMouseY - ptBase.y - 2 * CHATDLG_TOOLBAR_HEIGHT, SWP_NOMOVE | SWP_NOZORDER);
+        ::DeferWindowPos(hdwp, m_FontSelDlg, NULL, 0, ptBase.y + rtRichRecv.Height() - CHATDLG_TOOLBAR_HEIGHT, 0, CHATDLG_TOOLBAR_HEIGHT, SWP_NOSIZE | SWP_NOZORDER);
+    } else
+        ::DeferWindowPos(hdwp, m_richRecv, NULL, 0, 0, rtRichRecv.Width(), nMouseY - ptBase.y - CHATDLG_TOOLBAR_HEIGHT, SWP_NOMOVE | SWP_NOZORDER);
 
-	ResizeImageInRecvRichEdit();
+    //MidToolBar
+    ::GetClientRect(m_SplitterCtrl, &rtSplitter);
+    //AtlTrace(_T("ptBase.y+rtRichRecv.Height()+rtSplitter.Height(): %d\n"), ptBase.y+rtRichRecv.Height()+rtSplitter.Height());
+    ::DeferWindowPos(hdwp, m_tbMid, NULL, 3, ptBase.y + rtRichRecv.Height(), 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    //åˆ†å‰²çº¿
+    ::GetClientRect(m_richRecv, &rtRichRecv);
+    //AtlTrace(_T("ptBase.y+rtRichRecv.Height(): %d\n"), ptBase.y+rtRichRecv.Height());
+    ::DeferWindowPos(hdwp, m_SplitterCtrl, NULL, 6, ptBase.y + rtRichRecv.Height() + rtMidToolbar.Height(), 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    //å‘é€æ¡†
+    long nHeightRichSend = rtClient.Height() - 100 - 44 - (rtRichRecv.Height() + rtSplitter.Height() + rtMidToolbar.Height());
+    ::GetClientRect(m_tbMid, &rtMidToolbar);
+    //AtlTrace(_T("RichSend top: %d\n"), ptBase.y+rtRichRecv.bottom-rtRichRecv.top+rtSplitter.top-rtSplitter.bottom+rtMidToolbar.bottom-rtMidToolbar.top);
+    if (m_bMsgLogWindowVisible || m_bFileTransferVisible)
+        ::DeferWindowPos(hdwp, m_richSend, NULL, 6, ptBase.y + rtRichRecv.Height() + rtSplitter.Height() + rtMidToolbar.Height(), rtClient.Width() - 8 - RIGHT_CHAT_WINDOW_WIDTH, nHeightRichSend, SWP_NOZORDER);
+    else
+        ::DeferWindowPos(hdwp, m_richSend, NULL, 6, ptBase.y + rtRichRecv.Height() + rtSplitter.Height() + rtMidToolbar.Height(), rtClient.Width() - 8, nHeightRichSend, SWP_NOZORDER);
+    ::EndDeferWindowPos(hdwp);
 
-	//¼ÇÂ¼ÏÂ×îĞÂµÄ½ÓÊÜÎÄ±¾¿ò¡¢midTooBarºÍ·¢ËÍÎÄ±¾¿òµÄ×îĞÂÎ»ÖÃ
-	m_bDraged = TRUE;
-	::GetWindowRect(m_richRecv, &m_rtRichRecv);
-	::ScreenToClient(m_hWnd, m_rtRichRecv);
+    ResizeImageInRecvRichEdit();
 
-	::GetWindowRect(m_tbMid, &m_rtMidToolBar);
-	::ScreenToClient(m_hWnd, m_rtMidToolBar);
+    //è®°å½•ä¸‹æœ€æ–°çš„æ¥å—æ–‡æœ¬æ¡†ã€midTooBarå’Œå‘é€æ–‡æœ¬æ¡†çš„æœ€æ–°ä½ç½®
+    m_bDraged = TRUE;
+    ::GetWindowRect(m_richRecv, &m_rtRichRecv);
+    ::ScreenToClient(m_hWnd, m_rtRichRecv);
 
-	::GetWindowRect(m_SplitterCtrl, &m_rtSplitter);
-	::ScreenToClient(m_hWnd, m_rtSplitter);
+    ::GetWindowRect(m_tbMid, &m_rtMidToolBar);
+    ::ScreenToClient(m_hWnd, m_rtMidToolBar);
 
-	::GetWindowRect(m_richSend, &m_rtRichSend);
-	::ScreenToClient(m_hWnd, m_rtRichSend);
+    ::GetWindowRect(m_SplitterCtrl, &m_rtSplitter);
+    ::ScreenToClient(m_hWnd, m_rtSplitter);
+
+    ::GetWindowRect(m_richSend, &m_rtRichSend);
+    ::ScreenToClient(m_hWnd, m_rtRichSend);
 }
 
 UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
@@ -4628,7 +4569,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     CBuddyChatDlg* pThis = (CBuddyChatDlg*)p;
     if (pThis == NULL)
         return 0;
-    
+
     SIZE screenSize;
     HDC hScrDC = ::CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
     screenSize.cx = ::GetDeviceCaps(hScrDC, HORZRES);
@@ -4639,7 +4580,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     {
         //HDC hDesktopDC = ::GetDC(NULL);
         //HDC hTmpDC = CreateCompatibleDC(hDesktopDC);
-        //HBITMAP hBmp = CreateCompatibleBitmap(hDesktopDC, screenSize.cx, screenSize.cy);	//351x250, Ê¾ÀıÊı¾İ
+        //HBITMAP hBmp = CreateCompatibleBitmap(hDesktopDC, screenSize.cx, screenSize.cy);	//351x250, ç¤ºä¾‹æ•°æ®
         //SelectObject(hTmpDC, hBmp);
         //BitBlt(hTmpDC, 0, 0, screenSize.cx, screenSize.cy, hDesktopDC, 0, 0, SRCCOPY);
         //DeleteObject(hTmpDC);
@@ -4688,15 +4629,15 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
         //writeStream.WriteInt32(msg_type_screenshot);
         //writeStream.WriteInt32(nSeq);
 
-        ////ÎªÁË±£³ÖÍ³Ò»´¦ÀíµÄÂß¼­£¬ÕâÀï¼Ó¸öÕ¼Î»·ûÊı¾İ
+        ////ä¸ºäº†ä¿æŒç»Ÿä¸€å¤„ç†çš„é€»è¾‘ï¼Œè¿™é‡ŒåŠ ä¸ªå ä½ç¬¦æ•°æ®
         //std::string strDummyData;
         //writeStream.WriteString(strDummyData);
 
-        ////Î»Í¼ÎÄ¼şÍ·²¿ĞÅÏ¢
+        ////ä½å›¾æ–‡ä»¶å¤´éƒ¨ä¿¡æ¯
         //writeStream.WriteCString((const char*)bmpInf, nSize);
-        ////Î»Í¼ÎÄ¼şÄÚÈİ
+        ////ä½å›¾æ–‡ä»¶å†…å®¹
         //writeStream.WriteString(strDummyData);
-        ////Ä¿±êuserid
+        ////ç›®æ ‡userid
         //writeStream.WriteInt32(pThis->m_nUTalkNumber);
         //writeStream.Flush();
 
@@ -4716,7 +4657,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     //int nOffset;
     //BYTE r, g, b;
     //int nWidth = bm.bmWidth*bm.bmBitsPixel / 8;
-    //nWidth = ((nWidth + 3) / 4) * 4; //4×Ö½Ú¶ÔÆë
+    //nWidth = ((nWidth + 3) / 4) * 4; //4å­—èŠ‚å¯¹é½
 
     //if (bmpInf->bmiHeader.biBitCount == 8)
     //{
@@ -4726,7 +4667,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     //        {
     //            RGBQUAD rgbQ;
     //            rgbQ = bmpInf->bmiColors[buf[i*nWidth + j]];
-    //            dc.SetPixel(j, bm.bmHeight - i, RGB(rgbQ.rgbRed, rgbQ.rgbGreen, rgbQ.rgbBlue)); //²âÊÔÏÔÊ¾
+    //            dc.SetPixel(j, bm.bmHeight - i, RGB(rgbQ.rgbRed, rgbQ.rgbGreen, rgbQ.rgbBlue)); //æµ‹è¯•æ˜¾ç¤º
     //        }
     //    }
     //}
@@ -4746,7 +4687,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     //            b *= 8;
     //            g *= 8;
 
-    //            dc.SetPixel(j, bm.bmHeight - i, RGB(r, g, b)); //²âÊÔÏÔÊ¾
+    //            dc.SetPixel(j, bm.bmHeight - i, RGB(r, g, b)); //æµ‹è¯•æ˜¾ç¤º
     //        }
     //    }
     //}
@@ -4761,7 +4702,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     //            g = buf[nOffset + j * 3 + 1];
     //            r = buf[nOffset + j * 3 + 2];
 
-    //            dc.SetPixel(j, bm.bmHeight - i, RGB(r, g, b)); //²âÊÔÏÔÊ¾
+    //            dc.SetPixel(j, bm.bmHeight - i, RGB(r, g, b)); //æµ‹è¯•æ˜¾ç¤º
     //        }
     //    }
     //}
@@ -4776,7 +4717,7 @@ UINT CBuddyChatDlg::RemoteDesktopProc(void* p)
     //            g = buf[nOffset + j * 4 + 1];
     //            r = buf[nOffset + j * 4 + 2];
 
-    //            dc.SetPixel(j, bm.bmHeight - i, RGB(r, g, b)); //²âÊÔÏÔÊ¾
+    //            dc.SetPixel(j, bm.bmHeight - i, RGB(r, g, b)); //æµ‹è¯•æ˜¾ç¤º
     //        }
     //    }
     //}

@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * FileSession.cpp
  * zhangyl, 2017.03.17
  **/
@@ -15,15 +15,15 @@
 
 using namespace net;
 
-//ÎÄ¼ş·şÎñÆ÷×î´óµÄ°ü50M
+//æ–‡ä»¶æœåŠ¡å™¨æœ€å¤§çš„åŒ…50M
 #define MAX_PACKAGE_SIZE    50 * 1024 * 1024
 
 FileSession::FileSession(const std::shared_ptr<TcpConnection>& conn, const char* filebasedir) :
-TcpSession(conn), 
-m_id(0),
-m_seq(0),
-m_strFileBaseDir(filebasedir),
-m_bFileUploading(false)
+    TcpSession(conn),
+    m_id(0),
+    m_seq(0),
+    m_strFileBaseDir(filebasedir),
+    m_bFileUploading(false)
 {
 }
 
@@ -36,21 +36,21 @@ void FileSession::onRead(const std::shared_ptr<TcpConnection>& conn, ByteBuffer*
 {
     while (true)
     {
-        //²»¹»Ò»¸ö°üÍ·´óĞ¡
+        //ä¸å¤Ÿä¸€ä¸ªåŒ…å¤´å¤§å°
         if (pBuffer->readableBytes() < (size_t)sizeof(file_msg_header))
         {
             //LOGI << "buffer is not enough for a package header, pBuffer->readableBytes()=" << pBuffer->readableBytes() << ", sizeof(msg)=" << sizeof(file_msg);
             return;
         }
 
-        //²»¹»Ò»¸öÕû°ü´óĞ¡
+        //ä¸å¤Ÿä¸€ä¸ªæ•´åŒ…å¤§å°
         file_msg_header header;
         memcpy(&header, pBuffer->peek(), sizeof(file_msg_header));
 
-        //°üÍ·ÓĞ´íÎó£¬Á¢¼´¹Ø±ÕÁ¬½Ó
+        //åŒ…å¤´æœ‰é”™è¯¯ï¼Œç«‹å³å…³é—­è¿æ¥
         if (header.packagesize <= 0 || header.packagesize > MAX_PACKAGE_SIZE)
-        {          
-            //¿Í»§¶Ë·¢·Ç·¨Êı¾İ°ü£¬·şÎñÆ÷Ö÷¶¯¹Ø±ÕÖ®
+        {
+            //å®¢æˆ·ç«¯å‘éæ³•æ•°æ®åŒ…ï¼ŒæœåŠ¡å™¨ä¸»åŠ¨å…³é—­ä¹‹
             LOGE("Illegal package header size: %lld, close TcpConnection, client: %s", header.packagesize, conn->peerAddress().toIpPort().c_str());
             LOG_DEBUG_BIN((unsigned char*)&header, sizeof(header));
             conn->forceClose();
@@ -101,7 +101,7 @@ bool FileSession::process(const std::shared_ptr<TcpConnection>& conn, const char
     int64_t offset;
     if (!readStream.ReadInt64(offset))
     {
-        LOGE("read offset error, client: %s" , conn->peerAddress().toIpPort().c_str());
+        LOGE("read offset error, client: %s", conn->peerAddress().toIpPort().c_str());
         return false;
     }
 
@@ -119,43 +119,43 @@ bool FileSession::process(const std::shared_ptr<TcpConnection>& conn, const char
         LOGE("read filedata error, client: %s", conn->peerAddress().toIpPort().c_str());
         return false;
     }
-   
+
     LOGI("Request from client: cmd: %d, seq: %d, filemd5: %s, md5length: %d, offset: %lld, filesize: %lld, filedata length: %lld, header.packagesize: %lld, client: %s",
-         cmd, m_seq, filemd5.c_str(), md5length, offset, filesize, (int64_t)filedata.length(), (int64_t)length, conn->peerAddress().toIpPort().c_str());
+        cmd, m_seq, filemd5.c_str(), md5length, offset, filesize, (int64_t)filedata.length(), (int64_t)length, conn->peerAddress().toIpPort().c_str());
 
     //LOG_DEBUG_BIN((unsigned char*)filedata.c_str(), filedatalength);
 
     switch (cmd)
     {
-        //¿Í»§¶ËÎÄ¼şÉÏ´«
-        case msg_type_upload_req:
-            return onUploadFileResponse(filemd5, offset, filesize, filedata, conn);
+        //å®¢æˆ·ç«¯æ–‡ä»¶ä¸Šä¼ 
+    case msg_type_upload_req:
+        return onUploadFileResponse(filemd5, offset, filesize, filedata, conn);
 
-        //¿Í»§¶ËÎÄ¼şÏÂÔØ
-        case msg_type_download_req:
+        //å®¢æˆ·ç«¯æ–‡ä»¶ä¸‹è½½
+    case msg_type_download_req:
+    {
+        int32_t clientNetType;
+        if (!readStream.ReadInt32(clientNetType))
         {
-            int32_t clientNetType;
-            if (!readStream.ReadInt32(clientNetType))
-            {
-                LOGE("read clientNetType error, client: %s", conn->peerAddress().toIpPort().c_str());
-                return false;
-            }
-
-            //¶ÔÓÚÏÂÔØ£¬¿Í»§¶Ë²»ÖªµÀÎÄ¼ş´óĞ¡£¬ ËùÒÔÖµÊÇ0
-            //if (filedatalength != 0)
-            //    return false;
-            return onDownloadFileResponse(filemd5, clientNetType, conn);
-        }
-           
-
-        default:
-            //pBuffer->retrieveAll();
-            LOGE("unsupport cmd, cmd: %d, client: %s", cmd, conn->peerAddress().toIpPort().c_str());
-            //conn->forceClose();
+            LOGE("read clientNetType error, client: %s", conn->peerAddress().toIpPort().c_str());
             return false;
+        }
+
+        //å¯¹äºä¸‹è½½ï¼Œå®¢æˆ·ç«¯ä¸çŸ¥é“æ–‡ä»¶å¤§å°ï¼Œ æ‰€ä»¥å€¼æ˜¯0
+        //if (filedatalength != 0)
+        //    return false;
+        return onDownloadFileResponse(filemd5, clientNetType, conn);
+    }
+
+
+    default:
+        //pBuffer->retrieveAll();
+        LOGE("unsupport cmd, cmd: %d, client: %s", cmd, conn->peerAddress().toIpPort().c_str());
+        //conn->forceClose();
+        return false;
     }// end switch
 
-    ++ m_seq;
+    ++m_seq;
 
     return true;
 }
@@ -167,27 +167,27 @@ bool FileSession::onUploadFileResponse(const std::string& filemd5, int64_t offse
         LOGE("Empty filemd5, client: %s", conn->peerAddress().toIpPort().c_str());
         return false;
     }
-     
-    //·şÎñÆ÷ÉÏÒÑ¾­´æÔÚ¸ÃÎÄ¼ş£¬Ö±½Ó·µ»Ø(Èç¹û¸ÃÎÄ¼şÊÇ´¦ÓÚ´ò¿ª×´Ì¬ËµÃ÷´¦ÓÚÕıÔÚÉÏ´«µÄ×´Ì¬)
+
+    //æœåŠ¡å™¨ä¸Šå·²ç»å­˜åœ¨è¯¥æ–‡ä»¶ï¼Œç›´æ¥è¿”å›(å¦‚æœè¯¥æ–‡ä»¶æ˜¯å¤„äºæ‰“å¼€çŠ¶æ€è¯´æ˜å¤„äºæ­£åœ¨ä¸Šä¼ çš„çŠ¶æ€)
     if (Singleton<FileManager>::Instance().isFileExsit(filemd5.c_str()) && !m_bFileUploading)
     {
-        offset = filesize;      
-        string dummyfiledata;      
+        offset = filesize;
+        string dummyfiledata;
         send(msg_type_upload_resp, m_seq, file_msg_error_complete, filemd5, offset, filesize, dummyfiledata);
-        
-        
-        LOGI("Response to client: cmd=msg_type_upload_resp, errorcode: file_msg_error_complete, filemd5: %s, offset: %lld, filesize: %lld, client: %s", 
-              filemd5.c_str(), offset, filesize, conn->peerAddress().toIpPort().c_str());
+
+
+        LOGI("Response to client: cmd=msg_type_upload_resp, errorcode: file_msg_error_complete, filemd5: %s, offset: %lld, filesize: %lld, client: %s",
+            filemd5.c_str(), offset, filesize, conn->peerAddress().toIpPort().c_str());
 
         return true;
     }
-    
+
     if (offset == 0)
     {
         std::string filename = m_strFileBaseDir;
         filename += filemd5;
-        //Õâ¸öµØ·½ÎÒ¿ªÊ¼Ê¹ÓÃµÄÊÇ¡°w¡±Ä£Ê½£¬ÕâÔÚLinuxÆ½Ì¨Ã»ÎÊÌâ£¬µ«ÔÚWindowsÉÏÒòÎªÊÇÎÄ±¾Ä£Ê½£¬fwriteº¯ÊıÔÚÓöµ½ÎÄ¼şÖĞÓĞ0x0AÊ±£¬»á×Ô¶¯²¹ÉÏ0x0D£¬Ôì³ÉÎÄ¼şÄÚÈİ³ö´í
-        //ËùÒÔ¸Ä³Éwb£¬Ê¹ÓÃ¶ş½øÖÆÄ£Ê½
+        //è¿™ä¸ªåœ°æ–¹æˆ‘å¼€å§‹ä½¿ç”¨çš„æ˜¯â€œwâ€æ¨¡å¼ï¼Œè¿™åœ¨Linuxå¹³å°æ²¡é—®é¢˜ï¼Œä½†åœ¨Windowsä¸Šå› ä¸ºæ˜¯æ–‡æœ¬æ¨¡å¼ï¼Œfwriteå‡½æ•°åœ¨é‡åˆ°æ–‡ä»¶ä¸­æœ‰0x0Aæ—¶ï¼Œä¼šè‡ªåŠ¨è¡¥ä¸Š0x0Dï¼Œé€ æˆæ–‡ä»¶å†…å®¹å‡ºé”™
+        //æ‰€ä»¥æ”¹æˆwbï¼Œä½¿ç”¨äºŒè¿›åˆ¶æ¨¡å¼
         m_fp = fopen(filename.c_str(), "wb");
         if (m_fp == NULL)
         {
@@ -195,10 +195,9 @@ bool FileSession::onUploadFileResponse(const std::string& filemd5, int64_t offse
             return false;
         }
 
-        //±êÊ¶¸ÃÎÄ¼şÕıÔÚÉÏ´«ÖĞ
+        //æ ‡è¯†è¯¥æ–‡ä»¶æ­£åœ¨ä¸Šä¼ ä¸­
         m_bFileUploading = true;
-    }
-    else
+    } else
     {
         if (m_fp == NULL)
         {
@@ -225,7 +224,7 @@ bool FileSession::onUploadFileResponse(const std::string& filemd5, int64_t offse
         return false;
     }
 
-    //½«ÎÄ¼şÄÚÈİË¢µ½´ÅÅÌÉÏÈ¥
+    //å°†æ–‡ä»¶å†…å®¹åˆ·åˆ°ç£ç›˜ä¸Šå»
     if (fflush(m_fp) != 0)
     {
         LOGE("fflush error, filemd5: %s, errno: %d, errinfo: %s, filedata.length(): %lld, m_fp: 0x%x, buffer size is 512*1024, client: %s",
@@ -236,8 +235,9 @@ bool FileSession::onUploadFileResponse(const std::string& filemd5, int64_t offse
 
     int32_t errorcode = file_msg_error_progress;
 
-    //ÎÄ¼şÉÏ´«³É¹¦
-    if (offset + (int64_t)filedata.length() == filesize)
+    //æ–‡ä»¶ä¸Šä¼ æˆåŠŸ
+    int64_t filedataLength = static_cast<int64_t>(filedata.length());
+    if (offset + filedataLength == filesize)
     {
         offset = filesize;
         errorcode = file_msg_error_complete;
@@ -247,13 +247,13 @@ bool FileSession::onUploadFileResponse(const std::string& filemd5, int64_t offse
 
     string dummyfiledatax;
     send(msg_type_upload_resp, m_seq, errorcode, filemd5, offset, filesize, dummyfiledatax);
-       
+
     std::string errorcodestr = "file_msg_error_progress";
     if (errorcode == file_msg_error_complete)
         errorcodestr = "file_msg_error_complete";
 
-    LOGI("Response to client: cmd=msg_type_upload_resp, errorcode: %s, filemd5: %s, offset: %lld, filesize: %lld, upload percent: %d%%, client: %s", 
-         errorcodestr.c_str(), filemd5.c_str(), offset, filesize, (int32_t)(offset * 100 / filesize), conn->peerAddress().toIpPort().c_str());
+    LOGI("Response to client: cmd=msg_type_upload_resp, errorcode: %s, filemd5: %s, offset: %lld, filedataLength: %lld, filesize: %lld, upload percent: %d%%, client: %s",
+        errorcodestr.c_str(), filemd5.c_str(), offset, filedataLength, filesize, (int32_t)(offset * 100 / filesize), conn->peerAddress().toIpPort().c_str());
 
     return true;
 }
@@ -265,28 +265,28 @@ bool FileSession::onDownloadFileResponse(const std::string& filemd5, int32_t cli
         LOGE("Empty filemd5, client: %s", conn->peerAddress().toIpPort().c_str());
         return false;
     }
-    
+
     if (!Singleton<FileManager>::Instance().isFileExsit(filemd5.c_str()))
     {
-        //¿Í»§¶ËÏÂÔØ²»´æÔÚµÄÎÄ¼ş£¬¸æËß¿Í»§¶Ë²»´æÔÚ¸ÃÎÄ¼ş
+        //å®¢æˆ·ç«¯ä¸‹è½½ä¸å­˜åœ¨çš„æ–‡ä»¶ï¼Œå‘Šè¯‰å®¢æˆ·ç«¯ä¸å­˜åœ¨è¯¥æ–‡ä»¶
         string dummyfiledata;
-        //ÎÄ¼ş²»´æÔÚ,ÔòÉèÖÃÓ¦´ğÖĞÆ«ÒÆÁ¿offsetºÍÎÄ¼ş´óĞ¡filesize¾ùÉèÖÃÎª0
+        //æ–‡ä»¶ä¸å­˜åœ¨,åˆ™è®¾ç½®åº”ç­”ä¸­åç§»é‡offsetå’Œæ–‡ä»¶å¤§å°filesizeå‡è®¾ç½®ä¸º0
         int64_t notExsitFileOffset = 0;
         int64_t notExsitFileSize = 0;
         send(msg_type_download_resp, m_seq, file_msg_error_not_exist, filemd5, notExsitFileOffset, notExsitFileSize, dummyfiledata);
-        LOGE("filemd5 not exsit, filemd5: %s, clientNetType: %d, client: %s", filemd5.c_str() , clientNetType, conn->peerAddress().toIpPort().c_str());
+        LOGE("filemd5 not exsit, filemd5: %s, clientNetType: %d, client: %s", filemd5.c_str(), clientNetType, conn->peerAddress().toIpPort().c_str());
         std::ostringstream os;
         os << "Response to client: cmd=msg_type_download_resp, errorcode=file_msg_error_not_exist "
-                 << ", filemd5: " << filemd5 << ", clientNetType: " << clientNetType
-                 << ", offset: 0"
-                 << ", filesize: 0"
-                 << ", filedataLength: 0"
-                 << ", client:" << conn->peerAddress().toIpPort();
+            << ", filemd5: " << filemd5 << ", clientNetType: " << clientNetType
+            << ", offset: 0"
+            << ", filesize: 0"
+            << ", filedataLength: 0"
+            << ", client:" << conn->peerAddress().toIpPort();
         LOGI(os.str().c_str());
         return true;
     }
 
-    //ÎÄ¼ş»¹Î´´ò¿ª,ÔòÏÈ´ò¿ª
+    //æ–‡ä»¶è¿˜æœªæ‰“å¼€,åˆ™å…ˆæ‰“å¼€
     if (m_fp == NULL)
     {
         string filename = m_strFileBaseDir;
@@ -297,7 +297,7 @@ bool FileSession::onDownloadFileResponse(const std::string& filemd5, int32_t cli
             LOGE("fopen file error, filemd5: %s, clientNetType: %d, client: %s", filemd5.c_str(), clientNetType, conn->peerAddress().toIpPort().c_str());
             return false;
         }
-        
+
         if (fseek(m_fp, 0, SEEK_END) == -1)
         {
             LOGE("fseek error, m_filesize: %lld, errno: %d, filemd5: %s, clientNetType: %d, client: %s", m_currentDownloadFileSize, errno, filemd5.c_str(), clientNetType, conn->peerAddress().toIpPort().c_str());
@@ -306,24 +306,24 @@ bool FileSession::onDownloadFileResponse(const std::string& filemd5, int32_t cli
 
         m_currentDownloadFileSize = ftell(m_fp);
         if (m_currentDownloadFileSize <= 0)
-		{
+        {
             LOGE("m_filesize: %lld, errno: %d, filemd5: %s, clientNetType: %d, client: %s", m_currentDownloadFileSize, errno, filemd5.c_str(), clientNetType, conn->peerAddress().toIpPort().c_str());
-			return false;
-		}
+            return false;
+        }
 
         if (fseek(m_fp, 0, SEEK_SET) == -1)
         {
-            
+
             LOGE("fseek error, m_filesize: %lld, errno: %d, filemd5: %s, clientNetType: %d, client: %s", m_currentDownloadFileSize, errno, filemd5.c_str(), clientNetType, conn->peerAddress().toIpPort().c_str());
-            return false;     
+            return false;
         }
     }
 
     string filedata;
-    
+
     //m_offset += offset;
     int64_t currentSendSize = 512 * 1024;
-    //ÒÆ¶¯ÍøÂç£¬Ã¿´Î´«ËÍ64k
+    //ç§»åŠ¨ç½‘ç»œï¼Œæ¯æ¬¡ä¼ é€64k
     if (clientNetType == client_net_type_cellular)
         currentSendSize = 64 * 1024;
 
@@ -333,26 +333,26 @@ bool FileSession::onDownloadFileResponse(const std::string& filemd5, int32_t cli
         currentSendSize = m_currentDownloadFileSize - m_currentDownloadFileOffset;
     }
 
-    //TODO: Õâ¸öfread()µ÷ÓÃÊ±¿ÉÄÜ»á³öÏÖ±ÀÀ£,´ıÅÅ²é
-	if (currentSendSize <= 0 || fread(buffer, currentSendSize, 1, m_fp) != 1)
-	{
+    //TODO: è¿™ä¸ªfread()è°ƒç”¨æ—¶å¯èƒ½ä¼šå‡ºç°å´©æºƒ,å¾…æ’æŸ¥
+    if (currentSendSize <= 0 || fread(buffer, currentSendSize, 1, m_fp) != 1)
+    {
         std::ostringstream os;
         os << "fread error, filemd5: " << filemd5 << ", clientNetType: " << clientNetType
-		    << ", errno: " << errno << ", errinfo: " << strerror(errno)
-		    << ", currentSendSize: " << currentSendSize
-		    << ", m_fp: " << m_fp
+            << ", errno: " << errno << ", errinfo: " << strerror(errno)
+            << ", currentSendSize: " << currentSendSize
+            << ", m_fp: " << m_fp
             << ", buffer size is " << currentSendSize
-		    << ", connection name:" << conn->peerAddress().toIpPort();
+            << ", connection name:" << conn->peerAddress().toIpPort();
         LOGE(os.str().c_str());
-	}
+    }
 
-    //½«Òª·¢ËÍµÄÆ«ÒÆÁ¿
+    //å°†è¦å‘é€çš„åç§»é‡
     int sendoffset = m_currentDownloadFileOffset;
     m_currentDownloadFileOffset += currentSendSize;
-    filedata.append(buffer, currentSendSize);      
+    filedata.append(buffer, currentSendSize);
 
     int errorcode = file_msg_error_progress;
-    //ÎÄ¼şÒÑ¾­ÏÂÔØÍê³É
+    //æ–‡ä»¶å·²ç»ä¸‹è½½å®Œæˆ
     if (m_currentDownloadFileOffset == m_currentDownloadFileSize)
         errorcode = file_msg_error_complete;
 
@@ -360,20 +360,20 @@ bool FileSession::onDownloadFileResponse(const std::string& filemd5, int32_t cli
 
     std::ostringstream os2;
     os2 << "Response to client: cmd=msg_type_download_resp, errorcode: " << (errorcode == file_msg_error_progress ? "file_msg_error_progress" : "file_msg_error_complete")
-             << ", filemd5: " << filemd5 << ", clientNetType: " << clientNetType
-             << ", sendoffset: " << sendoffset
-             << ", filesize: " << m_currentDownloadFileSize
-             << ", filedataLength: " << filedata.length()
-             << ", download percent: " << (m_currentDownloadFileOffset * 100 / m_currentDownloadFileSize) << "%"
-             << ", client:" << conn->peerAddress().toIpPort();
+        << ", filemd5: " << filemd5 << ", clientNetType: " << clientNetType
+        << ", sendoffset: " << sendoffset
+        << ", filesize: " << m_currentDownloadFileSize
+        << ", filedataLength: " << filedata.length()
+        << ", download percent: " << (m_currentDownloadFileOffset * 100 / m_currentDownloadFileSize) << "%"
+        << ", client:" << conn->peerAddress().toIpPort();
 
     LOGI(os2.str().c_str());
 
-    //ÎÄ¼şÏÂÔØ³É¹¦,ÖØÖÃÎÄ¼ş×´Ì¬
+    //æ–‡ä»¶ä¸‹è½½æˆåŠŸ,é‡ç½®æ–‡ä»¶çŠ¶æ€
     if (errorcode == file_msg_error_complete)
         resetFile();
 
-     return true;
+    return true;
 }
 
 void FileSession::resetFile()
@@ -383,7 +383,7 @@ void FileSession::resetFile()
         fclose(m_fp);
         m_currentDownloadFileOffset = 0;
         m_currentDownloadFileSize = 0;
-		m_fp = NULL;
+        m_fp = NULL;
         m_bFileUploading = false;
     }
 }

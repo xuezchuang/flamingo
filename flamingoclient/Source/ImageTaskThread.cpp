@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "ImageTaskThread.h"
 #include "UserSessionData.h"
 #include "IULog.h"
@@ -12,125 +12,124 @@
 #include "net/IUProtocolData.h"
 #include "net/IUSocket.h"
 #include "net/FileMsg.h"
-#include "net/protocolstream.h"
+#include "net/ProtocolStream.h"
 #include "net/IUProtocolData.h"
 
-CImageTaskThread::CImageTaskThread() :  m_seq(0)
+CImageTaskThread::CImageTaskThread() : m_seq(0)
 {
-	m_lpFMGClient = NULL;
-	m_pProtocol = NULL;
-	
-	m_pCurrentTransferringItem = NULL;
+    m_lpFMGClient = NULL;
+    m_pProtocol = NULL;
+
+    m_pCurrentTransferringItem = NULL;
 }
 
 CImageTaskThread::~CImageTaskThread()
 {
-	ClearAllItems();
+    ClearAllItems();
 }
 
 
 void CImageTaskThread::Stop()
 {
-	m_bStop = true;
-	m_cvItems.notify_one();
+    m_bStop = true;
+    m_cvItems.notify_one();
 }
 
 BOOL CImageTaskThread::AddItem(CFileItemRequest* pItem)
 {
-	if (NULL == pItem)
-		return FALSE;
+    if (NULL == pItem)
+        return FALSE;
 
-	std::lock_guard<std::mutex> guard(m_mtItems);
-	m_Filelist.push_back(pItem);
-	m_cvItems.notify_one();
+    std::lock_guard<std::mutex> guard(m_mtItems);
+    m_Filelist.push_back(pItem);
+    m_cvItems.notify_one();
 
-	return TRUE;
+    return TRUE;
 }
 
 void CImageTaskThread::RemoveItem(CFileItemRequest* pItem)
 {
-	if(pItem == NULL)
-		return;
+    if (pItem == NULL)
+        return;
 
-	std::lock_guard<std::mutex> guard(m_mtItems);
-	//Î´¿ªÊ¼ÏÂÔØ»òÉÏ´«µÄÏîÖ±½ÓÒÆ³ı
-	if(pItem->m_bPending)
-	{
-		std::list<CFileItemRequest*>::iterator iter = m_Filelist.begin();
-		for(; iter!=m_Filelist.end(); ++iter)
-		{
-			if(pItem ==*iter)
-			{
-				m_Filelist.erase(iter);
-				delete pItem;
-				break;
-			}
-		}
-	}
-	//ÕıÔÚÏÂÔØ»òÉÏ´«µÄÏîÊ¹ÓÃĞÅºÅÈÃÆäÍ£Ö¹
-	else
-	{
-		if(pItem->m_hCancelEvent != NULL)
-			::SetEvent(pItem->m_hCancelEvent);
-	}
+    std::lock_guard<std::mutex> guard(m_mtItems);
+    //æœªå¼€å§‹ä¸‹è½½æˆ–ä¸Šä¼ çš„é¡¹ç›´æ¥ç§»é™¤
+    if (pItem->m_bPending)
+    {
+        std::list<CFileItemRequest*>::iterator iter = m_Filelist.begin();
+        for (; iter != m_Filelist.end(); ++iter)
+        {
+            if (pItem == *iter)
+            {
+                m_Filelist.erase(iter);
+                delete pItem;
+                break;
+            }
+        }
+    }
+    //æ­£åœ¨ä¸‹è½½æˆ–ä¸Šä¼ çš„é¡¹ä½¿ç”¨ä¿¡å·è®©å…¶åœæ­¢
+    else
+    {
+        if (pItem->m_hCancelEvent != NULL)
+            ::SetEvent(pItem->m_hCancelEvent);
+    }
 
-	//AtlTrace(_T("File item count: %d.\n"), m_Filelist.size());
+    //AtlTrace(_T("File item count: %d.\n"), m_Filelist.size());
 }
 
 void CImageTaskThread::ClearAllItems()
 {
-	std::lock_guard<std::mutex> guard(m_mtItems);
-	for (auto& iter : m_Filelist)
-	{
-		delete iter;
-	}
+    std::lock_guard<std::mutex> guard(m_mtItems);
+    for (auto& iter : m_Filelist)
+    {
+        delete iter;
+    }
 
-	m_Filelist.clear();
+    m_Filelist.clear();
 }
 
 void CImageTaskThread::Run()
 {
-	while (!m_bStop)
-	{
-		CFileItemRequest* pFileItem;
-		{
-			std::unique_lock<std::mutex> guard(m_mtItems);
-			while (m_Filelist.empty())
-			{
-				if (m_bStop)
-					return;
+    while (!m_bStop)
+    {
+        CFileItemRequest* pFileItem;
+        {
+            std::unique_lock<std::mutex> guard(m_mtItems);
+            while (m_Filelist.empty())
+            {
+                if (m_bStop)
+                    return;
 
-				m_cvItems.wait(guard);
-			}
+                m_cvItems.wait(guard);
+            }
 
-			pFileItem = m_Filelist.front();
-			m_Filelist.pop_front();
-		}
+            pFileItem = m_Filelist.front();
+            m_Filelist.pop_front();
+        }
 
-		HandleItem(pFileItem);
-	}
+        HandleItem(pFileItem);
+    }
 }
 
 void CImageTaskThread::HandleItem(CFileItemRequest* pFileItem)
 {
-	if(pFileItem==NULL || pFileItem->m_uType!=NET_DATA_FILE)
-		return;
+    if (pFileItem == NULL || pFileItem->m_uType != NET_DATA_FILE)
+        return;
 
-	//¿ªÊ¼½øĞĞ´¦Àí
-	pFileItem->m_bPending = FALSE;
-	m_pCurrentTransferringItem = pFileItem;
-	
-	BOOL bRet = FALSE;
-	CUploadFileResult* pUploadFileResult = new CUploadFileResult();
-	if(pFileItem->m_nFileType == FILE_ITEM_UPLOAD_USER_THUMB)
-	{
-		bRet = UploadUserThumb(pFileItem->m_szFilePath, pFileItem->m_hwndReflection,*pUploadFileResult);
-		long nUploadUserThumbResult = (bRet!=FALSE ? UPLOAD_USER_THUMB_RESULT_SUCCESS : UPLOAD_USER_THUMB_RESULT_FAILED);
-        ::PostMessage(pFileItem->m_hwndReflection, FMG_MSG_UPLOAD_USER_THUMB, (WPARAM)nUploadUserThumbResult, (LPARAM)pUploadFileResult);
-	}
-    else if (pFileItem->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
+    //å¼€å§‹è¿›è¡Œå¤„ç†
+    pFileItem->m_bPending = FALSE;
+    m_pCurrentTransferringItem = pFileItem;
+
+    BOOL bRet = FALSE;
+    CUploadFileResult* pUploadFileResult = new CUploadFileResult();
+    if (pFileItem->m_nFileType == FILE_ITEM_UPLOAD_USER_THUMB)
     {
-        //ÉÏ´«ÎÄ¼şÈç¹ûÊ§°Ü£¬ÔòÖØÊÔÈı´Î
+        bRet = UploadUserThumb(pFileItem->m_szFilePath, pFileItem->m_hwndReflection, *pUploadFileResult);
+        long nUploadUserThumbResult = (bRet != FALSE ? UPLOAD_USER_THUMB_RESULT_SUCCESS : UPLOAD_USER_THUMB_RESULT_FAILED);
+        ::PostMessage(pFileItem->m_hwndReflection, FMG_MSG_UPLOAD_USER_THUMB, (WPARAM)nUploadUserThumbResult, (LPARAM)pUploadFileResult);
+    } else if (pFileItem->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
+    {
+        //ä¸Šä¼ æ–‡ä»¶å¦‚æœå¤±è´¥ï¼Œåˆ™é‡è¯•ä¸‰æ¬¡
         pUploadFileResult->m_uSenderID = pFileItem->m_uSenderID;
         pUploadFileResult->m_setTargetIDs = pFileItem->m_setTargetIDs;
         pUploadFileResult->m_nFileType = pFileItem->m_nFileType;
@@ -148,95 +147,91 @@ void CImageTaskThread::HandleItem(CFileItemRequest* pFileItem)
             ++pFileItem->m_nRetryTimes;
         }
 
-        //³ı·ÇÓÃ»§È¡Ïû£¬·ñÔòÉÏ´«³É¹¦»òÊ§°Ü¶¼Òª¸æËß¶Ô·½
+        //é™¤éç”¨æˆ·å–æ¶ˆï¼Œå¦åˆ™ä¸Šä¼ æˆåŠŸæˆ–å¤±è´¥éƒ½è¦å‘Šè¯‰å¯¹æ–¹
         if (nRetCode != FILE_UPLOAD_USERCANCEL)
         {
             //SendConfirmMessage(pUploadFileResult);
 
-            //¿ËÂ¡Ò»·İÉÏ´«½á¹ûÊı¾İÒÔÓÃÓÚPostMessage
+            //å…‹éš†ä¸€ä»½ä¸Šä¼ ç»“æœæ•°æ®ä»¥ç”¨äºPostMessage
             CUploadFileResult* pResult = new CUploadFileResult();
             pResult->Clone(pUploadFileResult);
             long nSendFileResultCode = (nRetCode == FILE_UPLOAD_SUCCESS ? SEND_FILE_SUCCESS : SEND_FILE_FAILED);
-            //Èç¹û¶Ô»°¿òÒÑ¾­¹Ø±Õ£¬ÔòÖ±½Ó·¢¸ø´úÀí´°¿Ú
+            //å¦‚æœå¯¹è¯æ¡†å·²ç»å…³é—­ï¼Œåˆ™ç›´æ¥å‘ç»™ä»£ç†çª—å£
             if (::IsWindow(pFileItem->m_hwndReflection))
                 ::PostMessage(pFileItem->m_hwndReflection, FMG_MSG_SEND_FILE_RESULT, (WPARAM)nSendFileResultCode, (LPARAM)pResult);
             else
                 ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_SEND_FILE_RESULT, (WPARAM)nSendFileResultCode, (LPARAM)pResult);
         }
-    }
-	else if(pFileItem->m_nFileType==FILE_ITEM_DOWNLOAD_USER_THUMB)
-	{
-		CString strDumyPath;
-		CString strThumb;
-		//std::set<UINT>::const_iterator iter = pFileItem->m_setTargetIDs.begin();
-		UINT uTargetID = pFileItem->m_uAccountID;
-		strThumb.Format(_T("%s%u.png"), m_lpFMGClient->m_UserMgr.GetCustomUserThumbFolder().c_str(), uTargetID);
-		long nRetCode = DownloadImage(pFileItem->m_szUtfFilePath, strThumb, TRUE, pFileItem->m_hwndReflection, pFileItem->m_hCancelEvent);
+    } else if (pFileItem->m_nFileType == FILE_ITEM_DOWNLOAD_USER_THUMB)
+    {
+        CString strDumyPath;
+        CString strThumb;
+        //std::set<UINT>::const_iterator iter = pFileItem->m_setTargetIDs.begin();
+        UINT uTargetID = pFileItem->m_uAccountID;
+        strThumb.Format(_T("%s%u.png"), m_lpFMGClient->m_UserMgr.GetCustomUserThumbFolder().c_str(), uTargetID);
+        long nRetCode = DownloadImage(pFileItem->m_szUtfFilePath, strThumb, TRUE, pFileItem->m_hwndReflection, pFileItem->m_hCancelEvent);
 
-		if(nRetCode == FILE_DOWNLOAD_SUCCESS)
-		{		
-			TransformImage(strThumb, strThumb, 64, 64, strDumyPath);
-			::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_CUSTOMFACE_AVAILABLE, (WPARAM)(uTargetID), 0);
-		}
-        else
+        if (nRetCode == FILE_DOWNLOAD_SUCCESS)
+        {
+            TransformImage(strThumb, strThumb, 64, 64, strDumyPath);
+            ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_CUSTOMFACE_AVAILABLE, (WPARAM)(uTargetID), 0);
+        } else
             LOG_ERROR("download user thumb [%s] failed, userid = %d.", pFileItem->m_szUtfFilePath, pFileItem->m_uAccountID);
-	}
-    //ÏÂÔØÁÄÌìÍ¼Æ¬
-	else if(pFileItem->m_nFileType == FILE_ITEM_DOWNLOAD_CHAT_IMAGE)
-	{
-		long nRetCode;
-		while(pFileItem->m_nRetryTimes < 3)
-		{
-			if(pFileItem->m_szUtfFilePath[0] == NULL)
-				break;
-			//nRetCode = m_pProtocol->DownloadFile3(pFileItem->m_szUtfFilePath, pFileItem->m_szFilePath, TRUE, pFileItem->m_hwndReflection, pFileItem->m_hCancelEvent);
+    }
+    //ä¸‹è½½èŠå¤©å›¾ç‰‡
+    else if (pFileItem->m_nFileType == FILE_ITEM_DOWNLOAD_CHAT_IMAGE)
+    {
+        long nRetCode;
+        while (pFileItem->m_nRetryTimes < 3)
+        {
+            if (pFileItem->m_szUtfFilePath[0] == NULL)
+                break;
+            //nRetCode = m_pProtocol->DownloadFile3(pFileItem->m_szUtfFilePath, pFileItem->m_szFilePath, TRUE, pFileItem->m_hwndReflection, pFileItem->m_hCancelEvent);
             nRetCode = DownloadImage(pFileItem->m_szUtfFilePath, pFileItem->m_szFilePath, TRUE, pFileItem->m_hwndReflection, pFileItem->m_hCancelEvent);
-            if(nRetCode==FILE_DOWNLOAD_SUCCESS || nRetCode==FILE_DOWNLOAD_USERCANCEL)
-				break;
+            if (nRetCode == FILE_DOWNLOAD_SUCCESS || nRetCode == FILE_DOWNLOAD_USERCANCEL)
+                break;
 
-			++pFileItem->m_nRetryTimes;
-			::Sleep(3000);
-		}
+            ++pFileItem->m_nRetryTimes;
+            ::Sleep(3000);
+        }
 
-        //TODO£ºÁÄÌìÍ¼Æ¬Èç¹ûÏÂÔØÊ§°ÜÁË£¬²»Í¨Öª½çÃæÂğ£¿
-		
-		CBuddyMessage* lpMsg = pFileItem->m_pBuddyMsg;
+        //TODOï¼šèŠå¤©å›¾ç‰‡å¦‚æœä¸‹è½½å¤±è´¥äº†ï¼Œä¸é€šçŸ¥ç•Œé¢å—ï¼Ÿ
 
-		UINT nSenderID = lpMsg->m_nFromUin;
-		UINT nTargetID = lpMsg->m_nToUin;
-		
-		if(IsGroupTarget(nTargetID))
-		{
-			//·ÇÆäËûÆ½Ì¨Í¬²½µÄÏûÏ¢£¬½çÃæÌáÊ¾ÓÃ»§
-			if(m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID != nSenderID)
-				::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_GROUP_MSG, 0, (LPARAM)lpMsg);
-		}
-		else
-		{
-			//ÆäËüÆ½Ì¨Í¬²½µÄÏûÏ¢
-			if(m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID == nSenderID)
-			{
-				::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_BUDDY_MSG, 0, (LPARAM)lpMsg);
-			}	
-			else
-			{
-				//Õı³£ºÃÓÑ·¢À´µÄÏûÏ¢
-				if(nTargetID == m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID)
-					::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_BUDDY_MSG, 0, (LPARAM)lpMsg);
-				else
-				{
-					lpMsg->m_nFromUin = nTargetID;
-					::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_BUDDY_MSG, 0, (LPARAM)lpMsg);
-				}
-			}
-		}
-	}
-	
-    //TODO: ¼ÇµÃÔÚ¶ÔÓ¦µÄÄ¿±ê´°¿Ú³öÉ¾³ı£¬·ñÔò»áÓĞÄÚ´æĞ¹Â¶
-	//delete pUploadFileResult;
-	delete pFileItem;
+        CBuddyMessage* lpMsg = pFileItem->m_pBuddyMsg;
 
-	m_pCurrentTransferringItem = NULL;
+        UINT nSenderID = lpMsg->m_nFromUin;
+        UINT nTargetID = lpMsg->m_nToUin;
+
+        if (IsGroupTarget(nTargetID))
+        {
+            //éå…¶ä»–å¹³å°åŒæ­¥çš„æ¶ˆæ¯ï¼Œç•Œé¢æç¤ºç”¨æˆ·
+            if (m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID != nSenderID)
+                ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_GROUP_MSG, 0, (LPARAM)lpMsg);
+        } else
+        {
+            //å…¶å®ƒå¹³å°åŒæ­¥çš„æ¶ˆæ¯
+            if (m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID == nSenderID)
+            {
+                ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_BUDDY_MSG, 0, (LPARAM)lpMsg);
+            } else
+            {
+                //æ­£å¸¸å¥½å‹å‘æ¥çš„æ¶ˆæ¯
+                if (nTargetID == m_lpFMGClient->m_UserMgr.m_UserInfo.m_uUserID)
+                    ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_BUDDY_MSG, 0, (LPARAM)lpMsg);
+                else
+                {
+                    lpMsg->m_nFromUin = nTargetID;
+                    ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_BUDDY_MSG, 0, (LPARAM)lpMsg);
+                }
+            }
+        }
+    }
+
+    //TODO: è®°å¾—åœ¨å¯¹åº”çš„ç›®æ ‡çª—å£å‡ºåˆ é™¤ï¼Œå¦åˆ™ä¼šæœ‰å†…å­˜æ³„éœ²
+    //delete pUploadFileResult;
+    delete pFileItem;
+
+    m_pCurrentTransferringItem = NULL;
 }
 
 //void CImageTaskThread::SendConfirmMessage(const CUploadFileResult* pUploadFileResult)
@@ -244,7 +239,7 @@ void CImageTaskThread::HandleItem(CFileItemRequest* pFileItem)
 //	if(pUploadFileResult == NULL)
 //		return;
 //	
-//	//ÉÏ´«Í¼Æ¬½á¹û
+//	//ä¸Šä¼ å›¾ç‰‡ç»“æœ
 //	if(pUploadFileResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
 //	{
 //		time_t nTime = time(NULL);
@@ -287,15 +282,15 @@ void CImageTaskThread::HandleItem(CFileItemRequest* pFileItem)
 //	}
 //}
 
-//TODO: ÕâÑù´ò¿ªÁËÁ½´ÎÎÄ¼ş£¬Íâ²¿Èç¹ûÖØÊÔ£¬Ôò»ñµÃÎÄ¼şmd5Ò²ÖØÊÔÁËÒ»´Î£¬ÖØÊÔµÄÖ»ÊÇÍøÂçÍ¨ĞÅ²¿·Ö
-//ĞŞ¸Äµô,¸Ä³É´ò¿ªÒ»´ÎÎÄ¼ş£¬ÖØÊÔÖ»ÖØÊÔÍøÂçÍ¨ĞÅ²¿·Ö¡£
+//TODO: è¿™æ ·æ‰“å¼€äº†ä¸¤æ¬¡æ–‡ä»¶ï¼Œå¤–éƒ¨å¦‚æœé‡è¯•ï¼Œåˆ™è·å¾—æ–‡ä»¶md5ä¹Ÿé‡è¯•äº†ä¸€æ¬¡ï¼Œé‡è¯•çš„åªæ˜¯ç½‘ç»œé€šä¿¡éƒ¨åˆ†
+//ä¿®æ”¹æ‰,æ”¹æˆæ‰“å¼€ä¸€æ¬¡æ–‡ä»¶ï¼Œé‡è¯•åªé‡è¯•ç½‘ç»œé€šä¿¡éƒ¨åˆ†ã€‚
 long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HANDLE hCancelEvent, CUploadFileResult& uploadFileResult)
 {
     _tcscpy_s(uploadFileResult.m_szLocalName, ARRAYSIZE(uploadFileResult.m_szLocalName), pszFileName);
 
-    //ÎÄ¼şmd5Öµ
+    //æ–‡ä»¶md5å€¼
     char szMd5[64] = { 0 };
-    //TODO: ÌáÊ¾ÓÃ»§ÕıÔÚĞ£ÑéÎÄ¼ş
+    //TODO: æç¤ºç”¨æˆ·æ­£åœ¨æ ¡éªŒæ–‡ä»¶
     FileProgress* pFileProgress = NULL;
     pFileProgress = new FileProgress();
     memset(pFileProgress, 0, sizeof(FileProgress));
@@ -309,8 +304,7 @@ long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HAND
     {
         LOG_ERROR(_T("Failed to upload image:%s as unable to get file md5."), pszFileName);
         return FILE_UPLOAD_FAILED;
-    }
-    else if (nRetCode == GET_FILE_MD5_USERCANCEL)
+    } else if (nRetCode == GET_FILE_MD5_USERCANCEL)
     {
         LOG_INFO(_T("User cancel to upload image:%s."), pszFileName);
         return FILE_UPLOAD_USERCANCEL;
@@ -326,12 +320,12 @@ long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HAND
     uploadFileResult.m_nFileSize = nFileSize;
 
     HANDLE	hFile = ::CreateFile(pszFileName,
-                                GENERIC_READ,
-                                FILE_SHARE_READ,
-                                NULL,
-                                OPEN_EXISTING,
-                                FILE_ATTRIBUTE_NORMAL,
-                                NULL);
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
     {
@@ -339,10 +333,10 @@ long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HAND
         return FILE_UPLOAD_FAILED;
     }
 
-    //·½±ãhFileÔÚº¯Êıµ÷ÓÃ½áÊøÊ±×Ô¶¯¹Ø±Õ
+    //æ–¹ä¾¿hFileåœ¨å‡½æ•°è°ƒç”¨ç»“æŸæ—¶è‡ªåŠ¨å…³é—­
     CAutoFileHandle autoFile(hFile);
 
-    //ÎÄ¼şutf8¸ñÊ½Ãû³Æ
+    //æ–‡ä»¶utf8æ ¼å¼åç§°
     char szUtf8Name[MAX_PATH] = { 0 };
     EncodeUtil::UnicodeToUtf8(::PathFindFileName(pszFileName), szUtf8Name, ARRAYSIZE(szUtf8Name));
 
@@ -385,7 +379,7 @@ long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HAND
         memset(pFileProgress, 0, sizeof(FileProgress));
         //AtlTrace(_T("nTotalSent:%d\n"), nTotalSent);
         //AtlTrace(_T("nFileSize:%d\n"), nFileSize);
-        //nTotalSent*100¿ÉÄÜ»á³¬³ölongµÄ·¶Î§£¬¹ÊÏÈÁÙÊ±×ª»»³É__int64
+        //nTotalSent*100å¯èƒ½ä¼šè¶…å‡ºlongçš„èŒƒå›´ï¼Œæ•…å…ˆä¸´æ—¶è½¬æ¢æˆ__int64
         pFileProgress->nPercent = (long)((__int64)offsetX * 100 / nFileSize);
         //AtlTrace(_T("pFileProgress->nPercent:%d\n"), pFileProgress->nPercent);
         _tcscpy_s(pFileProgress->szDestPath, ARRAYSIZE(pFileProgress->szDestPath), pszFileName);
@@ -435,7 +429,7 @@ long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HAND
             FillUploadFileResult(uploadFileResult, pszFileName, filemd5.c_str(), nFileSize, szMd5);
             LOG_INFO(_T("Succeed to upload file:%s as there already exist file on server."), pszFileName);
 
-            //TODO: Èç¹ûÍâ²¿²»ÊÍ·ÅÔò»áÓĞÄÚ´æĞ¹Â¶
+            //TODO: å¦‚æœå¤–éƒ¨ä¸é‡Šæ”¾åˆ™ä¼šæœ‰å†…å­˜æ³„éœ²
             pFileProgress = new FileProgress();
             memset(pFileProgress, 0, sizeof(FileProgress));
             pFileProgress->nPercent = 100;
@@ -452,28 +446,28 @@ long CImageTaskThread::UploadImage(PCTSTR pszFileName, HWND hwndReflection, HAND
 
 void CImageTaskThread::FillUploadFileResult(CUploadFileResult& uploadFileResult, PCTSTR pszLocalName, PCSTR pszRemoteName, int64_t nFileSize, char* pszMd5)
 {
-	uploadFileResult.m_bSuccessful = TRUE;
-	uploadFileResult.m_nFileSize = nFileSize;
-	_tcscpy_s(uploadFileResult.m_szLocalName, ARRAYSIZE(uploadFileResult.m_szLocalName), pszLocalName);
-	strcpy_s(uploadFileResult.m_szRemoteName, ARRAYSIZE(uploadFileResult.m_szRemoteName), pszRemoteName);
-	strcpy_s(uploadFileResult.m_szMd5, ARRAYSIZE(uploadFileResult.m_szMd5), pszMd5);
+    uploadFileResult.m_bSuccessful = TRUE;
+    uploadFileResult.m_nFileSize = nFileSize;
+    _tcscpy_s(uploadFileResult.m_szLocalName, ARRAYSIZE(uploadFileResult.m_szLocalName), pszLocalName);
+    strcpy_s(uploadFileResult.m_szRemoteName, ARRAYSIZE(uploadFileResult.m_szRemoteName), pszRemoteName);
+    strcpy_s(uploadFileResult.m_szMd5, ARRAYSIZE(uploadFileResult.m_szMd5), pszMd5);
 }
 
 long CImageTaskThread::DownloadImage(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BOOL bOverwriteIfExist, HWND hwndReflection, HANDLE hCancelEvent)
 {
-    //TODO: È·¶¨ÊÇ·ñ¸²¸ÇµÄ·½·¨Ó¦¸ÃÊÇ¸ù¾İmd5ÖµÀ´ÅĞ¶Ï±¾µØµÄÎÄ¼şºÍÏÂÔØµÄÎÄ¼şÊÇ·ñÍêÈ«ÏàÍ¬
-    if (Hootina::CPath::IsFileExist(lpszDestPath) && IUGetFileSize2(lpszDestPath)>0 && !bOverwriteIfExist)
+    //TODO: ç¡®å®šæ˜¯å¦è¦†ç›–çš„æ–¹æ³•åº”è¯¥æ˜¯æ ¹æ®md5å€¼æ¥åˆ¤æ–­æœ¬åœ°çš„æ–‡ä»¶å’Œä¸‹è½½çš„æ–‡ä»¶æ˜¯å¦å®Œå…¨ç›¸åŒ
+    if (Hootina::CPath::IsFileExist(lpszDestPath) && IUGetFileSize2(lpszDestPath) > 0 && !bOverwriteIfExist)
     {
         LOG_INFO(_T("File %s already exsited, there is no need to download."), lpszDestPath);
         return FILE_DOWNLOAD_SUCCESS;
     }
 
-    //Æ«ÒÆÁ¿
+    //åç§»é‡
     int64_t nOffset = 0;
     long nBreakType = FILE_DOWNLOAD_SUCCESS;
 
     char* pBuffer = NULL;
-    //nCurrentContentSizeÎªµ±Ç°ÊÕµ½µÄ°üÖĞÎÄ¼şÄÚÈİ×Ö½ÚÊı´óĞ¡
+    //nCurrentContentSizeä¸ºå½“å‰æ”¶åˆ°çš„åŒ…ä¸­æ–‡ä»¶å†…å®¹å­—èŠ‚æ•°å¤§å°
     long nCurrentContentSize = 0;
     DWORD dwSizeToWrite = 0;
     DWORD dwSizeWritten = 0;
@@ -602,7 +596,7 @@ long CImageTaskThread::DownloadImage(LPCSTR lpszFileName, LPCTSTR lpszDestPath, 
 
         offset += (int64_t)filedata.length();
 
-        //£¡£¡£¡£¡TODO: ¶ÔÓÚ·ÇÏÂÔØÁÄÌìÍ¼Æ¬£¬Õâ¿éÄÚ´æÒòÎªÎ´ÊÍ·Å¶ø²úÉúÄÚ´æĞ¹Â¶£¡£¡£¡£¡
+        //ï¼ï¼ï¼ï¼TODO: å¯¹äºéä¸‹è½½èŠå¤©å›¾ç‰‡ï¼Œè¿™å—å†…å­˜å› ä¸ºæœªé‡Šæ”¾è€Œäº§ç”Ÿå†…å­˜æ³„éœ²ï¼ï¼ï¼ï¼
         pFileProgress = new FileProgress();
         memset(pFileProgress, 0, sizeof(FileProgress));
         _tcscpy_s(pFileProgress->szDestPath, ARRAYSIZE(pFileProgress->szDestPath), lpszDestPath);
@@ -616,10 +610,10 @@ long CImageTaskThread::DownloadImage(LPCSTR lpszFileName, LPCTSTR lpszDestPath, 
         }
     }// end while-loop
 
-    //¹Ø±ÕÓëÍ¼Æ¬·şÎñÆ÷µÄÁ¬½Ó
+    //å…³é—­ä¸å›¾ç‰‡æœåŠ¡å™¨çš„è¿æ¥
     iusocket.CloseImgServerConnection();
 
-    //ÏÂÔØ³É¹¦
+    //ä¸‹è½½æˆåŠŸ
     if (nBreakType == FILE_DOWNLOAD_SUCCESS)
     {
         //::CloseHandle(hFile);
@@ -630,14 +624,14 @@ long CImageTaskThread::DownloadImage(LPCSTR lpszFileName, LPCTSTR lpszDestPath, 
         pFileProgress->nPercent = /*nOffset* 100 / nFileSize*/100;
         ::PostMessage(hwndReflection, FMG_MSG_RECV_FILE_PROGRESS, 0, (LPARAM)(pFileProgress));
     }
-    //ÏÂÔØÊ§°Ü»òÕßÓÃ»§È¡ÏûÏÂÔØ
+    //ä¸‹è½½å¤±è´¥æˆ–è€…ç”¨æˆ·å–æ¶ˆä¸‹è½½
     else
     {
         if (nBreakType == FILE_DOWNLOAD_FAILED)
             LOG_ERROR(_T("Failed to download image: %s."), lpszDestPath);
         else
             LOG_INFO(_T("User canceled to download file: %s."), lpszDestPath);
-        //ÎªÁËÄÜÉ¾³ıÏÂÔØµÄ°ë³ÉÆ·£¬ÏÔÊ½¹Ø±ÕÎÄ¼ş¾ä±ú
+        //ä¸ºäº†èƒ½åˆ é™¤ä¸‹è½½çš„åŠæˆå“ï¼Œæ˜¾å¼å…³é—­æ–‡ä»¶å¥æŸ„
         autoFileHandle.Release();
         ::DeleteFile(lpszDestPath);
     }

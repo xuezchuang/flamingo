@@ -189,7 +189,7 @@
     <ClCompile Include="MultiChatMemberSelectionDlg.cpp" />
     <ClCompile Include="net\IUProtocolData.cpp" />
     <ClCompile Include="net\IUSocket.cpp" />
-    <ClCompile Include="net\protocolstream.cpp" />
+    <ClCompile Include="net\ProtocolStream.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="PerformanceCounter.cpp" />
     <ClCompile Include="PicBarDlg.cpp" />
@@ -379,7 +379,7 @@
     <ClInclude Include="net\IUProtocolData.h" />
     <ClInclude Include="net\IUSocket.h" />
     <ClInclude Include="net\Msg.h" />
-    <ClInclude Include="net\protocolstream.h" />
+    <ClInclude Include="net\ProtocolStream.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="PerformanceCounter.h" />
     <ClInclude Include="PicBarDlg.h" />

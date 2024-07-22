@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "FileTaskThread.h"
 #include "UserSessionData.h"
 #include "IULog.h"
@@ -12,7 +12,7 @@
 #include "net/IUProtocolData.h"
 #include "net/IUSocket.h"
 #include "net/FileMsg.h"
-#include "net/protocolstream.h"
+#include "net/ProtocolStream.h"
 #include "net/IUProtocolData.h"
 
 using namespace net;
@@ -55,7 +55,7 @@ void CFileTaskThread::RemoveItem(CFileItemRequest* pItem)
         return;
 
     std::lock_guard<std::mutex> guard(m_mtItems);
-    //Î´¿ªÊ¼ÏÂÔØ»òÉÏ´«µÄÏîÖ±½ÓÒÆ³ı
+    //æœªå¼€å§‹ä¸‹è½½æˆ–ä¸Šä¼ çš„é¡¹ç›´æ¥ç§»é™¤
     if (pItem->m_bPending)
     {
         std::list<CFileItemRequest*>::iterator iter = m_Filelist.begin();
@@ -69,7 +69,7 @@ void CFileTaskThread::RemoveItem(CFileItemRequest* pItem)
             }
         }
     }
-    //ÕıÔÚÏÂÔØ»òÉÏ´«µÄÏîÊ¹ÓÃĞÅºÅÈÃÆäÍ£Ö¹
+    //æ­£åœ¨ä¸‹è½½æˆ–ä¸Šä¼ çš„é¡¹ä½¿ç”¨ä¿¡å·è®©å…¶åœæ­¢
     else
     {
         if (pItem->m_hCancelEvent != NULL)
@@ -118,7 +118,7 @@ void CFileTaskThread::HandleItem(CFileItemRequest* pFileItem)
     if (pFileItem == NULL || pFileItem->m_uType != NET_DATA_FILE)
         return;
 
-    //¿ªÊ¼½øĞĞ´¦Àí
+    //å¼€å§‹è¿›è¡Œå¤„ç†
     pFileItem->m_bPending = FALSE;
     m_pCurrentTransferringItem = pFileItem;
 
@@ -126,7 +126,7 @@ void CFileTaskThread::HandleItem(CFileItemRequest* pFileItem)
     CUploadFileResult* pUploadFileResult = new CUploadFileResult();
     if (pFileItem->m_nFileType == FILE_ITEM_UPLOAD_CHAT_OFFLINE_FILE)
     {
-        //ÉÏ´«ÎÄ¼şÈç¹ûÊ§°Ü£¬ÔòÖØÊÔÈı´Î
+        //ä¸Šä¼ æ–‡ä»¶å¦‚æœå¤±è´¥ï¼Œåˆ™é‡è¯•ä¸‰æ¬¡
         pUploadFileResult->m_uSenderID = pFileItem->m_uSenderID;
         pUploadFileResult->m_setTargetIDs = pFileItem->m_setTargetIDs;
         pUploadFileResult->m_nFileType = pFileItem->m_nFileType;
@@ -144,23 +144,23 @@ void CFileTaskThread::HandleItem(CFileItemRequest* pFileItem)
             ++pFileItem->m_nRetryTimes;
         }
 
-        //³ı·ÇÓÃ»§È¡Ïû£¬·ñÔòÉÏ´«³É¹¦»òÊ§°Ü¶¼Òª¸æËß¶Ô·½
+        //é™¤éç”¨æˆ·å–æ¶ˆï¼Œå¦åˆ™ä¸Šä¼ æˆåŠŸæˆ–å¤±è´¥éƒ½è¦å‘Šè¯‰å¯¹æ–¹
         if (nRetCode != FILE_UPLOAD_USERCANCEL)
         {
             //SendConfirmMessage(pUploadFileResult);
 
-            //¿ËÂ¡Ò»·İÉÏ´«½á¹ûÊı¾İÒÔÓÃÓÚPostMessage
+            //å…‹éš†ä¸€ä»½ä¸Šä¼ ç»“æœæ•°æ®ä»¥ç”¨äºPostMessage
             CUploadFileResult* pResult = new CUploadFileResult();
             pResult->Clone(pUploadFileResult);
             long nSendFileResultCode = (nRetCode == FILE_UPLOAD_SUCCESS ? SEND_FILE_SUCCESS : SEND_FILE_FAILED);
-            //Èç¹û¶Ô»°¿òÒÑ¾­¹Ø±Õ£¬ÔòÖ±½Ó·¢¸ø´úÀí´°¿Ú
+            //å¦‚æœå¯¹è¯æ¡†å·²ç»å…³é—­ï¼Œåˆ™ç›´æ¥å‘ç»™ä»£ç†çª—å£
             if (::IsWindow(pFileItem->m_hwndReflection))
                 ::PostMessage(pFileItem->m_hwndReflection, FMG_MSG_SEND_FILE_RESULT, (WPARAM)nSendFileResultCode, (LPARAM)pResult);
             else
                 ::PostMessage(m_lpFMGClient->m_UserMgr.m_hProxyWnd, FMG_MSG_SEND_FILE_RESULT, (WPARAM)nSendFileResultCode, (LPARAM)pResult);
         }
     }
-    //ÏÂÔØÀëÏßÎÄ¼ş
+    //ä¸‹è½½ç¦»çº¿æ–‡ä»¶
     else if (pFileItem->m_nFileType == FILE_ITEM_DOWNLOAD_CHAT_OFFLINE_FILE)
     {
         long nRetCode;
@@ -175,14 +175,14 @@ void CFileTaskThread::HandleItem(CFileItemRequest* pFileItem)
             ::Sleep(3000);
         }
 
-        //TODO: Ó¦¸Ã¸Ä³ÉPostMessage
+        //TODO: åº”è¯¥æ”¹æˆPostMessage
         if (nRetCode == FILE_DOWNLOAD_SUCCESS)
             ::SendMessage(pFileItem->m_hwndReflection, FMG_MSG_RECV_FILE_RESULT, RECV_FILE_SUCCESS, (LPARAM)pFileItem);
         else if (nRetCode == FILE_DOWNLOAD_FAILED)
             ::SendMessage(pFileItem->m_hwndReflection, FMG_MSG_RECV_FILE_RESULT, RECV_FILE_FAILED, (LPARAM)pFileItem);
     }
 
-    //TODO: ¼ÇµÃÔÚ¶ÔÓ¦µÄÄ¿±ê´°¿Ú³öÉ¾³ı£¬·ñÔò»áÓĞÄÚ´æĞ¹Â¶
+    //TODO: è®°å¾—åœ¨å¯¹åº”çš„ç›®æ ‡çª—å£å‡ºåˆ é™¤ï¼Œå¦åˆ™ä¼šæœ‰å†…å­˜æ³„éœ²
     //delete pUploadFileResult;
     delete pFileItem;
 
@@ -194,7 +194,7 @@ void CFileTaskThread::HandleItem(CFileItemRequest* pFileItem)
 //	if(pUploadFileResult == NULL)
 //		return;
 //	
-//	//ÉÏ´«Í¼Æ¬½á¹û
+//	//ä¸Šä¼ å›¾ç‰‡ç»“æœ
 //	if(pUploadFileResult->m_nFileType == FILE_ITEM_UPLOAD_CHAT_IMAGE)
 //	{
 //		time_t nTime = time(NULL);
@@ -237,15 +237,15 @@ void CFileTaskThread::HandleItem(CFileItemRequest* pFileItem)
 //	}
 //}
 
-//TODO: ÕâÑù´ò¿ªÁËÁ½´ÎÎÄ¼ş£¬Íâ²¿Èç¹ûÖØÊÔ£¬Ôò»ñµÃÎÄ¼şmd5Ò²ÖØÊÔÁËÒ»´Î£¬ÖØÊÔµÄÖ»ÊÇÍøÂçÍ¨ĞÅ²¿·Ö
-//ĞŞ¸Äµô,¸Ä³É´ò¿ªÒ»´ÎÎÄ¼ş£¬ÖØÊÔÖ»ÖØÊÔÍøÂçÍ¨ĞÅ²¿·Ö¡£
+//TODO: è¿™æ ·æ‰“å¼€äº†ä¸¤æ¬¡æ–‡ä»¶ï¼Œå¤–éƒ¨å¦‚æœé‡è¯•ï¼Œåˆ™è·å¾—æ–‡ä»¶md5ä¹Ÿé‡è¯•äº†ä¸€æ¬¡ï¼Œé‡è¯•çš„åªæ˜¯ç½‘ç»œé€šä¿¡éƒ¨åˆ†
+//ä¿®æ”¹æ‰,æ”¹æˆæ‰“å¼€ä¸€æ¬¡æ–‡ä»¶ï¼Œé‡è¯•åªé‡è¯•ç½‘ç»œé€šä¿¡éƒ¨åˆ†ã€‚
 long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE hCancelEvent, CUploadFileResult& uploadFileResult)
 {
     _tcscpy_s(uploadFileResult.m_szLocalName, ARRAYSIZE(uploadFileResult.m_szLocalName), pszFileName);
 
-    //ÎÄ¼şmd5Öµ
+    //æ–‡ä»¶md5å€¼
     char szMd5[64] = { 0 };
-    //TODO: ÌáÊ¾ÓÃ»§ÕıÔÚĞ£ÑéÎÄ¼ş
+    //TODO: æç¤ºç”¨æˆ·æ­£åœ¨æ ¡éªŒæ–‡ä»¶
     FileProgress* pFileProgress = NULL;
     pFileProgress = new FileProgress();
     memset(pFileProgress, 0, sizeof(FileProgress));
@@ -259,13 +259,12 @@ long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE
     {
         LOG_INFO(_T("Failed to upload file:%s as unable to get file md5."), pszFileName);
         return FILE_UPLOAD_FAILED;
-    }
-    else if (nRetCode == GET_FILE_MD5_USERCANCEL)
+    } else if (nRetCode == GET_FILE_MD5_USERCANCEL)
     {
         LOG_INFO(_T("User cancel to upload file:%s."), pszFileName);
         return FILE_UPLOAD_USERCANCEL;
     }
-    //0×Ö½ÚµÄÎÄ¼ş²»ÄÜÉÏ´«
+    //0å­—èŠ‚çš„æ–‡ä»¶ä¸èƒ½ä¸Šä¼ 
     if (nFileSize == 0)
     {
         LOG_ERROR(_T("Failed to upload file:%s as file size is 0."), pszFileName);
@@ -295,10 +294,10 @@ long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE
         return FILE_UPLOAD_FAILED;
     }
 
-    //·½±ãhFileÔÚº¯Êıµ÷ÓÃ½áÊøÊ±×Ô¶¯¹Ø±Õ
+    //æ–¹ä¾¿hFileåœ¨å‡½æ•°è°ƒç”¨ç»“æŸæ—¶è‡ªåŠ¨å…³é—­
     CAutoFileHandle autoFile(hFile);
 
-    //ÎÄ¼şutf8¸ñÊ½Ãû³Æ
+    //æ–‡ä»¶utf8æ ¼å¼åç§°
     char szUtf8Name[MAX_PATH] = { 0 };
     EncodeUtil::UnicodeToUtf8(::PathFindFileName(pszFileName), szUtf8Name, ARRAYSIZE(szUtf8Name));
 
@@ -323,46 +322,49 @@ long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE
             LOG_ERROR(_T("Failed to upload file: %s as ReadFile error, errorCode: %d"), pszFileName, (int32_t)::GetLastError());
             break;
         }
-            
-        AtlTrace("eachfilesize = %lld", eachfilesize);
+
+        //AtlTrace("eachfilesize = %lld", eachfilesize);
         std::string filedata;
         filedata.append(buffer.GetBuffer(), (size_t)buffer.GetSize());
         writeStream.WriteString(filedata);
         writeStream.Flush();
         file_msg headerx = { outbuf.length() };
-        outbuf.insert(0, (const char*)& headerx, sizeof(headerx));
+        outbuf.insert(0, (const char*)&headerx, sizeof(headerx));
         if (!iusocket.SendOnFilePort(outbuf.c_str(), (int64_t)outbuf.length()))
         {
             LOG_ERROR(_T("Failed to upload file: %s as SendOnFilePort error."), pszFileName);
             break;
         }
-            
-        offsetX += eachfilesize;
+
+
         pFileProgress = new FileProgress();
         memset(pFileProgress, 0, sizeof(FileProgress));
         //AtlTrace(_T("nTotalSent:%d\n"), nTotalSent);
         //AtlTrace(_T("nFileSize:%d\n"), nFileSize);
-        //nTotalSent*100¿ÉÄÜ»á³¬³ölongµÄ·¶Î§£¬¹ÊÏÈÁÙÊ±×ª»»³É__int64
+        //nTotalSent*100å¯èƒ½ä¼šè¶…å‡ºlongçš„èŒƒå›´ï¼Œæ•…å…ˆä¸´æ—¶è½¬æ¢æˆ__int64
         pFileProgress->nPercent = (long)((__int64)offsetX * 100 / nFileSize);
-        AtlTrace(_T("pFileProgress->nPercent:%d, eachfilesize=%lld, offsetX:%lld, nFilesize: %lld\n"), pFileProgress->nPercent, eachfilesize, offsetX, nFileSize);
-        LOG_INFO(_T("pFileProgress->nPercent:%d, eachfilesize=%lld, offsetX:%lld, nFilesize: %lld\n"), pFileProgress->nPercent, eachfilesize, offsetX, nFileSize);
+        AtlTrace(_T("pFileProgress->nPercent: %d, eachfilesize: %lld, offsetX: %lld, filedataLength: %u, nFilesize: %lld\n"), pFileProgress->nPercent, eachfilesize, offsetX, filedata.length(), nFileSize);
+        LOG_INFO(_T("pFileProgress->nPercent: %d, eachfilesize: %lld, offsetX: %lld, filedataLength: %u, nFilesize: %lld\n"), pFileProgress->nPercent, eachfilesize, offsetX, filedata.length(), nFileSize);
         _tcscpy_s(pFileProgress->szDestPath, ARRAYSIZE(pFileProgress->szDestPath), pszFileName);
         ::PostMessage(hwndReflection, FMG_MSG_SEND_FILE_PROGRESS, 0, (LPARAM)pFileProgress);
 
+        //æ›´æ–°æˆä¸‹ä¸€æ¬¡çš„å‘é€åç§»é‡
+        offsetX += eachfilesize;
+
         file_msg header;
-        if (!iusocket.RecvOnFilePort((char*)& header, (int64_t)sizeof(header)))
+        if (!iusocket.RecvOnFilePort((char*)&header, (int64_t)sizeof(header)))
         {
             LOG_ERROR(_T("Failed to upload file: %s as recv header error."), pszFileName);
             break;
         }
-            
+
         CMiniBuffer recvBuf(header.packagesize);
         if (!iusocket.RecvOnFilePort(recvBuf.GetBuffer(), recvBuf.GetSize()))
         {
             LOG_ERROR(_T("Failed to upload file: %s as recv body error, bodysize: %lld"), pszFileName, header.packagesize);
             break;
         }
-            
+
         BinaryStreamReader readStream(recvBuf.GetBuffer(), (size_t)recvBuf.GetSize());
         int32_t cmd;
         if (!readStream.ReadInt32(cmd) || cmd != msg_type_upload_resp)
@@ -370,21 +372,21 @@ long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE
             LOG_ERROR(_T("Failed to upload file: %s as read cmd error."), pszFileName);
             break;
         }
-            
+
         //int seq;
         if (!readStream.ReadInt32(m_seq))
         {
             LOG_ERROR(_T("Failed to upload file: %s as read seq error."), pszFileName);
             break;
         }
-            
+
         int32_t nErrorCode = 0;
         if (!readStream.ReadInt32(nErrorCode))
         {
             LOG_ERROR(_T("Failed to upload file: %s as read ErrorCode error."), pszFileName);
             break;
         }
-            
+
         std::string filemd5;
         size_t md5length;
         if (!readStream.ReadString(&filemd5, 0, md5length) || md5length != 32)
@@ -392,21 +394,21 @@ long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE
             LOG_ERROR(_T("Failed to upload file: %s as read filemd5 error."), pszFileName);
             break;
         }
-            
+
         int64_t offset;
         if (!readStream.ReadInt64(offset))
         {
             LOG_ERROR(_T("Failed to upload file: %s as read offset error."), pszFileName);
             break;
         }
-            
+
         int64_t filesize;
         if (!readStream.ReadInt64(filesize))
         {
             LOG_ERROR(_T("Failed to upload file: %s as read filesize error."), pszFileName);
             break;
         }
-            
+
         std::string dummyfiledata;
         size_t filedatalength;
         if (!readStream.ReadString(&dummyfiledata, 0, filedatalength) || filedatalength != 0)
@@ -414,14 +416,14 @@ long CFileTaskThread::UploadFile(PCTSTR pszFileName, HWND hwndReflection, HANDLE
             LOG_ERROR(_T("Failed to upload file: %s as read dummyfiledata error."), pszFileName);
             break;
         }
-            
+
 
         if (nErrorCode == file_msg_error_complete)
         {
             FillUploadFileResult(uploadFileResult, pszFileName, filemd5.c_str(), nFileSize, szMd5);
-            LOG_INFO(_T("Succeed to upload file:%s as there already exist file on server."), pszFileName);
+            LOG_INFO(_T("Succeed to upload file: %s."), pszFileName);
 
-            //TODO: Èç¹ûÍâ²¿²»ÊÍ·ÅÔò»áÓĞÄÚ´æĞ¹Â¶
+            //TODO: å¦‚æœå¤–éƒ¨ä¸é‡Šæ”¾åˆ™ä¼šæœ‰å†…å­˜æ³„éœ²
             pFileProgress = new FileProgress();
             memset(pFileProgress, 0, sizeof(FileProgress));
             pFileProgress->nPercent = 100;
@@ -449,19 +451,19 @@ void CFileTaskThread::FillUploadFileResult(CUploadFileResult& uploadFileResult, 
 
 long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BOOL bOverwriteIfExist, HWND hwndReflection, HANDLE hCancelEvent)
 {
-    //TODO: È·¶¨ÊÇ·ñ¸²¸ÇµÄ·½·¨Ó¦¸ÃÊÇ¸ù¾İmd5ÖµÀ´ÅĞ¶Ï±¾µØµÄÎÄ¼şºÍÏÂÔØµÄÎÄ¼şÊÇ·ñÍêÈ«ÏàÍ¬
+    //TODO: ç¡®å®šæ˜¯å¦è¦†ç›–çš„æ–¹æ³•åº”è¯¥æ˜¯æ ¹æ®md5å€¼æ¥åˆ¤æ–­æœ¬åœ°çš„æ–‡ä»¶å’Œä¸‹è½½çš„æ–‡ä»¶æ˜¯å¦å®Œå…¨ç›¸åŒ
     if (Hootina::CPath::IsFileExist(lpszDestPath) && IUGetFileSize2(lpszDestPath) > 0 && !bOverwriteIfExist)
     {
         LOG_INFO(_T("File %s already exsited, there is no need to download."), lpszDestPath);
         return FILE_DOWNLOAD_SUCCESS;
     }
 
-    //Æ«ÒÆÁ¿
+    //åç§»é‡
     long nOffset = 0;
     long nBreakType = FILE_DOWNLOAD_SUCCESS;
 
     char* pBuffer = NULL;
-    //nCurrentContentSizeÎªµ±Ç°ÊÕµ½µÄ°üÖĞÎÄ¼şÄÚÈİ×Ö½ÚÊı´óĞ¡
+    //nCurrentContentSizeä¸ºå½“å‰æ”¶åˆ°çš„åŒ…ä¸­æ–‡ä»¶å†…å®¹å­—èŠ‚æ•°å¤§å°
     long nCurrentContentSize = 0;
     DWORD dwSizeToWrite = 0;
     DWORD dwSizeWritten = 0;
@@ -505,7 +507,7 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
         writeStream.Flush();
 
         file_msg header = { outbuf.length() };
-        outbuf.insert(0, (const char*)& header, sizeof(header));
+        outbuf.insert(0, (const char*)&header, sizeof(header));
 
         if (!iusocket.SendOnFilePort(outbuf.c_str(), (int64_t)outbuf.length()))
         {
@@ -515,7 +517,7 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
         }
 
         file_msg recvheader;
-        if (!iusocket.RecvOnFilePort((char*)& recvheader, (int64_t)sizeof(recvheader)))
+        if (!iusocket.RecvOnFilePort((char*)&recvheader, (int64_t)sizeof(recvheader)))
         {
             LOG_ERROR("DownloadFile %s error when recv header error", lpszFileName);
             nBreakType = FILE_DOWNLOAD_FAILED;
@@ -598,7 +600,7 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
 
         DWORD dwBytesWritten;
         if (!::WriteFile(hFile, filedata.c_str(), filedata.length(), &dwBytesWritten, NULL) || dwBytesWritten != filedata.length())
-        {          
+        {
             nBreakType = FILE_DOWNLOAD_FAILED;
             LOG_ERROR("DownloadFile %s error when WriteFile error, errorCode: %d", lpszFileName, (int32_t)::GetLastError());
             break;
@@ -606,7 +608,7 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
 
         offset += (int64_t)filedata.length();
 
-        //FIXME: ¶ÔÓÚ·ÇÏÂÔØÁÄÌìÍ¼Æ¬£¬Õâ¿éÄÚ´æÒòÎªÎ´ÊÍ·Å¶ø²úÉúÄÚ´æĞ¹Â¶£¡£¡£¡£¡
+        //FIXME: å¯¹äºéä¸‹è½½èŠå¤©å›¾ç‰‡ï¼Œè¿™å—å†…å­˜å› ä¸ºæœªé‡Šæ”¾è€Œäº§ç”Ÿå†…å­˜æ³„éœ²ï¼ï¼ï¼ï¼
         pFileProgress = new FileProgress();
         memset(pFileProgress, 0, sizeof(FileProgress));
         _tcscpy_s(pFileProgress->szDestPath, ARRAYSIZE(pFileProgress->szDestPath), lpszDestPath);
@@ -615,7 +617,7 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
         AtlTrace(_T("DownloadFile %s, percent: %d%%\n"), pFileProgress->szDestPath, pFileProgress->nPercent);
         LOG_INFO(_T("DownloadFile %s, percent: %d%%\n"), pFileProgress->szDestPath, pFileProgress->nPercent);
 
-        ::PostMessage(hwndReflection, FMG_MSG_RECV_FILE_PROGRESS, 0, (LPARAM)(pFileProgress));   
+        ::PostMessage(hwndReflection, FMG_MSG_RECV_FILE_PROGRESS, 0, (LPARAM)(pFileProgress));
 
         if (nErrorCode == file_msg_error_complete)
         {
@@ -626,7 +628,7 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
 
     iusocket.CloseFileServerConnection();
 
-    //ÏÂÔØ³É¹¦
+    //ä¸‹è½½æˆåŠŸ
     if (nBreakType == FILE_DOWNLOAD_SUCCESS)
     {
         //::CloseHandle(hFile);
@@ -637,14 +639,14 @@ long CFileTaskThread::DownloadFile(LPCSTR lpszFileName, LPCTSTR lpszDestPath, BO
         pFileProgress->nPercent = /*nOffset* 100 / nFileSize*/100;
         ::PostMessage(hwndReflection, FMG_MSG_RECV_FILE_PROGRESS, 0, (LPARAM)(pFileProgress));
     }
-    //ÏÂÔØÊ§°Ü»òÕßÓÃ»§È¡ÏûÏÂÔØ
+    //ä¸‹è½½å¤±è´¥æˆ–è€…ç”¨æˆ·å–æ¶ˆä¸‹è½½
     else
     {
         if (nBreakType == FILE_DOWNLOAD_FAILED)
             LOG_ERROR(_T("Failed to download file: %s."), lpszDestPath);
         else
             LOG_INFO(_T("User canceled to download file: %s."), lpszDestPath);
-        //ÎªÁËÄÜÉ¾³ıÏÂÔØµÄ°ë³ÉÆ·£¬ÏÔÊ½¹Ø±ÕÎÄ¼ş¾ä±ú
+        //ä¸ºäº†èƒ½åˆ é™¤ä¸‹è½½çš„åŠæˆå“ï¼Œæ˜¾å¼å…³é—­æ–‡ä»¶å¥æŸ„
         autoFileHandle.Release();
         ::DeleteFile(lpszDestPath);
     }
