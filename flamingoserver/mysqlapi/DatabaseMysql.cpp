@@ -37,8 +37,9 @@ bool CDatabaseMysql::initialize(const std::string& host, const std::string& user
     }
 
     m_Mysql = mysql_init(m_Mysql);
-    m_Mysql = mysql_real_connect(m_Mysql, host.c_str(), user.c_str(), pwd.c_str(), dbname.c_str(), 0, NULL, 0);
+	MYSQL* mysql = mysql_real_connect(m_Mysql, host.c_str(), user.c_str(), pwd.c_str(), dbname.c_str(), 0, NULL, 0);
 
+	
     //ClearStoredResults();
 
     //LOGI << "mysql info: host=" << host << ", user=" << user << ", password=" << pwd << ", dbname=" << dbname;
@@ -48,19 +49,21 @@ bool CDatabaseMysql::initialize(const std::string& host, const std::string& user
     m_DBInfo.strUser = user;
     m_DBInfo.strPwd = pwd;
 
-    if (m_Mysql)
+    if (mysql)
     {
         //LOGI << "m_Mysql address " << (long)m_Mysql;
         //LOGI << "CDatabaseMysql::Initialize, set names utf8";
-        mysql_query(m_Mysql, "set names utf8");
+        mysql_query(m_Mysql, "set names utf8mb4");
+		//mysql_set_character_set(m_Mysql, "utf8mb4");
         //mysql_query(m_Mysql, "set names latin1");
         m_bInit = true;
         return true;
     }
     else
     {
-        //LOGE << "Could not connect to MySQL database at " << host.c_str()
-        //    << ", " << mysql_error(m_Mysql);
+		//const char* p = mysql_error(m_Mysql);
+		LOGE("Could not connect to MySQL database at %s,%s", host.c_str(), mysql_error(m_Mysql));
+		//LOGE << "Could not connect to MySQL database at " << host.c_str() << ", " << mysql_error(m_Mysql);
         mysql_close(m_Mysql);
         return false;
     }
@@ -189,7 +192,7 @@ bool CDatabaseMysql::execute(const char* sql)
                     LOGE("sql error: %s, sql: %s", mysql_error(m_Mysql), sql);
                     //LOGE << "query ERROR: " << mysql_error(m_Mysql);
                 }
-            }
+			}
             else
             {
                 //LOGE << "SQL: " << sql;

@@ -114,6 +114,7 @@ bool CMysqlManager::init(const char* host, const char* user, const char* pwd, co
 	//注意：检查数据库是否存在时，需要将数据库名称设置为空
 	m_poConn.reset(new CDatabaseMysql());
     if (!m_poConn->initialize(m_strHost, m_strUser, m_strPassword, ""))
+	//if (!m_poConn->initialize(m_strHost, m_strUser, m_strPassword, m_strDataBase))
 	{
 		//LOG_FATAL << "CMysqlManager::Init failed, please check params(" << m_strHost << ", " << m_strUser << ", " << m_strPassword << ")";
 		return false;
@@ -305,7 +306,7 @@ bool CMysqlManager::createTable(const STableInfo& table)
 	}
 
     std::stringstream ss;
-	ss << "CREATE TABLE IF NOT EXISTS " << table.m_strName << " (";
+	ss << "CREATE TABLE IF NOT EXISTS " << table.m_strName << "(";
 	
 	for (std::map<std::string, STableField>::const_iterator it = table.m_mapField.begin();
 		it != table.m_mapField.end(); ++it)

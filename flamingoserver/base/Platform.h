@@ -64,7 +64,7 @@ public:
 };
 
 #else
-
+#error 1
 typedef int SOCKET;
 
 #define INVALID_SOCKET -1
