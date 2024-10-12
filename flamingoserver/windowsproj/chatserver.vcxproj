@@ -168,6 +168,9 @@
     <ClInclude Include="..\zlib1.2.11\zutil.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\etc\chatserver.conf" />
+    <None Include="..\etc\fileserver.conf" />
+    <None Include="..\etc\imgserver.conf" />
     <None Include="..\jsoncpp1.9.0\json_valueiterator.inl" />
   </ItemGroup>
   <ItemGroup>

@@ -229,6 +229,10 @@ bool CAsyncLog::output(long nLevel, const char* pszFileName, int nLineNo, const 
     if (m_bTruncateLongLog)
         strMsgFormal = strMsgFormal.substr(0, MAX_LINE_LENGTH);
 
+	if (!m_strFileName.empty())
+	{
+		strLine += "\n        ";
+	}
     strLine += strMsgFormal;
 
     //不是输出到控制台才会在每一行末尾加一个换行符
@@ -267,8 +271,7 @@ bool CAsyncLog::output(long nLevel, const char* pszFileName, int nLineNo, const 
 #endif
                 strftime(szNow, sizeof(szNow), "%Y%m%d%H%M%S", &time);
 
-                std::string strNewFileName(m_strFileName);
-                strNewFileName += ".";
+                std::string strNewFileName(szNow);
                 strNewFileName += szNow;
                 strNewFileName += ".";
                 strNewFileName += m_strFileNamePID;
@@ -497,13 +500,12 @@ void CAsyncLog::writeThreadProc()
 #else
                 localtime_r(&now, &time);
 #endif
-                strftime(szNow, sizeof(szNow), "%Y%m%d%H%M%S", &time);
+                strftime(szNow, sizeof(szNow), "%Y-%m-%d.%H_%M", &time);
 
-                std::string strNewFileName(m_strFileName);
-                strNewFileName += ".";
-                strNewFileName += szNow;
-                strNewFileName += ".";
-                strNewFileName += m_strFileNamePID;
+                std::string strNewFileName(szNow);
+                //strNewFileName += szNow;
+                //strNewFileName += ".";
+                //strNewFileName += m_strFileNamePID;
                 strNewFileName += ".log";
                 if (!createNewFile(strNewFileName.c_str()))
                     return;

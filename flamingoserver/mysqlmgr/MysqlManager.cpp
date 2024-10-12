@@ -269,15 +269,13 @@ bool CMysqlManager::checkTable(const STableInfo& table)
 		pResult->endQuery();
         delete pResult;
 
-		for (std::map<std::string, STableField>::const_iterator it = table.m_mapField.begin();
-			it != table.m_mapField.end(); ++it)
+		for (std::map<std::string, STableField>::const_iterator it = table.m_mapField.begin(); it != table.m_mapField.end(); ++it)
 		{
 			STableField field = it->second;
 			if (mapOldTable.find(field.m_strName) == mapOldTable.end())
 			{
                 std::stringstream ss;
-				ss << "alter table " << table.m_strName << " add column "
-					<< field.m_strName << " " << field.m_strType;
+				ss << "alter table " << table.m_strName << " add column " << field.m_strName << " " << field.m_strType;
 
                 std::string sql = ss.str();
 				if (m_poConn->execute(sql.c_str()))

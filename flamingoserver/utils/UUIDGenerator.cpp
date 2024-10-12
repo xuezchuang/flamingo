@@ -28,7 +28,7 @@ std::string UUIDGenerator::generate()
 
 #else
 
-#include <uuid.h>
+#include <uuid/uuid.h>
 
 std::string UUIDGenerator::generate()
 {

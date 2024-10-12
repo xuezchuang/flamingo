@@ -117,7 +117,8 @@ int main(int argc, char* argv[])
     logFileFullPath += logfilename;
 
 #ifdef _DEBUG
-    CAsyncLog::init();
+    //CAsyncLog::init();
+	CAsyncLog::init(logFileFullPath.c_str());
 #else
     CAsyncLog::init(logFileFullPath.c_str());
 #endif
@@ -141,14 +142,14 @@ int main(int argc, char* argv[])
     short listenport = (short)atol(config.getConfigName("listenport"));
     Singleton<ChatServer>::Instance().init(listenip, listenport, &g_mainLoop);
 
-    const char* monitorlistenip = config.getConfigName("monitorlistenip");
-    short monitorlistenport = (short)atol(config.getConfigName("monitorlistenport"));
-    const char* monitortoken = config.getConfigName("monitortoken");
-    Singleton<MonitorServer>::Instance().init(monitorlistenip, monitorlistenport, &g_mainLoop, monitortoken);
+    //const char* monitorlistenip = config.getConfigName("monitorlistenip");
+    //short monitorlistenport = (short)atol(config.getConfigName("monitorlistenport"));
+    //const char* monitortoken = config.getConfigName("monitortoken");
+    //Singleton<MonitorServer>::Instance().init(monitorlistenip, monitorlistenport, &g_mainLoop, monitortoken);
 
-    const char* httplistenip = config.getConfigName("monitorlistenip");
-    short httplistenport = (short)atol(config.getConfigName("httplistenport"));
-    Singleton<HttpServer>::Instance().init(httplistenip, httplistenport, &g_mainLoop);
+    //const char* httplistenip = config.getConfigName("monitorlistenip");
+    //short httplistenport = (short)atol(config.getConfigName("httplistenport"));
+    //Singleton<HttpServer>::Instance().init(httplistenip, httplistenport, &g_mainLoop);
 
     LOGI("chatserver initialization completed, now you can use client to connect it.");
 

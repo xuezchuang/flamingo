@@ -355,9 +355,10 @@ int sockets::getSocketError(SOCKET sockfd)
 {
     int optval;
 #ifdef WIN32
-    int optvallen = sizeof(optval);
-    if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char*)&optval, &optvallen) < 0)
-        return ::WSAGetLastError();
+	//optval = ::WSAGetLastError();
+	int optvallen = sizeof(optval);
+	if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char*)&optval, &optvallen) < 0)
+		return ::WSAGetLastError();
 #else
     socklen_t optlen = static_cast<socklen_t>(sizeof optval);
 

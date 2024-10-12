@@ -25,6 +25,9 @@
     <Filter Include="chatserversrc">
       <UniqueIdentifier>{d9196d7f-1f47-46ce-aa16-ea105de881c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="etc">
+      <UniqueIdentifier>{2606dffb-3800-4f99-817c-41a11c216d0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\net\Acceptor.cpp">
@@ -468,6 +471,15 @@
   <ItemGroup>
     <None Include="..\jsoncpp1.9.0\json_valueiterator.inl">
       <Filter>jsoncpp1.9.0</Filter>
+    </None>
+    <None Include="..\etc\chatserver.conf">
+      <Filter>etc</Filter>
+    </None>
+    <None Include="..\etc\fileserver.conf">
+      <Filter>etc</Filter>
+    </None>
+    <None Include="..\etc\imgserver.conf">
+      <Filter>etc</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

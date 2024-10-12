@@ -318,8 +318,16 @@ void TcpConnection::handleRead(Timestamp receiveTime)
         handleClose();
     }
     else
-    {
-        errno = savedErrno;
+	{
+		errno = savedErrno;
+#ifdef WIN32
+		if (savedErrno == WSAECONNRESET)
+		{
+			LOGE("TcpConnection::%s handleError [%d] - SO_ERROR = An existing connection was forcibly closed by the remote host.", m_name.c_str(), savedErrno);
+			handleClose();
+			return;
+		}
+#endif
         LOGSYSE("TcpConnection::handleRead");
         handleError();
     }
